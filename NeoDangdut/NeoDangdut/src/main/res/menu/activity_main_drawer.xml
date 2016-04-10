@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<!--
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_camera"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Import" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Gallery" />
+        <item
+            android:id="@+id/nav_slideshow"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Slideshow" />
+        <item
+            android:id="@+id/nav_manage"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Tools" />
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Send" />
+        </menu>
+    </item>
+-->
+
+    <group
+        android:id="@+id/group_post"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_new_post"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="New Posts"/>
+    </group>
+
+    <group
+        android:id="@+id/group_library"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_library"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Library"/>
+    </group>
+
+    <group
+        android:id="@+id/group_shop"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_shop"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Shop">
+            <menu>
+                <item
+                    android:id="@+id/nav_music"
+                    android:icon="@drawable/ic_menu_manage"
+                    android:title="Music"/>
+
+                <item
+                    android:id="@+id/nav_video"
+                    android:icon="@drawable/ic_menu_manage"
+                    android:title="Video"/>
+            </menu>
+        </item>
+    </group>
+
+    <group
+        android:id="@+id/group_downloads"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_downloads"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Downloads"/>
+    </group>
+
+    <group
+        android:id="@+id/group_misc"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Settings"/>
+
+        <item
+            android:id="@+id/nav_signout"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Sign Out"/>
+    </group>
+</menu>
