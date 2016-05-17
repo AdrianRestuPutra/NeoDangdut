@@ -1,46 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-<!--
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
-    </group>
+    <!--
+        <group android:checkableBehavior="single">
+            <item
+                android:id="@+id/nav_camera"
+                android:icon="@drawable/ic_menu_camera"
+                android:title="Import" />
+            <item
+                android:id="@+id/nav_gallery"
+                android:icon="@drawable/ic_menu_gallery"
+                android:title="Gallery" />
+            <item
+                android:id="@+id/nav_slideshow"
+                android:icon="@drawable/ic_menu_slideshow"
+                android:title="Slideshow" />
+            <item
+                android:id="@+id/nav_manage"
+                android:icon="@drawable/ic_menu_manage"
+                android:title="Tools" />
+        </group>
 
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
-        </menu>
-    </item>
--->
+        <item android:title="Communicate">
+            <menu>
+                <item
+                    android:id="@+id/nav_share"
+                    android:icon="@drawable/ic_menu_share"
+                    android:title="Share" />
+                <item
+                    android:id="@+id/nav_send"
+                    android:icon="@drawable/ic_menu_send"
+                    android:title="Send" />
+            </menu>
+        </item>
+    -->
 
     <group
         android:id="@+id/group_post"
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_new_post"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="New Posts"/>
+            android:icon="@drawable/icon_sidebar_home"
+            android:title="Home" />
     </group>
 
     <group
@@ -48,8 +48,8 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_library"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Library"/>
+            android:icon="@drawable/icon_sidebar_library"
+            android:title="Library" />
     </group>
 
     <group
@@ -57,18 +57,26 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_shop"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/icon_sidebar_shop"
             android:title="Shop">
             <menu>
-                <item
-                    android:id="@+id/nav_music"
-                    android:icon="@drawable/ic_menu_manage"
-                    android:title="Music"/>
+                <group
+                    android:id="@+id/nav_shop_music"
+                    android:checkableBehavior="single">
+                    <item
+                        android:id="@+id/nav_music"
+                        android:icon="@drawable/icon_sidebar_music"
+                        android:title="Music" />
+                </group>
 
-                <item
-                    android:id="@+id/nav_video"
-                    android:icon="@drawable/ic_menu_manage"
-                    android:title="Video"/>
+                <group
+                    android:id="@+id/nav_shop_video"
+                    android:checkableBehavior="single">
+                    <item
+                        android:id="@+id/nav_video"
+                        android:icon="@drawable/icon_sidebar_video"
+                        android:title="Video" />
+                </group>
             </menu>
         </item>
     </group>
@@ -78,8 +86,8 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_downloads"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Downloads"/>
+            android:icon="@drawable/icon_sidebar_downloads"
+            android:title="Downloads" />
     </group>
 
     <group
@@ -88,11 +96,11 @@
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Settings"/>
+            android:title="Settings" />
 
         <item
             android:id="@+id/nav_signout"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Sign Out"/>
+            android:title="Sign Out" />
     </group>
 </menu>

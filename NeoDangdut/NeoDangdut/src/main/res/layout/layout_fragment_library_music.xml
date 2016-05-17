@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_bg">
+
+    <GridView
+        android:id="@+id/list_view_library_music"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:horizontalSpacing="@dimen/library_horizontal_spacing"
+        android:verticalSpacing="@dimen/library_vertical_spacing"
+        android:numColumns="5">
+
+    </GridView>
+
+    <LinearLayout
+        android:id="@+id/library_music_album_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/blue_semi_transparent"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <!-- Thumbnail -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/lib_music_album_view_thumbnail_container_height"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/lib_music_thumbnail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/ic_menu_camera"/>
+            </RelativeLayout>
+
+            <!-- Album Title -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:layout_weight="2">
+
+                <TextView
+                    android:id="@+id/lib_music_album_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Album Title"
+                    android:textSize="@dimen/lib_music_album_view_title"
+                    android:textColor="@color/white_font"/>
+
+                <TextView
+                    android:id="@+id/lib_music_album_artist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Artist Name"
+
+                    android:textColor="@color/white_font"/>
+            </LinearLayout>
+
+            <!-- Option -->
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3">
+
+            </RelativeLayout>
+        </LinearLayout>
+        <!-- Thumbnail End -->
+
+        <!-- Title -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/lib_music_album_view_title_container_height"
+            android:background="@color/black_semi_transparent"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="Album Tracks"
+                    android:textColor="@color/white_font"/>
+            </RelativeLayout>
+
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_weight="1.2">
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <!-- TODO play -->
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <!-- TODO shuffle -->
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <!-- TODO loop -->
+                </RelativeLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+        <!-- End Title -->
+
+        <!-- List -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ListView
+                android:id="@+id/lib_music_album_listview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"></ListView>
+        </RelativeLayout>
+        <!-- List End -->
+
+    </LinearLayout>
+</RelativeLayout>

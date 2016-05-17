@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".activities.MainActivity"
+    tools:showIn="@layout/app_bar_main">
+
+    <!-- Home -->
+    <RelativeLayout
+        android:id="@+id/panel_new_post"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/main_bg"
+        android:visibility="visible">
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/sliding_tab_new_post"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_pager_tab"
+            android:layout_marginRight="@dimen/margin_pager_tab"
+            android:fillViewport="false"
+            app:tabIndicatorColor="@color/tab_indicator"
+            app:tabMode="scrollable"
+            app:tabMinWidth="@dimen/tab_scrollable_min_width"
+            app:tabSelectedTextColor="@color/tab_indicator"
+            app:tabTextAppearance="@style/CustomHomeTab"
+            app:tabTextColor="@color/white_font">
+
+        </android.support.design.widget.TabLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager_main_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/sliding_tab_new_post">
+
+        </android.support.v4.view.ViewPager>
+    </RelativeLayout>
+
+    <!-- Library -->
+    <RelativeLayout
+        android:id="@+id/panel_library"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/main_bg"
+        android:visibility="invisible">
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/sliding_tab_library"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_pager_tab"
+            android:layout_marginRight="@dimen/margin_pager_tab"
+            android:fillViewport="false"
+            app:tabIndicatorColor="@color/tab_indicator"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/tab_indicator"
+            app:tabTextAppearance="@style/CustomLibraryTab"
+            app:tabTextColor="@color/white_font">
+
+        </android.support.design.widget.TabLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager_library"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/sliding_tab_library">
+
+        </android.support.v4.view.ViewPager>
+    </RelativeLayout>
+
+    <!-- Shop Music -->
+
+    <RelativeLayout
+        android:id="@+id/panel_shop_music"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/main_bg"
+        android:visibility="invisible">
+
+        <!-- TODO create shop music panel -->
+        <android.support.design.widget.TabLayout
+            android:id="@+id/sliding_tab_shop_music"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_pager_tab"
+            android:layout_marginRight="@dimen/margin_pager_tab"
+            android:fillViewport="false"
+            app:tabIndicatorColor="@color/tab_indicator"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/tab_indicator"
+            app:tabTextAppearance="@style/CustomShopTab"
+            app:tabTextColor="@color/white_font">
+
+        </android.support.design.widget.TabLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager_shop_music"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/sliding_tab_shop_music">
+
+        </android.support.v4.view.ViewPager>
+    </RelativeLayout>
+
+    <!-- Shop Video -->
+
+    <RelativeLayout
+        android:id="@+id/panel_shop_video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/main_bg"
+        android:visibility="invisible">
+
+        <!-- TODO create shop video panel -->
+        <android.support.design.widget.TabLayout
+            android:id="@+id/sliding_tab_shop_video"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_pager_tab"
+            android:layout_marginRight="@dimen/margin_pager_tab"
+            android:fillViewport="false"
+            app:tabIndicatorColor="@color/tab_indicator"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/tab_indicator"
+            app:tabTextAppearance="@style/CustomShopTab"
+            app:tabTextColor="@color/white_font">
+
+        </android.support.design.widget.TabLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager_shop_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/sliding_tab_shop_video">
+
+        </android.support.v4.view.ViewPager>
+    </RelativeLayout>
+
+    <!-- Download -->
+
+    <RelativeLayout
+        android:id="@+id/panel_downloads"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        android:visibility="invisible">
+
+        <!-- TODO create download panel -->
+    </RelativeLayout>
+
+</RelativeLayout>

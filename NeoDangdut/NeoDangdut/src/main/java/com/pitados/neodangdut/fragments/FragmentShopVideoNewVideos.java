@@ -1,5 +1,6 @@
 package com.pitados.neodangdut.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,17 +13,27 @@ import com.pitados.neodangdut.R;
 /**
  * Created by adrianrestuputranto on 4/10/16.
  */
-public class FragmentMusic extends Fragment {
+public class FragmentShopVideoNewVideos extends Fragment {
+    private Context context;
     private int pageNumber;
     private String pageTitle;
 
-    public static FragmentMusic newInstance(int page, String title) {
-        FragmentMusic home = new FragmentMusic();
+    // TODO widgets
+
+    public static FragmentShopVideoNewVideos newInstance(int page, String title) {
+        FragmentShopVideoNewVideos home = new FragmentShopVideoNewVideos();
         Bundle args = new Bundle();
         args.putInt(Consts.FRAGMENT_PAGE_NUMBER_KEY, page);
         args.putString(Consts.FRAGMENT_PAGE_TITLE_KEY, title);
         home.setArguments(args);
         return home;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        this.context = context;
     }
 
     @Override
@@ -37,6 +48,7 @@ public class FragmentMusic extends Fragment {
 
         View view = inflater.inflate(R.layout.layout_fragment_music, container, false);
         // TODO init widgets
+
 
         return view;
     }

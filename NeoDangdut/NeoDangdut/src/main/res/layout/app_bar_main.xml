@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/main_bg"
     android:fitsSystemWindows="true"
-    tools:context="com.pitados.neodangdut.MainActivity">
+    tools:context=".activities.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -16,19 +18,182 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@color/main_bg"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:background="@color/tab_divider"/>
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_home" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
+
+    <include layout="@layout/content_all" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email" />
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
+
+        <com.getbase.floatingactionbutton.FloatingActionsMenu
+            android:id="@+id/fab_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            app:fab_addButtonColorNormal="@color/fab_default_color"
+            app:fab_addButtonColorPressed="@color/fab_pressed_color"
+            app:fab_addButtonSize="normal"
+            app:fab_labelStyle="@style/menu_labels_style"
+            app:fab_labelsPosition="left">
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_upload_music"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_colorNormal="@color/fab_default_color"
+                app:fab_colorPressed="@color/fab_pressed_color"
+                app:fab_size="mini"
+                app:fab_title="Upload Music"
+                app:fab_icon="@drawable/icon_fab_music"/>
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_upload_video"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_colorNormal="@color/fab_default_color"
+                app:fab_colorPressed="@color/fab_pressed_color"
+                app:fab_size="mini"
+                app:fab_title="Upload video"
+                app:fab_icon="@drawable/icon_fab_vid"/>
+
+        </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+        <!-- Music Player -->
+
+        <LinearLayout
+            android:id="@+id/music_player_panel"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/music_player_height"
+            android:background="@color/colorPrimaryDark"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:layout_width="@dimen/music_player_thumbnail_container_width"
+                android:layout_height="match_parent"
+                android:background="@color/black_panel">
+
+                <ImageView
+                    android:id="@+id/music_player_thumbnail"
+                    android:layout_width="@dimen/music_player_thumbnail_width"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/ic_menu_gallery" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+
+                <!-- Title and Artist -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1.5"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:paddingLeft="@dimen/music_player_title_padding">
+
+                    <TextView
+                        android:id="@+id/music_player_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Song Title"
+                        android:textColor="@color/white_font" />
+
+                    <TextView
+                        android:id="@+id/music_player_artist"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Artist Name"
+                        android:textColor="@color/white_font" />
+                </LinearLayout>
+                <!-- End of Title and Artist -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="8">
+
+                        <SeekBar
+                            android:id="@+id/music_player_progress"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:progress="0" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/music_player_pause"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:layout_width="@dimen/music_player_button_icon_width"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/ic_menu_share" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:id="@+id/music_player_random"
+                            android:layout_width="@dimen/music_player_button_icon_width"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/ic_menu_slideshow" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:id="@+id/music_player_loop"
+                            android:layout_width="@dimen/music_player_button_icon_width"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/ic_menu_camera" />
+                    </RelativeLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
