@@ -6,9 +6,16 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
+import com.pitados.neodangdut.custom.CustomListShopMusicAdapter;
+import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.DataPool;
 
 /**
  * Created by adrianrestuputranto on 4/10/16.
@@ -19,6 +26,10 @@ public class FragmentShopMusicNewSongs extends Fragment {
     private String pageTitle;
 
     // TODO widgets
+    private TextView topTitle;
+    private ListView listNewSongs;
+
+    private CustomListShopMusicAdapter listAdapter;
 
     public static FragmentShopMusicNewSongs newInstance(int page, String title) {
         FragmentShopMusicNewSongs home = new FragmentShopMusicNewSongs();
@@ -46,10 +57,41 @@ public class FragmentShopMusicNewSongs extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.layout_fragment_music, container, false);
+        View view = inflater.inflate(R.layout.layout_fragment_shop_music_top_50, container, false);
         // TODO init widgets
 
+        topTitle = (TextView) view.findViewById(R.id.shop_music_top_50_title);
+        topTitle.setText("TOP 50 NEW SONGS");
+
+        listNewSongs = (ListView) view.findViewById(R.id.shop_music_top_50_listview);
+        listNewSongs.setFocusable(false);
+
+        loadData();
+
+        listNewSongs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(context, "TODO on item "+i, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return view;
+    }
+
+    public void loadData() {
+        if(DataPool.getInstance().listShopMusicNewSongs.size() > 0) {
+            listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicNewSongs);
+            listNewSongs.setAdapter(listAdapter);
+        }
+
+        ApiManager.getInstance().setOnShopMusicNewSongsListener(new ApiManager.OnShopMusicNewSongsReceived() {
+            @Override
+            public void onDataLoaded(ApiManager.ApiType type) {
+                listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicNewSongs);
+                listNewSongs.setAdapter(listAdapter);
+
+                listAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }

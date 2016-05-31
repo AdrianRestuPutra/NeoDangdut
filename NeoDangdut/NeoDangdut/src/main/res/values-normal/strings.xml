@@ -3,6 +3,9 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    
+    <!-- FB -->
+    <string name="facebook_app_id">1725744334341622</string>
 
     <!-- toolbar -->
     <string name="action_settings">Settings</string>

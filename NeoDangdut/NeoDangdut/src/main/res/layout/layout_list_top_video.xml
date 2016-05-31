@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/top_video_thumbnail_container_height">
         <ImageView
+            android:id="@+id/list_view_top_video_thumbnail"
             android:layout_width="@dimen/top_video_thumbnail_width"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
@@ -49,6 +50,6 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:adjustViewBounds="true"
-            android:src="@drawable/ic_menu_manage"/>
+            android:src="@drawable/icon_more_white"/>
     </RelativeLayout>
 </LinearLayout>

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -73,27 +72,7 @@ public class FragmentLibraryVideo extends Fragment implements AdapterView.OnItem
         listViewVideo = (GridView) view.findViewById(R.id.list_view_library_video);
 
         // Video Player
-        videoPlayerPanel = (LinearLayout) view.findViewById(R.id.video_player_panel);
-        videoPlayerPanel.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN :
-                        StateManager.isTopView = true;
-                        return true;
 
-                    case MotionEvent.ACTION_UP :
-                        StateManager.isTopView = false;
-                        return true;
-                }
-                return false;
-            }
-        });
-
-        // TODO insert widget id
-        videoView = (EMVideoView) view.findViewById(R.id.library_video_view);
-
-        CustomMediaPlayer.getInstance().setVideoPanel(videoPlayerPanel, videoView);
 
         isVideoPlayerShowing = false;
 
@@ -120,8 +99,8 @@ public class FragmentLibraryVideo extends Fragment implements AdapterView.OnItem
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         if(adapterView == listViewVideo && !isVideoPlayerShowing && !StateManager.isTopView) {
             Toast.makeText(context, "TODO handle lib video item : " + i, Toast.LENGTH_SHORT).show();
-            CustomMediaPlayer.getInstance().playVideo(Consts.VIDEO_SAMPLE_URL);
-            isVideoPlayerShowing = true;
+
+//            isVideoPlayerShowing = true;
 //            ConnManager.getInstance().downloadFile(Consts.VIDEO_SAMPLE_URL, ConnManager.DataType.VIDEO, null, "Video-"+i);
         }
     }

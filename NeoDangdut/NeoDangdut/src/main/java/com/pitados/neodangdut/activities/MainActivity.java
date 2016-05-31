@@ -22,12 +22,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.devbrackets.android.exomedia.EMVideoView;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomPagerAdapter;
@@ -45,8 +50,10 @@ import com.pitados.neodangdut.fragments.FragmentShopVideoAllVideos;
 import com.pitados.neodangdut.fragments.FragmentShopVideoNewVideos;
 import com.pitados.neodangdut.fragments.FragmentShopVideoTopVideos;
 import com.pitados.neodangdut.model.FragmentModel;
+import com.pitados.neodangdut.util.ApiManager;
 import com.pitados.neodangdut.util.ConnManager;
 import com.pitados.neodangdut.util.CustomMediaPlayer;
+import com.pitados.neodangdut.util.DataPool;
 import com.pitados.neodangdut.util.StateManager;
 
 import org.onepf.oms.OpenIabHelper;
@@ -75,14 +82,28 @@ public class MainActivity extends AppCompatActivity
     // Panel
     private RelativeLayout panelNewPost, panelLibrary, panelShopMusic, panelShopVideo, panelDownloads;
     // Media Panel
-    private LinearLayout panelMusicPlayer, panelVideoPlayer;
-    private RelativeLayout musicPlayerPauseButton;
+    private LinearLayout panelMusicPlayer;
+    private RelativeLayout musicPlayerPauseButton, musicPlayerShuffleButton, musicPlayerLoopbutton;
+    private ImageView musicPlayerPauseIcon;
+    private ImageView musicPlayerThumbnail;
+    private TextView musicPlayerTitle, musicPlayerArtistName, musicPlayerDuration;
     private SeekBar musicPlayerProgress;
+    // VIDEO
+    private RelativeLayout panelVideoPlayer;
+    private EMVideoView videoView;
+    // TODO widget video
+    private TextView videoDate, videoDescription;
+    // NEWS
+    private RelativeLayout panelNewsDetail;
+    private ImageView newsDetailThumbnail;
+    private TextView newsDetailTitle;
+    private TextView newsDetailDate;
+    private TextView newsDetailDescription;
 
     // Fragments
     private ViewPager viewPagerNewPost, viewPagerLibrary, viewPagerShopMusic, viewPagerShopVideo;
     private TabLayout slidingTabNewPost, slidingTabLibrary, slidingTabShopMusic, slidingTabShopVideo;
-    private CustomPagerAdapter pagerAdapterNewPost, pagerAdapterLibrary, pagerAdapterShopMusic, pagerAdapterShopVideo;
+    private CustomPagerAdapter pagerAdapterHome, pagerAdapterLibrary, pagerAdapterShopMusic, pagerAdapterShopVideo;
 
     // In App Purchase
     private String storeKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5F8fASyrDFdaXrkoW8kNtwH5JIkLnNuTD5uE1a37TbI5LDZRVgvMIYAtZ9CAHAfLnJ6OEZt0lvLLJSKVuS47VqYVhGZciOkX8TEihONBRwis6i9A3JnKfyqm0iiT+P0CEktOLuFLROIo13utCIO++6h7A7/WLfxNV+Jnxfs9OEHyyPS+MdHxa0wtZGeAGiaN65BymsBQo7J/ABt2DFyMJP1R/nJM45F8yu4D6wSkUNKzs/QbPfvHJQzq56/B/hbx59EkzkInqC567hrlUlX4bU5IvOTF/B1G+UMuKg80m3I1IcQk4FD2D9oJ3E+8IXG/1UdejrOsmqDAzE7LkMl8xwIDAQAB";
@@ -123,6 +144,10 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        musicPlayerTitle = (TextView) findViewById(R.id.music_player_title);
+        musicPlayerArtistName = (TextView) findViewById(R.id.music_player_artist);
+
+        musicPlayerPauseIcon = (ImageView) findViewById(R.id.music_player_pause_icon);
         musicPlayerPauseButton = (RelativeLayout) findViewById(R.id.music_player_pause);
         musicPlayerPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,13 +156,53 @@ public class MainActivity extends AppCompatActivity
             }
         });
         musicPlayerProgress = (SeekBar) findViewById(R.id.music_player_progress);
+        musicPlayerThumbnail = (ImageView) findViewById(R.id.music_player_thumbnail);
+        musicPlayerShuffleButton = (RelativeLayout) findViewById(R.id.music_player_random);
+        musicPlayerLoopbutton = (RelativeLayout) findViewById(R.id.music_player_loop);
+        musicPlayerDuration = (TextView) findViewById(R.id.music_player_duration);
 
-        CustomMediaPlayer.getInstance().setAudioPanel(this, panelMusicPlayer, musicPlayerProgress);
-//        CustomMediaPlayer.getInstance().playTrack(Consts.AUDIO_SAMPLE_URL);
+        panelVideoPlayer = (RelativeLayout) findViewById(R.id.video_player_panel);
+        panelVideoPlayer.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN :
+                        StateManager.isTopView = true;
+                        return true;
+
+                    case MotionEvent.ACTION_UP :
+                        StateManager.isTopView = false;
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        // TODO insert widget id
+        videoView = (EMVideoView) findViewById(R.id.video_player_view);
+        videoDate = (TextView) findViewById(R.id.video_player_detail_date);
+        videoDate = (TextView) findViewById(R.id.video_player_detail_description);
+
+
+        panelNewsDetail = (RelativeLayout) findViewById(R.id.news_detail);
+        newsDetailThumbnail = (ImageView) findViewById(R.id.news_detail_thumbnail);
+        newsDetailTitle = (TextView) findViewById(R.id.news_detail_title);
+        newsDetailDate = (TextView) findViewById(R.id.news_detail_date);
+        newsDetailDescription = (TextView) findViewById(R.id.news_detail_description);
+
+        CustomMediaPlayer.getInstance().setAudioPanel(this, panelMusicPlayer, musicPlayerProgress, musicPlayerDuration,
+                musicPlayerThumbnail, musicPlayerTitle, musicPlayerArtistName, musicPlayerPauseIcon);
+
+        CustomMediaPlayer.getInstance().setVideoPanel(panelVideoPlayer, videoView, videoDate, videoDescription);
+
+        CustomMediaPlayer.getInstance().setNewsPanel(panelNewsDetail, newsDetailThumbnail, newsDetailTitle, newsDetailDate, newsDetailDescription);
 
         // init state
         panelState = PanelState.PANEL_NEW_POST;
         ConnManager.getInstance().init(getBaseContext());
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
+        ImageLoader.getInstance().init(config);
 
         // Set base directory
         PackageManager pm = getPackageManager();
@@ -196,6 +261,32 @@ public class MainActivity extends AppCompatActivity
         initPanelShopVideo();
         // TODO init download
 
+        // Load All data
+        ApiManager.getInstance().getToken();
+        ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
+            @Override
+            public void onTokenSaved() {
+                ApiManager.getInstance().getHomeBanner();
+                ApiManager.getInstance().getHomeTopMusic();
+                ApiManager.getInstance().getHomeTopVideos();
+                ApiManager.getInstance().getHomeLatestNews();
+                // Community
+                ApiManager.getInstance().getCommunityMusic();
+                ApiManager.getInstance().getCommunityVideo();
+                ApiManager.getInstance().getAllNews();
+                // SHOP MUSIC
+                ApiManager.getInstance().getShopMusicTopSongs();
+                ApiManager.getInstance().getShopMusicTopAlbums();
+                ApiManager.getInstance().getShopMusicNewSongs();
+//                ApiManager.getInstance().getShopMusicAllSongs();
+                // SHOP VIDEO
+                ApiManager.getInstance().getShopVideoTopVideos();
+                ApiManager.getInstance().getShopVideoNewVideos();
+//                ApiManager.getInstance().getShopVideoAllVideos();
+                // TODO library
+
+            }
+        });
     }
 
     private void initOpenIAB() {
@@ -231,8 +322,8 @@ public class MainActivity extends AppCompatActivity
         list.add(new FragmentModel(3, "News", FragmentHomeNews.newInstance(3, "News")));
 
         viewPagerNewPost = (ViewPager) findViewById(R.id.pager_main_content);
-        pagerAdapterNewPost = new CustomPagerAdapter(getSupportFragmentManager(), list);
-        viewPagerNewPost.setAdapter(pagerAdapterNewPost);
+        pagerAdapterHome = new CustomPagerAdapter(getSupportFragmentManager(), list);
+        viewPagerNewPost.setAdapter(pagerAdapterHome);
 
         slidingTabNewPost = (TabLayout)findViewById(R.id.sliding_tab_new_post);
         slidingTabNewPost.setupWithViewPager(viewPagerNewPost);
@@ -274,7 +365,7 @@ public class MainActivity extends AppCompatActivity
         List<FragmentModel> list = new ArrayList<>();
         list.add(new FragmentModel(0, "Top Videos", FragmentShopVideoTopVideos.newInstance(0, "Top Videos")));
         list.add(new FragmentModel(1, "New Videos", FragmentShopVideoNewVideos.newInstance(1, "New Videos")));
-        list.add(new FragmentModel(1, "All Videos", FragmentShopVideoAllVideos.newInstance(2, "All Videos")));
+        list.add(new FragmentModel(2, "All Videos", FragmentShopVideoAllVideos.newInstance(2, "All Videos")));
 
         viewPagerShopVideo = (ViewPager) findViewById(R.id.pager_shop_video);
         pagerAdapterShopVideo = new CustomPagerAdapter(getSupportFragmentManager(), list);
@@ -287,18 +378,23 @@ public class MainActivity extends AppCompatActivity
     private RelativeLayout getCurrentPanel(PanelState state) {
         switch (state) {
             case PANEL_NEW_POST:
+                Log.d("CURRENT PANEL", "HOME");
                 return panelNewPost;
 
             case PANEL_LIBRARY:
+                Log.d("CURRENT PANEL", "LIBRARY");
                 return panelLibrary;
 
             case PANEL_SHOP_MUSIC:
+                Log.d("CURRENT PANEL", "SHOP MUSIC");
                 return panelShopMusic;
 
             case PANEL_SHOP_VIDEO:
+                Log.d("CURRENT PANEL", "SHOP VIDEO");
                 return panelShopVideo;
 
             case PANEL_DOWNLOAD:
+                Log.d("CURRENT PANEL", "DOWNLOAD");
                 return panelDownloads;
         }
         return null;
@@ -313,24 +409,33 @@ public class MainActivity extends AppCompatActivity
                 panelNewPost.setVisibility(View.VISIBLE);
                 panelState = PanelState.PANEL_NEW_POST;
                 fabMenu.setVisibility(View.VISIBLE);
+
+                // TODO load data
                 break;
 
             case PANEL_LIBRARY:
                 panelLibrary.setVisibility(View.VISIBLE);
                 panelState = PanelState.PANEL_LIBRARY;
                 fabMenu.setVisibility(View.INVISIBLE);
+
+                // TODO load data music
                 break;
 
             case PANEL_SHOP_MUSIC:
                 panelShopMusic.setVisibility(View.VISIBLE);
                 panelState = PanelState.PANEL_SHOP_MUSIC;
                 fabMenu.setVisibility(View.INVISIBLE);
+
+//                FragmentShopMusicTopSongs tempFragment = (FragmentShopMusicTopSongs) pagerAdapterShopMusic.getItem(0);
+//                tempFragment.loadData();
                 break;
 
             case PANEL_SHOP_VIDEO:
                 panelShopVideo.setVisibility(View.VISIBLE);
                 panelState = PanelState.PANEL_SHOP_VIDEO;
                 fabMenu.setVisibility(View.INVISIBLE);
+
+                // TODO load data
                 break;
 
             case PANEL_DOWNLOAD:
@@ -395,7 +500,15 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        } else if(CustomMediaPlayer.getInstance().isVideoPlayerShowing) {
+            CustomMediaPlayer.getInstance().closeVideoPlayer();
+        } else if(CustomMediaPlayer.getInstance().isNewsDetailShowing) {
+            CustomMediaPlayer.getInstance().closeNewsDetail();
         } else {
+            DataPool.getInstance().listHomeBanner.clear();
+            DataPool.getInstance().listHomeTopVideos.clear();
+            DataPool.getInstance().listHomeTopMusic.clear();
+            MainActivity.this.finish();
             super.onBackPressed();
         }
     }

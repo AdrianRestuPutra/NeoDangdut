@@ -3,25 +3,24 @@ package com.pitados.neodangdut.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
-import com.pitados.neodangdut.custom.CustomListShopMusicTopSongAdapter;
-import com.pitados.neodangdut.model.MusicData;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.pitados.neodangdut.custom.CustomListShopMusicAdapter;
+import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.CustomMediaPlayer;
+import com.pitados.neodangdut.util.DataPool;
 
 /**
  * Created by adrianrestuputranto on 4/10/16.
  */
-public class FragmentShopMusicTopSongs extends Fragment {
+public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.OnItemClickListener{
     private Context context;
     private int pageNumber;
     private String pageTitle;
@@ -29,7 +28,7 @@ public class FragmentShopMusicTopSongs extends Fragment {
     // TODO widgets
     private ListView listTopSong;
 
-    private CustomListShopMusicTopSongAdapter listAdapter;
+    private CustomListShopMusicAdapter listAdapter;
 
     public static FragmentShopMusicTopSongs newInstance(int page, String title) {
         FragmentShopMusicTopSongs home = new FragmentShopMusicTopSongs();
@@ -56,6 +55,7 @@ public class FragmentShopMusicTopSongs extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d("CREATE VIEW", "Shop");
 
         View view = inflater.inflate(R.layout.layout_fragment_shop_music_top_song, container, false);
         // TODO init widgets
@@ -63,34 +63,35 @@ public class FragmentShopMusicTopSongs extends Fragment {
         listTopSong = (ListView) view.findViewById(R.id.shop_music_top_song_listview);
         listTopSong.setFocusable(false);
 
-        // TODO change to shop data
-        List<MusicData> listData = new ArrayList<>();
-        listData.add(new MusicData());
-        listData.add(new MusicData());
-        listData.add(new MusicData());
-        listData.add(new MusicData());
-        listData.add(new MusicData());
-        listData.add(new MusicData());
-        listData.add(new MusicData());
-        listData.add(new MusicData());
-        listData.add(new MusicData());
-        listData.add(new MusicData());
-        listData.add(new MusicData());
-        listData.add(new MusicData());
-        listData.add(new MusicData());
-        listData.add(new MusicData());
-        listData.add(new MusicData());
+        loadData();
 
-        listAdapter = new CustomListShopMusicTopSongAdapter(context, listData);
-        listTopSong.setAdapter(listAdapter);
-
-        listTopSong.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(context, "Select Top Song", Toast.LENGTH_SHORT).show();
-            }
-        });
+        listTopSong.setOnItemClickListener(this);
 
         return view;
+    }
+
+    public void loadData() {
+        if(DataPool.getInstance().listShopMusicTopSongs.size() > 0) {
+            listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicTopSongs);
+            listTopSong.setAdapter(listAdapter);
+        } else {
+            ApiManager.getInstance().setOnShopMusicTopSongListener(new ApiManager.OnShopMusicTopSongReceived() {
+                @Override
+                public void onDataLoaded(ApiManager.ApiType type) {
+                    listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicTopSongs);
+                    listTopSong.setAdapter(listAdapter);
+
+                    listAdapter.notifyDataSetChanged();
+                }
+            });
+        }
+    }
+
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        if(adapterView == listTopSong) {
+            CustomMediaPlayer.getInstance().playTrack(DataPool.getInstance().listShopMusicTopSongs.get(i), true);
+        }
     }
 }

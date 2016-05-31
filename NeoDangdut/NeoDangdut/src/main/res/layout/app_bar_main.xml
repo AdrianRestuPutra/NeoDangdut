@@ -24,10 +24,9 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/divider_height"
-            android:background="@color/tab_divider"/>
+            android:background="@color/tab_divider" />
 
     </android.support.design.widget.AppBarLayout>
-
 
 
     <include layout="@layout/content_all" />
@@ -55,9 +54,9 @@
                 android:layout_height="wrap_content"
                 app:fab_colorNormal="@color/fab_default_color"
                 app:fab_colorPressed="@color/fab_pressed_color"
+                app:fab_icon="@drawable/icon_fab_music"
                 app:fab_size="mini"
-                app:fab_title="Upload Music"
-                app:fab_icon="@drawable/icon_fab_music"/>
+                app:fab_title="Upload Music" />
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_upload_video"
@@ -65,19 +64,18 @@
                 android:layout_height="wrap_content"
                 app:fab_colorNormal="@color/fab_default_color"
                 app:fab_colorPressed="@color/fab_pressed_color"
+                app:fab_icon="@drawable/icon_fab_vid"
                 app:fab_size="mini"
-                app:fab_title="Upload video"
-                app:fab_icon="@drawable/icon_fab_vid"/>
+                app:fab_title="Upload video" />
 
         </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
         <!-- Music Player -->
-
         <LinearLayout
             android:id="@+id/music_player_panel"
             android:layout_width="match_parent"
             android:layout_height="@dimen/music_player_height"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/music_player_bg"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:visibility="gone">
@@ -109,22 +107,43 @@
                     android:layout_height="0dp"
                     android:layout_weight="1.5"
                     android:gravity="center_vertical"
-                    android:orientation="vertical"
+                    android:orientation="horizontal"
                     android:paddingLeft="@dimen/music_player_title_padding">
 
-                    <TextView
-                        android:id="@+id/music_player_title"
+                    <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Song Title"
-                        android:textColor="@color/white_font" />
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/music_player_artist"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Artist Name"
-                        android:textColor="@color/white_font" />
+                        <TextView
+                            android:id="@+id/music_player_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Song Title"
+                            android:textColor="@color/white_font" />
+
+                        <TextView
+                            android:id="@+id/music_player_artist"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Artist Name"
+                            android:textColor="@color/white_font" />
+
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:layout_width="@dimen/music_player_button_icon_width"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
+                            android:layout_alignParentRight="true"
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/icon_more_white" />
+                    </RelativeLayout>
+
                 </LinearLayout>
                 <!-- End of Title and Artist -->
 
@@ -145,6 +164,16 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:progress="0" />
+
+                        <TextView
+                            android:id="@+id/music_player_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentTop="true"
+                            android:text="5:09"
+                            android:textColor="@color/white_font"
+                            android:textSize="@dimen/music_player_duration_font" />
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -154,39 +183,57 @@
                         android:layout_weight="1">
 
                         <ImageView
+                            android:id="@+id/music_player_pause_icon"
                             android:layout_width="@dimen/music_player_button_icon_width"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:adjustViewBounds="true"
-                            android:src="@drawable/ic_menu_share" />
+                            android:src="@drawable/icon_play" />
                     </RelativeLayout>
 
                     <RelativeLayout
+                        android:id="@+id/music_player_random"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1">
 
                         <ImageView
-                            android:id="@+id/music_player_random"
+
                             android:layout_width="@dimen/music_player_button_icon_width"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:adjustViewBounds="true"
-                            android:src="@drawable/ic_menu_slideshow" />
+                            android:src="@drawable/icon_random" />
                     </RelativeLayout>
 
                     <RelativeLayout
+                        android:id="@+id/music_player_loop"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1">
 
                         <ImageView
-                            android:id="@+id/music_player_loop"
+
                             android:layout_width="@dimen/music_player_button_icon_width"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:adjustViewBounds="true"
-                            android:src="@drawable/ic_menu_camera" />
+                            android:src="@drawable/icon_loop" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/music_player_info"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <ImageView
+
+                            android:layout_width="@dimen/music_player_button_icon_width"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/icon_info" />
                     </RelativeLayout>
                 </LinearLayout>
 
@@ -194,6 +241,34 @@
 
         </LinearLayout>
 
+        <!-- Music Player End -->
+
     </LinearLayout>
+
+    <!-- Video Player -->
+    <RelativeLayout
+        android:id="@+id/video_player_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:visibility="gone">
+
+        <include layout="@layout/layout_video_player" />
+
+    </RelativeLayout>
+
+    <!-- Video Player End -->
+
+    <!-- News Detail -->
+    <RelativeLayout
+        android:id="@+id/news_detail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:visibility="gone">
+
+        <include layout="@layout/layout_news_detail" />
+    </RelativeLayout>
+    <!-- News Detail End -->
 
 </android.support.design.widget.CoordinatorLayout>

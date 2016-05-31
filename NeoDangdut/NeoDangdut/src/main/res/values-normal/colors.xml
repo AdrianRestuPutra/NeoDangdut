@@ -16,6 +16,9 @@
     <!-- FAB -->
     <color name="fab_default_color">#78235a</color>
     <color name="fab_pressed_color">#332839</color>
+
+    <!-- Media PLayer -->
+    <color name="music_player_bg">#0c080f</color>
     
     <color name="black_semi_transparent">#B2000000</color>
     <color name="blue_semi_transparent">#805677fc</color>

@@ -1,14 +1,20 @@
 package com.pitados.neodangdut.custom;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.R;
-import com.pitados.neodangdut.model.VideoData;
+import com.pitados.neodangdut.model.CommunityContentData;
 
 import java.util.List;
 
@@ -17,11 +23,32 @@ import java.util.List;
  */
 public class CustomCommunityVideoAdapter extends BaseAdapter {
     private Context context;
-    private List<VideoData> listVideo;
+    private List<CommunityContentData> listVideo;
 
-    public CustomCommunityVideoAdapter(Context context, List<VideoData> listVideo) {
+    static class ViewHolder {
+        ImageView thumbnail;
+        TextView videoTitle;
+        TextView artistName;
+        ImageView optButton;
+    }
+
+    private ImageLoader imageLoader;
+    private DisplayImageOptions opts;
+
+    public CustomCommunityVideoAdapter(Context context, List<CommunityContentData> listVideo) {
         this.context = context;
         this.listVideo = listVideo;
+
+        imageLoader = ImageLoader.getInstance();
+        opts = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.ic_menu_gallery)
+                .showImageForEmptyUri(R.drawable.ic_menu_gallery)
+                .cacheInMemory(false)
+                .cacheOnDisk(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .resetViewBeforeLoading(true)
+                .imageScaleType(ImageScaleType.EXACTLY)
+                .build();
     }
 
     @Override
@@ -43,24 +70,37 @@ public class CustomCommunityVideoAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        RecyclerView.ViewHolder holder;
+        ViewHolder holder;
         if(view == null) {
-            view = inflater.inflate(R.layout.layout_list_home_music, null);
+            view = inflater.inflate(R.layout.layout_list_home_video, null);
 
-            holder = new RecyclerView.ViewHolder(view) {
-                @Override
-                public String toString() {
-                    return super.toString();
-                }
-            };
+            holder = new ViewHolder();
             // TODO init all id
+
+            holder.thumbnail = (ImageView) view.findViewById(R.id.list_view_home_video_thumbnail);
+            holder.videoTitle = (TextView) view.findViewById(R.id.list_view_home_video_song_title);
+            holder.artistName = (TextView) view.findViewById(R.id.list_view_home_video_artist_name);
+            holder.optButton = (ImageView) view.findViewById(R.id.list_view_home_video_optbutton);
 
             view.setTag(holder);
         } else {
-            holder = (RecyclerView.ViewHolder) view.getTag();
+            holder = (ViewHolder) view.getTag();
         }
 
         // TODO set data using holder.wiget
+        if(listVideo.get(i).photoURL != null)
+            imageLoader.displayImage(listVideo.get(i).photoURL, holder.thumbnail, opts);
+        holder.videoTitle.setText(listVideo.get(i).songName);
+        holder.artistName.setText(listVideo.get(i).userName);
+
+        final int pos = i;
+        holder.optButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(context, "OPT button item "+pos, Toast.LENGTH_SHORT).show();
+            }
+        });
+
         return view;
     }
 }

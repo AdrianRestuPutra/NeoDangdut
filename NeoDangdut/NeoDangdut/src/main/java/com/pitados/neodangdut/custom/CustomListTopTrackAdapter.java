@@ -1,15 +1,19 @@
 package com.pitados.neodangdut.custom;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.MusicData;
 
@@ -22,9 +26,31 @@ public class CustomListTopTrackAdapter extends BaseAdapter {
     private Context context;
     private List<MusicData> listTopTrack;
 
+    private ImageLoader imageLoader;
+    private DisplayImageOptions opts;
+
+    static class ViewHolder {
+        ImageView thumbnail;
+        TextView musicTitle;
+        TextView artistName;
+        TextView album;
+        ImageView optButton;
+    }
+
     public CustomListTopTrackAdapter(Context context, List<MusicData> listTopTrack) {
         this.context = context;
         this.listTopTrack = listTopTrack;
+
+        imageLoader = ImageLoader.getInstance();
+        opts = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.ic_menu_gallery)
+                .showImageForEmptyUri(R.drawable.ic_menu_gallery)
+                .cacheInMemory(false)
+                .cacheOnDisk(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .resetViewBeforeLoading(true)
+                .imageScaleType(ImageScaleType.EXACTLY)
+                .build();
     }
 
     @Override
@@ -46,20 +72,20 @@ public class CustomListTopTrackAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        RecyclerView.ViewHolder holder;
+        ViewHolder holder;
         if(view == null) {
             view = inflater.inflate(R.layout.layout_list_top_track, null);
 
-            holder = new RecyclerView.ViewHolder(view) {
-                @Override
-                public String toString() {
-                    return super.toString();
-                }
-            };
+            holder = new ViewHolder();
+
             // TODO init all id
+            holder.thumbnail = (ImageView) view.findViewById(R.id.list_view_top_track_thumbnail);
+            holder.musicTitle = (TextView) view.findViewById(R.id.list_view_top_track_title);
+            holder.artistName = (TextView) view.findViewById(R.id.list_view_top_track_artist);
+
             final int index = i;
-            ImageView optButton = (ImageView) view.findViewById(R.id.list_view_top_track_opt_button);
-            optButton.setOnClickListener(new OnClickListener() {
+            holder.optButton = (ImageView) view.findViewById(R.id.list_view_top_track_opt_button);
+            holder.optButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Toast.makeText(context, "TODO handle opt " + index, Toast.LENGTH_SHORT).show();
@@ -68,10 +94,13 @@ public class CustomListTopTrackAdapter extends BaseAdapter {
 
             view.setTag(holder);
         } else {
-            holder = (RecyclerView.ViewHolder) view.getTag();
+            holder = (ViewHolder) view.getTag();
         }
 
-        // TODO set data using holder.wiget
+        // TODO set data using holder.widget
+        imageLoader.displayImage(listTopTrack.get(i).albumCover, holder.thumbnail, opts);
+        holder.musicTitle.setText(listTopTrack.get(i).songTitle);
+        holder.artistName.setText(listTopTrack.get(i).singerName);
         return view;
     }
 }

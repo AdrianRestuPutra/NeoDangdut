@@ -3,9 +3,11 @@ package com.pitados.neodangdut.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -13,10 +15,8 @@ import android.widget.Toast;
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomCommunityMusicAdapter;
-import com.pitados.neodangdut.model.MusicData;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.DataPool;
 
 /**
  * Created by adrianrestuputranto on 4/10/16.
@@ -29,6 +29,7 @@ public class FragmentHomeMusic extends Fragment {
     private ListView listViewCommunityMusic;
 
     private CustomCommunityMusicAdapter listAdapter;
+
 
     public static FragmentHomeMusic newInstance(int page, String title) {
         FragmentHomeMusic home = new FragmentHomeMusic();
@@ -62,15 +63,7 @@ public class FragmentHomeMusic extends Fragment {
         listViewCommunityMusic = (ListView) view.findViewById(R.id.community_music_listview);
         listViewCommunityMusic.setFocusable(false);
 
-        // TODO get data
-        List<MusicData> listMusic = new ArrayList<>();
-        listMusic.add(new MusicData());
-        listMusic.add(new MusicData());
-        listMusic.add(new MusicData());
-        listMusic.add(new MusicData());
-        listMusic.add(new MusicData());
-        listAdapter = new CustomCommunityMusicAdapter(context, listMusic);
-        listViewCommunityMusic.setAdapter(listAdapter);
+        loadData();
 
         listViewCommunityMusic.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -79,6 +72,47 @@ public class FragmentHomeMusic extends Fragment {
             }
         });
 
+        listViewCommunityMusic.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                int lastItem = firstVisibleItem + visibleItemCount;
+
+                if(lastItem == totalItemCount && totalItemCount != 0) {
+//                    loadMore();
+                }
+            }
+        });
+
         return view;
     }
+
+    public void loadData() {
+        if(DataPool.getInstance().listCommunityMusic.size() > 0) {
+            listAdapter = new CustomCommunityMusicAdapter(context, DataPool.getInstance().listCommunityMusic);
+            listViewCommunityMusic.setAdapter(listAdapter);
+
+        } else {
+            ApiManager.getInstance().setOnCommunityMusicListener(new ApiManager.OnCommunityMusicReceived() {
+                @Override
+                public void onDataLoaded(ApiManager.ApiType type) {
+                    listAdapter = new CustomCommunityMusicAdapter(context, DataPool.getInstance().listCommunityMusic);
+                    listViewCommunityMusic.setAdapter(listAdapter);
+
+                    listAdapter.notifyDataSetChanged();
+                }
+            });
+        }
+
+    }
+
+    public void loadMore() {
+        Log.d("LOAD MORE", "COMM MUSIC");
+//        ApiManager.getInstance().getCommunityMusic();
+    }
+
 }

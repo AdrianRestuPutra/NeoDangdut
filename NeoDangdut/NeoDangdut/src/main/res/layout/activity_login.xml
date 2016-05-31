@@ -10,7 +10,7 @@
         android:id="@+id/panel_login"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimary"
+        android:background="@drawable/bg_login"
         android:padding="@dimen/activity_horizontal_margin"
         android:visibility="invisible">
 
@@ -30,7 +30,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/ic_menu_send" />
+                    android:src="@drawable/logo_medium" />
             </RelativeLayout>
             <!-- End Logo -->
 
@@ -75,17 +75,21 @@
                     <EditText
                         android:id="@+id/login_form_username"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/login_button_height"
+                        android:layout_height="@dimen/login_edittext_height"
                         android:layout_marginLeft="@dimen/login_button_margin"
                         android:layout_marginRight="@dimen/login_button_margin"
+                        android:layout_marginTop="@dimen/login_button_margin_top"
+                        android:background="@drawable/bg_input"
                         android:hint="Username" />
 
                     <EditText
                         android:id="@+id/login_form_password"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/login_button_height"
+                        android:layout_height="@dimen/login_edittext_height"
                         android:layout_marginLeft="@dimen/login_button_margin"
                         android:layout_marginRight="@dimen/login_button_margin"
+                        android:layout_marginTop="@dimen/login_button_margin_top"
+                        android:background="@drawable/bg_input"
                         android:hint="Password" />
 
                     <Button
@@ -94,6 +98,8 @@
                         android:layout_height="@dimen/login_button_height"
                         android:layout_marginLeft="@dimen/login_button_margin"
                         android:layout_marginRight="@dimen/login_button_margin"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/btn_login"
                         android:text="Login"/>
                 </LinearLayout>
 
@@ -157,6 +163,7 @@
                 android:layout_weight="2">
 
                 <!-- Signup page 1 -->
+
                 <!-- End Signup page 1 -->
 
                 <!-- Signup page 2 -->

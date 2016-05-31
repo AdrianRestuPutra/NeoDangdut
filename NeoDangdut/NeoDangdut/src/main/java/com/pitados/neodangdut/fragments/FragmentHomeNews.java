@@ -8,15 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomCommunityNewsAdapter;
-import com.pitados.neodangdut.model.NewsData;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.CustomMediaPlayer;
+import com.pitados.neodangdut.util.DataPool;
 
 /**
  * Created by adrianrestuputranto on 4/10/16.
@@ -62,25 +60,32 @@ public class FragmentHomeNews extends Fragment {
         listNews = (ListView) view.findViewById(R.id.community_news_listview);
         listNews.setFocusable(false);
 
-        // TODO get news data
-        List<NewsData> list = new ArrayList<>();
-        list.add(new NewsData());
-        list.add(new NewsData());
-        list.add(new NewsData());
-        list.add(new NewsData());
-        list.add(new NewsData());
-        list.add(new NewsData());
-
-        listAdapter = new CustomCommunityNewsAdapter(context, list);
-        listNews.setAdapter(listAdapter);
+        loadData();
 
         listNews.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(context, "Show News Detail", Toast.LENGTH_SHORT).show();
+                CustomMediaPlayer.getInstance().showNewsDetail(DataPool.getInstance().listAllNews.get(i));
             }
         });
 
         return view;
+    }
+
+    public void loadData() {
+        if(DataPool.getInstance().listAllNews.size() > 0) {
+            listAdapter = new CustomCommunityNewsAdapter(context, DataPool.getInstance().listAllNews);
+            listNews.setAdapter(listAdapter);
+        } else {
+            ApiManager.getInstance().setOnCommunityNewsListener(new ApiManager.OnCommunityNewsReceived() {
+                @Override
+                public void onDataLoaded(ApiManager.ApiType type) {
+                    listAdapter = new CustomCommunityNewsAdapter(context, DataPool.getInstance().listAllNews);
+                    listNews.setAdapter(listAdapter);
+
+                    listAdapter.notifyDataSetChanged();
+                }
+            });
+        }
     }
 }

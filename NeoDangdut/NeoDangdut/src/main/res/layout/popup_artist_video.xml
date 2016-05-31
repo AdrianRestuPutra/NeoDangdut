@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_bg">
+
+    <LinearLayout
+        android:layout_width="@dimen/dialog_artist_song_width"
+        android:layout_height="@dimen/dialog_artist_song_height"
+        android:layout_centerInParent="true"
+        android:background="@drawable/popup_artistsong_bg"
+        android:orientation="horizontal"
+        android:padding="@dimen/dialog_artist_price_margin">
+
+        <!-- Left Panel -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.2"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dialog_artist_song_upper_panel_height"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/popup_artist_video_thumbnail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/dialog_artist_left_panel_margin"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/ic_menu_camera" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dialog_artist_song_price_height"
+                    android:layout_margin="@dimen/dialog_artist_left_panel_margin"
+                    android:background="@drawable/btn_price_artist_song">
+
+                    <TextView
+                        android:id="@+id/popup_artist_video_price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/dialog_artist_price_margin"
+                        android:text="1000"
+                        android:textColor="@color/white_font" />
+
+                </RelativeLayout>
+            </LinearLayout>
+
+
+        </LinearLayout>
+        <!-- Left Panel End -->
+
+        <!-- Right Panel -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dialog_artist_song_upper_panel_height"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/popup_artist_video_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Abang Kapan Pulang"
+                            android:textSize="@dimen/tab_text_large_size"
+                            android:textColor="@color/white_font" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/popup_artist_video_artist_name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Artist"
+                                android:textColor="@color/white_font"
+                                android:textSize="@dimen/tab_text_size" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+            <!-- Button -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <!-- Play -->
+                <RelativeLayout
+                    android:id="@+id/popup_artist_song_button_play"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="@dimen/dialog_artist_price_button_icon"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/icon_popup_play" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/dialog_artist_button_text_margin"
+                        android:text="Play"
+                        android:textColor="@color/white_font"
+                        android:textSize="@dimen/tab_text_size" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/tab_divider"/>
+
+                <!-- Like -->
+                <RelativeLayout
+                    android:id="@+id/popup_artist_song_button_like"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="@dimen/dialog_artist_price_button_icon"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/icon_popup_play" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/dialog_artist_button_text_margin"
+                        android:text="Like"
+                        android:textColor="@color/white_font"
+                        android:textSize="@dimen/tab_text_size" />
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/tab_divider"/>
+
+                <!-- Go to Album -->
+                <RelativeLayout
+                    android:id="@+id/popup_artist_song_button_album"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="@dimen/dialog_artist_price_button_icon"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/icon_popup_play" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/dialog_artist_button_text_margin"
+                        android:text="Go to Album"
+                        android:textColor="@color/white_font"
+                        android:textSize="@dimen/tab_text_size" />
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/tab_divider"/>
+
+                <!-- Share FB -->
+                <RelativeLayout
+                    android:id="@+id/popup_artist_song_button_share_fb"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="@dimen/dialog_artist_price_button_icon"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/icon_popup_play" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/dialog_artist_button_text_margin"
+                        android:text="Share to Facebook"
+                        android:textColor="@color/white_font"
+                        android:textSize="@dimen/tab_text_size" />
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/tab_divider"/>
+
+                <!-- Share Twitter -->
+                <RelativeLayout
+                    android:id="@+id/popup_artist_song_button_share_twitter"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="@dimen/dialog_artist_price_button_icon"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/icon_popup_play" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/dialog_artist_button_text_margin"
+                        android:text="Share to Twitter"
+                        android:textColor="@color/white_font"
+                        android:textSize="@dimen/tab_text_size" />
+                </RelativeLayout>
+            </LinearLayout>
+        </LinearLayout>
+        <!-- Right Panel End -->
+
+    </LinearLayout>
+
+
+</RelativeLayout>

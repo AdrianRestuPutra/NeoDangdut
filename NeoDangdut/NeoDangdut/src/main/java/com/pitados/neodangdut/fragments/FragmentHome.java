@@ -11,33 +11,19 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.daimajia.slider.library.Indicators.PagerIndicator;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
-import com.pitados.neodangdut.app.AppController;
+import com.pitados.neodangdut.custom.CustomCommunityNewsAdapter;
 import com.pitados.neodangdut.custom.CustomListTopTrackAdapter;
 import com.pitados.neodangdut.custom.CustomListTopVideoAdapter;
 import com.pitados.neodangdut.model.BannerModel;
-import com.pitados.neodangdut.model.MusicData;
-import com.pitados.neodangdut.model.VideoData;
 import com.pitados.neodangdut.util.ApiManager;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.pitados.neodangdut.util.CustomMediaPlayer;
+import com.pitados.neodangdut.util.DataPool;
 
 /**
  * Created by adrianrestuputranto on 4/10/16.
@@ -55,6 +41,8 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
     // Adapters
     private CustomListTopTrackAdapter listTrackAdapter;
     private CustomListTopVideoAdapter listVideoAdapter;
+    private CustomCommunityNewsAdapter listNewsAdapter;
+
 
     public static FragmentHome newInstance(int page, String title) {
         FragmentHome home = new FragmentHome();
@@ -85,14 +73,6 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
 
         View view = inflater.inflate(R.layout.layout_fragment_home, container, false);
 
-        ApiManager.getInstance().getToken();
-        ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
-            @Override
-            public void onTokenSaved() {
-                getBanner();
-            }
-        });
-
         // TODO init widgets
         homeBanner = (SliderLayout) view.findViewById(R.id.home_slider);
         homeBannerIndicator = (PagerIndicator) view.findViewById(R.id.home_slider_indicator);
@@ -104,104 +84,96 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
         listViewTopVideo = (ListView) view.findViewById(R.id.list_view_top_video);
         listViewTopVideo.setFocusable(false);
 
-        // TEST music
-        List<MusicData> listTopTrack = new ArrayList<>();
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTrackAdapter = new CustomListTopTrackAdapter(context, listTopTrack);
-        listViewTopTrack.setAdapter(listTrackAdapter);
+        listViewLatestNews = (ListView) view.findViewById(R.id.list_view_latest_news);
+        listViewLatestNews.setFocusable(false);
 
-        // TEST video
-        List<VideoData> listTopVideo = new ArrayList<>();
-        listTopVideo.add(new VideoData());
-        listTopVideo.add(new VideoData());
-        listVideoAdapter = new CustomListTopVideoAdapter(context, listTopVideo);
-        listViewTopVideo.setAdapter(listVideoAdapter);
+        loadData();
 
         // On click listener
         listViewTopTrack.setOnItemClickListener(this);
+        listViewTopVideo.setOnItemClickListener(this);
+        listViewLatestNews.setOnItemClickListener(this);
 
         return view;
     }
 
-    private void getBanner() {
-        StringRequest request = new StringRequest(Request.Method.GET, Consts.URL_GET_BANNER,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+    public void loadData() {
+        if(DataPool.getInstance().listHomeLatestNews.size() > 0) {
+            loadBanner();
+            loadTopMusic();
+            loadTopVideo();
+            loadLatestNews();
+        }
 
-                        List<BannerModel> listBanner = new ArrayList<>();
-                        try {
-                            JSONObject data = new JSONObject(response);
-                            JSONArray arr = data.getJSONArray(Consts.TAG_BANNER);
-                            for(int i = 0; i < arr.length(); i++) {
-                                JSONObject obj = arr.getJSONObject(i);
-                                int id = obj.getInt("id");
-                                String imageLink = obj.getString("image");
-                                String title = obj.getString("title");
-                                String description = obj.getString("description");
-                                String link = obj.getString("link");
-
-                                BannerModel model = new BannerModel(id, imageLink, title, description, link);
-                                listBanner.add(model);
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        for(BannerModel temp : listBanner) {
-                            DefaultSliderView sliderImage = new DefaultSliderView(context);
-                            sliderImage
-                                .image(temp.imageLink)
-                                .setOnSliderClickListener(FragmentHome.this);
-
-                            // TODO extra
-                            sliderImage.bundle(new Bundle());
-                            sliderImage.getBundle().putString("extra", "TODO extra");
-
-                            homeBanner.addSlider(sliderImage);
-                        }
-
-                    }
-                }, new Response.ErrorListener() {
+        ApiManager.getInstance().setOnHomeListener(new ApiManager.OnHomeDataReceived() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("API Error", "Bad Request");
+            public void onDataLoaded(ApiManager.ApiType type) {
+                if (type == ApiManager.ApiType.HOME_BANNER) {
+                    Log.d("DATA RECEIVED", "Banner");
+                    loadBanner();
+                } else if (type == ApiManager.ApiType.HOME_TOP_MUSIC) {
+                    Log.d("DATA RECEIVED", "Music");
+                    loadTopMusic();
+                } else if (type == ApiManager.ApiType.HOME_TOP_VIDEO) {
+                    Log.d("DATA RECEIVED", "Video");
+                    loadTopVideo();
+                } else if (type == ApiManager.ApiType.HOME_LATEST_NEWS) {
+                    Log.d("DATA RECEIVED", "News");
+                    loadLatestNews();
+                }
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", ApiManager.getInstance().TOKEN_TYPE + " " + ApiManager.getInstance().TOKEN);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> params = new HashMap<>();
-                params.put("shop", "0");
-                return params;
-            }
-        };
-
-        AppController.getInstance().addToRequestQueue(request, Consts.TAG_API_BANNER);
+        });
     }
+
+    // Load Data
+    private void loadBanner() {
+        for(BannerModel temp : DataPool.getInstance().listHomeBanner) {
+            DefaultSliderView sliderImage = new DefaultSliderView(context);
+            sliderImage
+                    .image(temp.imageLink)
+                    .setOnSliderClickListener(FragmentHome.this);
+
+            // TODO extra
+            sliderImage.bundle(new Bundle());
+            sliderImage.getBundle().putString("extra", "TODO extra");
+
+            homeBanner.addSlider(sliderImage);
+        }
+    }
+
+    private void loadTopMusic() {
+        listTrackAdapter = new CustomListTopTrackAdapter(context, DataPool.getInstance().listHomeTopMusic);
+        listViewTopTrack.setAdapter(listTrackAdapter);
+
+        listTrackAdapter.notifyDataSetChanged();
+    }
+
+    private void loadTopVideo() {
+        listVideoAdapter = new CustomListTopVideoAdapter(context, DataPool.getInstance().listHomeTopVideos);
+        listViewTopVideo.setAdapter(listVideoAdapter);
+
+        listVideoAdapter.notifyDataSetChanged();
+    }
+
+    private void loadLatestNews() {
+        listNewsAdapter = new CustomCommunityNewsAdapter(context, DataPool.getInstance().listHomeLatestNews);
+        listViewLatestNews.setAdapter(listNewsAdapter);
+
+        listNewsAdapter.notifyDataSetChanged();
+    }
+
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
         if(adapterView == listViewTopTrack) {
-            Toast.makeText(context, "TODO handle top track item : "+pos, Toast.LENGTH_SHORT).show();
+            CustomMediaPlayer.getInstance().playTrack(DataPool.getInstance().listHomeTopMusic.get(pos), true);
         }
         if(adapterView == listViewTopVideo) {
-            Toast.makeText(context, "TODO handle top video item : "+pos, Toast.LENGTH_SHORT).show();
+            CustomMediaPlayer.getInstance().playVideo(DataPool.getInstance().listHomeTopVideos.get(pos));
+
         }
         if(adapterView == listViewLatestNews) {
-            Toast.makeText(context, "TODO handle news item : "+pos, Toast.LENGTH_SHORT).show();
+            CustomMediaPlayer.getInstance().showNewsDetail(DataPool.getInstance().listHomeLatestNews.get(pos));
         }
     }
 

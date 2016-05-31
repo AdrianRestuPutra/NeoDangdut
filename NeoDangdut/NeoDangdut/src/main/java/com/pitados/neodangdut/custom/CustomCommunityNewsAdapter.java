@@ -1,12 +1,17 @@
 package com.pitados.neodangdut.custom;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.NewsData;
 
@@ -19,9 +24,28 @@ public class CustomCommunityNewsAdapter extends BaseAdapter {
     private Context context;
     private List<NewsData> listNews;
 
+    private ImageLoader imageLoader;
+    private DisplayImageOptions opts;
+
+    static class ViewHolder {
+        ImageView thumbnail;
+        TextView newsTitle;
+    }
+
     public CustomCommunityNewsAdapter(Context context, List<NewsData> listNews) {
         this.context = context;
         this.listNews = listNews;
+
+        imageLoader = ImageLoader.getInstance();
+        opts = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.ic_menu_gallery)
+                .showImageForEmptyUri(R.drawable.ic_menu_gallery)
+                .cacheInMemory(false)
+                .cacheOnDisk(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .resetViewBeforeLoading(true)
+                .imageScaleType(ImageScaleType.EXACTLY)
+                .build();
     }
 
     @Override
@@ -43,24 +67,25 @@ public class CustomCommunityNewsAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        RecyclerView.ViewHolder holder;
+        ViewHolder holder;
         if(view == null) {
             view = inflater.inflate(R.layout.layout_list_home_news, null);
 
-            holder = new RecyclerView.ViewHolder(view) {
-                @Override
-                public String toString() {
-                    return super.toString();
-                }
-            };
+            holder = new ViewHolder();
             // TODO init all id
+
+            holder.thumbnail = (ImageView) view.findViewById(R.id.list_view_home_news_thumbnail);
+            holder.newsTitle = (TextView) view.findViewById(R.id.list_view_home_news_title);
 
             view.setTag(holder);
         } else {
-            holder = (RecyclerView.ViewHolder) view.getTag();
+            holder = (ViewHolder) view.getTag();
         }
 
         // TODO set data using holder.wiget
+        imageLoader.displayImage(listNews.get(i).thumbnailURL, holder.thumbnail, opts);
+        holder.newsTitle.setText(listNews.get(i).title);
+
         return view;
     }
 }

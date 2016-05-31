@@ -8,15 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomCommunityVideoAdapter;
-import com.pitados.neodangdut.model.VideoData;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.CustomMediaPlayer;
+import com.pitados.neodangdut.util.DataPool;
 
 /**
  * Created by adrianrestuputranto on 4/10/16.
@@ -64,24 +62,34 @@ public class FragmentHomeVideo extends Fragment {
         listViewCommunityVideo = (ListView) view.findViewById(R.id.community_video_listview);
         listViewCommunityVideo.setFocusable(false);
 
-        // TODO get data
-        List<VideoData> listVideo = new ArrayList<>();
-        listVideo.add(new VideoData());
-        listVideo.add(new VideoData());
-        listVideo.add(new VideoData());
-        listVideo.add(new VideoData());
-        listVideo.add(new VideoData());
-        listAdapter = new CustomCommunityVideoAdapter(context ,listVideo);
-
-        listViewCommunityVideo.setAdapter(listAdapter);
+        loadData();
 
         listViewCommunityVideo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(context, "Play Community Video", Toast.LENGTH_SHORT).show();
+                CustomMediaPlayer.getInstance().playVideo(DataPool.getInstance().listCommunityVideo.get(i));
             }
         });
 
         return view;
+    }
+
+    public void loadData() {
+        if(DataPool.getInstance().listCommunityVideo.size() > 0) {
+            listAdapter = new CustomCommunityVideoAdapter(context, DataPool.getInstance().listCommunityVideo);
+            listViewCommunityVideo.setAdapter(listAdapter);
+
+        } else {
+            ApiManager.getInstance().setOnCommunityVideoListener(new ApiManager.OnCommunityVideoReceived() {
+                @Override
+                public void onDataLoaded(ApiManager.ApiType type) {
+                    listAdapter = new CustomCommunityVideoAdapter(context, DataPool.getInstance().listCommunityVideo);
+                    listViewCommunityVideo.setAdapter(listAdapter);
+
+                    listAdapter.notifyDataSetChanged();
+                }
+            });
+        }
+
     }
 }

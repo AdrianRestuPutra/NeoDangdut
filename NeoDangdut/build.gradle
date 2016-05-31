@@ -16,6 +16,7 @@ allprojects {
     repositories {
         maven { url 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/' }
         jcenter()
+        mavenCentral();
     }
 }
 

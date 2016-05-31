@@ -19,10 +19,20 @@ public class Consts {
 
     // API
     public static String TAG_API_TOKEN = "get_token";
-    public static String TAG_API_BANNER = "get_banner";
+    public static String TAG_API_HOME = "get_home";
+    public static String TAG_API_COMMUNITY_MUSIC = "get_comm_music";
+    public static String TAG_API_COMMUNITY_VIDEO = "get_comm_video";
+    public static String TAG_API_SHOP_MUSIC_TOPSONGS = "get_shop_top";
+
 
     public static String URL_GET_TOKEN = "http://api.neodangdut.com";
     public static String URL_GET_BANNER = URL_GET_TOKEN+"/banner";
+
+    public static String URL_GET_MUSIC = URL_GET_TOKEN+"/music";
+    public static String URL_GET_VIDEO = URL_GET_TOKEN+"/video";
+    public static String URL_GET_NEWS = URL_GET_TOKEN+"/article";
+    public static String URL_GET_COMMUNITY_CONTENT = URL_GET_TOKEN+"/content";
+    public static String URL_GET_ALBUM = URL_GET_TOKEN+"/album";
 
     // TAG TOKEN
     public static String TAG_TOKEN = "access_token";

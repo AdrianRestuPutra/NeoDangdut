@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:EMVideoView="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/main_bg">
@@ -15,87 +14,4 @@
 
     </GridView>
 
-    <LinearLayout
-        android:id="@+id/video_player_panel"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorAccent"
-        android:orientation="vertical"
-        android:visibility="invisible">
-
-        <com.devbrackets.android.exomedia.EMVideoView
-            android:id="@+id/library_video_view"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/video_player_height"
-            EMVideoView:defaultControlsEnabled="true">
-
-        </com.devbrackets.android.exomedia.EMVideoView>
-
-        <!-- Detail video -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="@dimen/video_player_detail_padding"
-            android:orientation="vertical">
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/video_player_detail_height"
-                android:orientation="horizontal">
-
-                <RelativeLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <ImageView
-                        android:id="@+id/video_player_thumbnail"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:adjustViewBounds="true"
-                        android:src="@drawable/ic_menu_camera" />
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="3"
-                    android:orientation="vertical">
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:orientation="horizontal"></LinearLayout>
-            </LinearLayout>
-            <!-- End Of Detail Video -->
-
-            <!-- Description Video -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/video_player_description_margin_top"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/video_player_detail_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Posted on Apr 9, 2016"/>
-
-                <TextView
-                    android:id="@+id/video_player_detail_description"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/video_player_description_margin_top"
-                    android:text="This is description"/>
-            </LinearLayout>
-            <!-- End Of Description Video -->
-        </LinearLayout>
-    </LinearLayout>
 </RelativeLayout>

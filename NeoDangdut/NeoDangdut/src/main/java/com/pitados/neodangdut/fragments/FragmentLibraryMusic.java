@@ -15,7 +15,6 @@ import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomLibraryMusicAdapter;
 import com.pitados.neodangdut.model.MusicData;
-import com.pitados.neodangdut.util.CustomMediaPlayer;
 import com.pitados.neodangdut.util.StateManager;
 
 import java.util.ArrayList;
@@ -133,7 +132,6 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         if (adapterView == listViewMusic && !StateManager.isTopView) {
             Toast.makeText(context, "TODO handle lib music item : " + i, Toast.LENGTH_SHORT).show();
-            CustomMediaPlayer.getInstance().playTrack(Consts.AUDIO_SAMPLE_URL);
 //            ConnManager.getInstance().downloadFile(Consts.AUDIO_SAMPLE_URL, ConnManager.DataType.AUDIO, "MixTape", "Track-"+i);
         }
     }
