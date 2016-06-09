@@ -9,12 +9,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomListShopVideoAdapter;
 import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.CustomMediaPlayer;
 import com.pitados.neodangdut.util.DataPool;
 
 /**
@@ -71,7 +71,7 @@ public class FragmentShopVideoNewVideos extends Fragment {
         listNewVideos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(context, "TODO play video "+i, Toast.LENGTH_SHORT).show();
+                CustomMediaPlayer.getInstance().playVideo(DataPool.getInstance().listShopVideoTopVideos.get(i));
             }
         });
 

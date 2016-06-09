@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!--
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
@@ -24,7 +25,7 @@
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer"
         app:itemTextColor="@color/white_font"/>
-    <!--
+    -->
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
@@ -36,13 +37,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:background="@color/colorAccent">
+            android:background="@color/main_bg">
 
             <include layout="@layout/nav_header_main"/>
+
+            <include layout="@layout/layout_side_menu"/>
 
         </LinearLayout>
 
     </android.support.design.widget.NavigationView>
-    -->
+
 
 </android.support.v4.widget.DrawerLayout>

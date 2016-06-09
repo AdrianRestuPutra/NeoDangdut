@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:background="@drawable/bg_login"
         android:padding="@dimen/activity_horizontal_margin"
-        android:visibility="invisible">
+        android:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -37,7 +37,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/divider_height"
-                android:background="@color/dividerColor" />
+                android:background="@color/tab_divider" />
 
             <!-- Facebook button -->
             <RelativeLayout
@@ -52,14 +52,14 @@
                     android:layout_centerInParent="true"
                     android:layout_marginLeft="@dimen/login_button_margin"
                     android:layout_marginRight="@dimen/login_button_margin"
-                    android:text="Login With Facebook" />
+                    android:background="@drawable/btn_fb_login"/>
             </RelativeLayout>
             <!-- End FB button -->
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/divider_height"
-                android:background="@color/dividerColor" />
+                android:background="@color/tab_divider" />
 
             <!-- Login Form -->
             <RelativeLayout
@@ -80,7 +80,10 @@
                         android:layout_marginRight="@dimen/login_button_margin"
                         android:layout_marginTop="@dimen/login_button_margin_top"
                         android:background="@drawable/bg_input"
-                        android:hint="Username" />
+                        android:paddingLeft="@dimen/signup_padding"
+                        android:textColor="@color/white_font"
+                        android:textColorHint="@color/purple_font"
+                        android:hint="Username"/>
 
                     <EditText
                         android:id="@+id/login_form_password"
@@ -90,6 +93,10 @@
                         android:layout_marginRight="@dimen/login_button_margin"
                         android:layout_marginTop="@dimen/login_button_margin_top"
                         android:background="@drawable/bg_input"
+                        android:paddingLeft="@dimen/signup_padding"
+                        android:inputType="textPassword"
+                        android:textColor="@color/white_font"
+                        android:textColorHint="@color/purple_font"
                         android:hint="Password" />
 
                     <Button
@@ -99,8 +106,7 @@
                         android:layout_marginLeft="@dimen/login_button_margin"
                         android:layout_marginRight="@dimen/login_button_margin"
                         android:layout_marginTop="5dp"
-                        android:background="@drawable/btn_login"
-                        android:text="Login"/>
+                        android:background="@drawable/btn_login"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -115,13 +121,19 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/divider_height"
-                android:background="@color/dividerColor" />
+                android:background="@color/tab_divider" />
 
             <!-- Signup button -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1.5">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white_font"
+                    android:text="Don't have an account?"/>
 
                 <Button
                     android:id="@+id/login_signup"
@@ -130,7 +142,7 @@
                     android:layout_centerInParent="true"
                     android:layout_marginLeft="@dimen/login_button_margin"
                     android:layout_marginRight="@dimen/login_button_margin"
-                    android:text="Sign Up"/>
+                    android:background="@drawable/btn_signup"/>
             </RelativeLayout>
             <!-- End Signup button -->
         </LinearLayout>
@@ -143,30 +155,66 @@
         android:id="@+id/panel_signup"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimaryDark"
-        android:visibility="visible">
+        android:background="@drawable/bg_login"
+        android:visibility="invisible">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:padding="@dimen/signup_padding"
             android:orientation="vertical">
 
+            <!-- Title -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1">
+                android:layout_weight="0.8">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SIGNING\nUP"
+                        android:textColor="@color/purple_font"
+                        android:textSize="@dimen/signup_text_title"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/signup_divider_height"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/tab_divider"/>
             </RelativeLayout>
+            <!-- Title End -->
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:paddingTop="@dimen/signup_padding"
                 android:layout_weight="2">
 
                 <!-- Signup page 1 -->
-
+                <RelativeLayout
+                    android:id="@+id/signup_first_page"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible">
+                    <include layout="@layout/layout_signup_first_screen"/>
+                </RelativeLayout>
                 <!-- End Signup page 1 -->
 
                 <!-- Signup page 2 -->
+                <RelativeLayout
+                    android:id="@+id/signup_second_page"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible">
+                    <include layout="@layout/layout_signup_second_screen"/>
+                </RelativeLayout>
                 <!-- End Signup page 2 -->
 
             </RelativeLayout>

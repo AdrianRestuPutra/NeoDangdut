@@ -21,7 +21,7 @@ public class SplashActivity extends Activity {
             public void run() {
 
                 // TODO intent to login page
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                startActivity(new Intent(SplashActivity.this, LoginActivity.class));
                 SplashActivity.this.finish();
             }
         }, SPLASH_DELAY);

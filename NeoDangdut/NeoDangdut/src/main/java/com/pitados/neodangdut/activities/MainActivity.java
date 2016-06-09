@@ -2,13 +2,16 @@ package com.pitados.neodangdut.activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
@@ -22,15 +25,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.devbrackets.android.exomedia.EMVideoView;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.pitados.neodangdut.Consts;
@@ -50,6 +56,8 @@ import com.pitados.neodangdut.fragments.FragmentShopVideoAllVideos;
 import com.pitados.neodangdut.fragments.FragmentShopVideoNewVideos;
 import com.pitados.neodangdut.fragments.FragmentShopVideoTopVideos;
 import com.pitados.neodangdut.model.FragmentModel;
+import com.pitados.neodangdut.model.SettingPref;
+import com.pitados.neodangdut.model.UserLoginData;
 import com.pitados.neodangdut.util.ApiManager;
 import com.pitados.neodangdut.util.ConnManager;
 import com.pitados.neodangdut.util.CustomMediaPlayer;
@@ -60,27 +68,33 @@ import org.onepf.oms.OpenIabHelper;
 import org.onepf.oms.appstore.googleUtils.IabHelper;
 import org.onepf.oms.appstore.googleUtils.IabResult;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements View.OnClickListener {
 
     private int REQUEST_STORAGE_PERMISSION_CODE = 100;
+    private int UPLOAD_FILE_CODE = 250;
+
     private enum PanelState {
         PANEL_NEW_POST,
         PANEL_LIBRARY,
         PANEL_SHOP_MUSIC,
         PANEL_SHOP_VIDEO,
-        PANEL_DOWNLOAD
+        PANEL_DOWNLOAD,
+        PANEL_SETTING
     }
     private PanelState panelState;
+
+    private boolean isUploadFormShowing;
 
     private DrawerLayout drawer;
     private FloatingActionsMenu fabMenu;
     private com.getbase.floatingactionbutton.FloatingActionButton fabMusic, fabVideo;
     // Panel
-    private RelativeLayout panelNewPost, panelLibrary, panelShopMusic, panelShopVideo, panelDownloads;
+    private RelativeLayout panelNewPost, panelLibrary, panelShopMusic, panelShopVideo, panelDownloads, panelSettings, panelUpload;
     // Media Panel
     private LinearLayout panelMusicPlayer;
     private RelativeLayout musicPlayerPauseButton, musicPlayerShuffleButton, musicPlayerLoopbutton;
@@ -94,11 +108,24 @@ public class MainActivity extends AppCompatActivity
     // TODO widget video
     private TextView videoDate, videoDescription;
     // NEWS
-    private RelativeLayout panelNewsDetail;
+    private RelativeLayout panelNewsDetail, loadingBar;
+    private ScrollView newsScrollView;
     private ImageView newsDetailThumbnail;
     private TextView newsDetailTitle;
     private TextView newsDetailDate;
     private TextView newsDetailDescription;
+
+    // SETTINGS
+    private RelativeLayout settingToggleNotif, settingToggleDownload;
+    private ImageView iconToggleNotif, iconToggleDownload;
+    private RelativeLayout settingSupportButton, settingPrivacyButton, settingAboutButton;
+    // UPLOAD
+    private TextView uploadFileName, uploadButtonText;
+    private SeekBar uploadProgress;
+    private RelativeLayout uploadButtonPause, uploadButtonCancel, uploadButton;
+    private EditText uploadInputTitle, uploadInputDescription;
+
+    private boolean notifIsOn, downloadWIFIOnlyOn;
 
     // Fragments
     private ViewPager viewPagerNewPost, viewPagerLibrary, viewPagerShopMusic, viewPagerShopVideo;
@@ -106,8 +133,19 @@ public class MainActivity extends AppCompatActivity
     private CustomPagerAdapter pagerAdapterHome, pagerAdapterLibrary, pagerAdapterShopMusic, pagerAdapterShopVideo;
 
     // In App Purchase
-    private String storeKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5F8fASyrDFdaXrkoW8kNtwH5JIkLnNuTD5uE1a37TbI5LDZRVgvMIYAtZ9CAHAfLnJ6OEZt0lvLLJSKVuS47VqYVhGZciOkX8TEihONBRwis6i9A3JnKfyqm0iiT+P0CEktOLuFLROIo13utCIO++6h7A7/WLfxNV+Jnxfs9OEHyyPS+MdHxa0wtZGeAGiaN65BymsBQo7J/ABt2DFyMJP1R/nJM45F8yu4D6wSkUNKzs/QbPfvHJQzq56/B/hbx59EkzkInqC567hrlUlX4bU5IvOTF/B1G+UMuKg80m3I1IcQk4FD2D9oJ3E+8IXG/1UdejrOsmqDAzE7LkMl8xwIDAQAB";
+    private String storeKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApFO+8ygQlDoMB1bp7EtAYHjVpvAc2T+x054MAQCimjwT4yZD0QVW7GpYXVgELhEZtLDWpiREPYgIe6UX8ZxHwaU50sYy7Q8GtIx2zRR2ZMSW0TGhGZCYsdTuVpTUDBPnZ21lxXRCkDYyEAbZ2NhoOma6QoVcjdMkbGh8K0NHksBFjg6ngFxtTFJ8N7RNFKgGtcUKPJdQSbI1rXjHLAoae4GhSiffi/vkZp60yFEjCqsbN6lF1hdGvgOiC+kd3wLIApR+UWAYE46jMS4giP+5kt6vwV3wXR1aWXmpQIehq8p3sS99/2Qv7R1kYKRHT0uPHZTKSXnDhfs8aWTSt4QntwIDAQAB";
     private OpenIabHelper iabHelper;
+
+    // Side Menu
+    // TODO profile
+    private ImageView sideMenuUserPic;
+    private TextView sideMenuFullName;
+    private LinearLayout sideMenuTopup, sideMenuHome, sideMenuLibrary, sideMenuShopMusic, sideMenuShopVideo, sideMenuDownloads, sideMenuSetting, sideMenuSignOut;
+    private TextView sideMenuWallet;
+
+    private ImageLoader imageLoader;
+    private DisplayImageOptions opts;
+    private UserLoginData userLoginData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,12 +158,152 @@ public class MainActivity extends AppCompatActivity
 
         initOpenIAB();
 
+        userLoginData = new UserLoginData(getBaseContext());
+
+        imageLoader = ImageLoader.getInstance();
+        opts = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.ic_menu_gallery)
+                .showImageForEmptyUri(R.drawable.ic_menu_gallery)
+                .cacheInMemory(false)
+                .cacheOnDisk(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .resetViewBeforeLoading(true)
+                .build();
+
+
         // init panel
         panelNewPost = (RelativeLayout) findViewById(R.id.panel_new_post);
         panelLibrary = (RelativeLayout) findViewById(R.id.panel_library);
         panelShopMusic = (RelativeLayout) findViewById(R.id.panel_shop_music);
         panelShopVideo = (RelativeLayout) findViewById(R.id.panel_shop_video);
         panelDownloads = (RelativeLayout) findViewById(R.id.panel_downloads);
+        panelSettings = (RelativeLayout) findViewById(R.id.panel_settings);
+
+        initMediaPlayer();
+        initSideMenu();
+        // TODO init new post
+        initPanelNewPost();
+        // TODO init library
+        initPanelLibrary();
+        // TODO init shop
+        initPanelShopMusic();
+        initPanelShopVideo();
+        // TODO init download
+        initPanelSetting();
+        initUploadForm();
+
+        // init state
+        panelState = PanelState.PANEL_NEW_POST;
+        ConnManager.getInstance().init(getBaseContext());
+        isUploadFormShowing = false;
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
+        ImageLoader.getInstance().init(config);
+
+        // Set base directory
+        PackageManager pm = getPackageManager();
+        String packageName = getPackageName();
+        try {
+            PackageInfo pi = pm.getPackageInfo(packageName, 0);
+            Consts.APP_BASE_DIR = pi.applicationInfo.dataDir;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+        // TODO handle floating button
+        fabMenu = (FloatingActionsMenu) findViewById(R.id.fab_menu);
+        fabMusic = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_upload_music);
+        fabMusic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                showUploadForm();
+                showFileChooser();
+            }
+        });
+
+        fabVideo = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_upload_video);
+        fabVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                showUploadForm();
+                showFileChooser();
+            }
+        });
+
+
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        // Load All data
+        ApiManager.getInstance().getToken();
+        ApiManager.getInstance().getUserAccessToken();
+        ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
+            @Override
+            public void onTokenSaved() {
+                ApiManager.getInstance().getHomeBanner();
+                ApiManager.getInstance().getHomeTopMusic();
+                ApiManager.getInstance().getHomeTopVideos();
+                ApiManager.getInstance().getHomeLatestNews();
+                // Community
+                ApiManager.getInstance().getCommunityMusic();
+                ApiManager.getInstance().getCommunityVideo();
+                ApiManager.getInstance().getAllNews();
+                // SHOP MUSIC
+                ApiManager.getInstance().getShopMusicTopSongs();
+                ApiManager.getInstance().getFeaturedShopMusic();
+                ApiManager.getInstance().getShopMusicTopAlbums();
+                ApiManager.getInstance().getShopMusicNewSongs();
+//                ApiManager.getInstance().getShopMusicAllSongs();
+                // SHOP VIDEO
+                ApiManager.getInstance().getShopVideoTopVideos();
+                ApiManager.getInstance().getShopVideoNewVideos();
+//                ApiManager.getInstance().getShopVideoAllVideos();
+            }
+
+            @Override
+            public void onUserAccessTokenSaved() {
+                setSideMenuData();
+
+                ApiManager.getInstance().getLibraryMusic();
+            }
+
+            @Override
+            public void onError(String message) {
+
+            }
+        });
+
+    }
+
+    private void initOpenIAB() {
+        OpenIabHelper.Options opts = new OpenIabHelper.Options.Builder()
+                .addStoreKey(OpenIabHelper.NAME_GOOGLE, storeKey)
+                .addAvailableStoreNames(OpenIabHelper.NAME_GOOGLE)
+                .addPreferredStoreName(OpenIabHelper.NAME_GOOGLE)
+                .setVerifyMode(OpenIabHelper.Options.VERIFY_SKIP)
+                .setStoreSearchStrategy(OpenIabHelper.Options.SEARCH_STRATEGY_INSTALLER_THEN_BEST_FIT)
+                .build();
+
+        iabHelper = new OpenIabHelper(getBaseContext(), opts);
+        iabHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+            @Override
+            public void onIabSetupFinished(IabResult result) {
+                if (result.isSuccess()) {
+                    // TODO query inventory
+                    Log.d("Open IAB", "Open IAB ready!");
+                } else {
+                    Log.e("Open IAB", result.getMessage());
+                }
+            }
+        });
+    }
+
+    // Method init
+    private void initMediaPlayer() {
         // Media
         panelMusicPlayer = (LinearLayout) findViewById(R.id.music_player_panel);
         panelMusicPlayer.setOnTouchListener(new View.OnTouchListener() {
@@ -181,138 +359,59 @@ public class MainActivity extends AppCompatActivity
         // TODO insert widget id
         videoView = (EMVideoView) findViewById(R.id.video_player_view);
         videoDate = (TextView) findViewById(R.id.video_player_detail_date);
-        videoDate = (TextView) findViewById(R.id.video_player_detail_description);
+        videoDescription = (TextView) findViewById(R.id.video_player_detail_description);
 
 
+        newsScrollView = (ScrollView) findViewById(R.id.news_scroll_view);
         panelNewsDetail = (RelativeLayout) findViewById(R.id.news_detail);
         newsDetailThumbnail = (ImageView) findViewById(R.id.news_detail_thumbnail);
         newsDetailTitle = (TextView) findViewById(R.id.news_detail_title);
         newsDetailDate = (TextView) findViewById(R.id.news_detail_date);
         newsDetailDescription = (TextView) findViewById(R.id.news_detail_description);
+        loadingBar = (RelativeLayout) findViewById(R.id.news_detail_loading);
 
         CustomMediaPlayer.getInstance().setAudioPanel(this, panelMusicPlayer, musicPlayerProgress, musicPlayerDuration,
                 musicPlayerThumbnail, musicPlayerTitle, musicPlayerArtistName, musicPlayerPauseIcon);
 
         CustomMediaPlayer.getInstance().setVideoPanel(panelVideoPlayer, videoView, videoDate, videoDescription);
 
-        CustomMediaPlayer.getInstance().setNewsPanel(panelNewsDetail, newsDetailThumbnail, newsDetailTitle, newsDetailDate, newsDetailDescription);
+        CustomMediaPlayer.getInstance().setNewsPanel(panelNewsDetail, newsDetailThumbnail, newsDetailTitle, newsDetailDate, newsDetailDescription, loadingBar, newsScrollView);
 
-        // init state
-        panelState = PanelState.PANEL_NEW_POST;
-        ConnManager.getInstance().init(getBaseContext());
-
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
-        ImageLoader.getInstance().init(config);
-
-        // Set base directory
-        PackageManager pm = getPackageManager();
-        String packageName = getPackageName();
-        try {
-            PackageInfo pi = pm.getPackageInfo(packageName, 0);
-            Consts.APP_BASE_DIR = pi.applicationInfo.dataDir;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        // TODO handle floating button
-//        uploadFab = (FloatingActionButton) findViewById(R.id.fab_upload);
-//        uploadFab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // TODO show dialog to upload / upload screen
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-        fabMenu = (FloatingActionsMenu) findViewById(R.id.fab_menu);
-        fabMusic = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_upload_music);
-        fabMusic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Upload Music", Snackbar.LENGTH_SHORT).show();
-            }
-        });
-
-        fabVideo = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_upload_video);
-        fabVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Upload Video", Snackbar.LENGTH_SHORT).show();
-            }
-        });
-
-
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-
-        // TODO init new post
-        initPanelNewPost();
-        // TODO init library
-        initPanelLibrary();
-        // TODO init shop
-        initPanelShopMusic();
-        initPanelShopVideo();
-        // TODO init download
-
-        // Load All data
-        ApiManager.getInstance().getToken();
-        ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
-            @Override
-            public void onTokenSaved() {
-                ApiManager.getInstance().getHomeBanner();
-                ApiManager.getInstance().getHomeTopMusic();
-                ApiManager.getInstance().getHomeTopVideos();
-                ApiManager.getInstance().getHomeLatestNews();
-                // Community
-                ApiManager.getInstance().getCommunityMusic();
-                ApiManager.getInstance().getCommunityVideo();
-                ApiManager.getInstance().getAllNews();
-                // SHOP MUSIC
-                ApiManager.getInstance().getShopMusicTopSongs();
-                ApiManager.getInstance().getShopMusicTopAlbums();
-                ApiManager.getInstance().getShopMusicNewSongs();
-//                ApiManager.getInstance().getShopMusicAllSongs();
-                // SHOP VIDEO
-                ApiManager.getInstance().getShopVideoTopVideos();
-                ApiManager.getInstance().getShopVideoNewVideos();
-//                ApiManager.getInstance().getShopVideoAllVideos();
-                // TODO library
-
-            }
-        });
     }
 
-    private void initOpenIAB() {
-        OpenIabHelper.Options opts = new OpenIabHelper.Options.Builder()
-                .addStoreKey(OpenIabHelper.NAME_GOOGLE, storeKey)
-                .addAvailableStoreNames(OpenIabHelper.NAME_GOOGLE)
-                .addPreferredStoreName(OpenIabHelper.NAME_GOOGLE)
-                .setVerifyMode(OpenIabHelper.Options.VERIFY_EVERYTHING)
-                .setStoreSearchStrategy(OpenIabHelper.Options.SEARCH_STRATEGY_INSTALLER)
-                .build();
+    private void initSideMenu() {
+        sideMenuHome = (LinearLayout) findViewById(R.id.side_menu_home);
+        sideMenuLibrary = (LinearLayout) findViewById(R.id.side_menu_library);
+        sideMenuShopMusic = (LinearLayout) findViewById(R.id.side_menu_shop_music);
+        sideMenuShopVideo = (LinearLayout) findViewById(R.id.side_menu_shop_video);
+        sideMenuDownloads = (LinearLayout) findViewById(R.id.side_menu_download);
+        sideMenuSetting = (LinearLayout) findViewById(R.id.side_menu_setting);
+        sideMenuSignOut = (LinearLayout) findViewById(R.id.side_menu_signout);
 
-        iabHelper = new OpenIabHelper(getBaseContext(), opts);
-        iabHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
-            @Override
-            public void onIabSetupFinished(IabResult result) {
-                if(result.isSuccess()) {
-                    // TODO query inventory
-                    Log.d("Open IAB", "Open IAB ready!");
-                } else {
-                    Log.e("Open IAB", result.getMessage());
-                }
-            }
-        });
+        // Wallet
+        sideMenuTopup = (LinearLayout) findViewById(R.id.side_menu_topup);
+        sideMenuWallet = (TextView) findViewById(R.id.side_menu_user_wallet);
+
+        // DATA
+        sideMenuFullName = (TextView) findViewById(R.id.nav_header_user_name);
+        sideMenuUserPic = (ImageView) findViewById(R.id.nav_header_user_prof_pic);
+
+        sideMenuTopup.setOnClickListener(this);
+        sideMenuHome.setOnClickListener(this);
+        sideMenuLibrary.setOnClickListener(this);
+        sideMenuShopMusic.setOnClickListener(this);
+        sideMenuShopVideo.setOnClickListener(this);
+        sideMenuDownloads.setOnClickListener(this);
+        sideMenuSetting.setOnClickListener(this);
+        sideMenuSignOut.setOnClickListener(this);
     }
 
-    // Method init
+    private void setSideMenuData() {
+        imageLoader.displayImage(userLoginData.getPhotoURL(), sideMenuUserPic, opts);
+        sideMenuFullName.setText(userLoginData.getFullname());
+        sideMenuWallet.setText(userLoginData.getCredit());
+    }
+
     private void initPanelNewPost() {
         // pool fragment
         List<FragmentModel> list = new ArrayList<>();
@@ -375,6 +474,174 @@ public class MainActivity extends AppCompatActivity
         slidingTabShopVideo.setupWithViewPager(viewPagerShopVideo);
     }
 
+    private void initPanelSetting() {
+        final SettingPref settingPref = new SettingPref(getBaseContext());
+
+        notifIsOn = settingPref.getNotifState();
+        downloadWIFIOnlyOn = settingPref.getDowloadWifiOnlyState();
+
+        settingToggleNotif = (RelativeLayout) findViewById(R.id.setting_toggle_notif);
+        settingToggleDownload = (RelativeLayout) findViewById(R.id.setting_toggle_download);
+
+        iconToggleNotif = (ImageView) findViewById(R.id.icon_toggle_notif);
+        iconToggleDownload = (ImageView) findViewById(R.id.icon_toggle_download);
+
+        settingSupportButton = (RelativeLayout) findViewById(R.id.setting_help_support_button);
+        settingPrivacyButton = (RelativeLayout) findViewById(R.id.setting_privacy_policy_button);
+        settingAboutButton = (RelativeLayout) findViewById(R.id.setting_about_button);
+
+        if(notifIsOn) {
+            iconToggleNotif.setImageResource(R.drawable.btn_toggle_on);
+        } else {
+            iconToggleNotif.setImageResource(R.drawable.btn_toggle_off);
+        }
+
+        if(downloadWIFIOnlyOn) {
+            iconToggleDownload.setImageResource(R.drawable.btn_toggle_on);
+        } else {
+            iconToggleDownload.setImageResource(R.drawable.btn_toggle_off);
+        }
+
+        settingToggleNotif.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                notifIsOn = !notifIsOn;
+                settingPref.setNotifState(notifIsOn);
+
+                if(notifIsOn) {
+                    iconToggleNotif.setImageResource(R.drawable.btn_toggle_on);
+
+                    // TODO set notif on
+                } else {
+                    iconToggleNotif.setImageResource(R.drawable.btn_toggle_off);
+
+                    // TODO set notif off
+                }
+            }
+        });
+
+        settingToggleDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                downloadWIFIOnlyOn = !downloadWIFIOnlyOn;
+                settingPref.setDownloadWifiOnly(downloadWIFIOnlyOn);
+
+                if(downloadWIFIOnlyOn) {
+                    iconToggleDownload.setImageResource(R.drawable.btn_toggle_on);
+
+                    // TODO set download wifi only
+                } else {
+                    iconToggleDownload.setImageResource(R.drawable.btn_toggle_off);
+
+                    // TODO set download wifi only off
+                }
+            }
+        });
+
+        settingSupportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getBaseContext(), "Support Button", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        settingPrivacyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getBaseContext(), "Privacy Button", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        settingAboutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getBaseContext(), "About", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void initUploadForm() {
+        panelUpload = (RelativeLayout) findViewById(R.id.upload_form);
+
+        uploadFileName = (TextView) findViewById(R.id.upload_file_name);
+        uploadProgress = (SeekBar) findViewById(R.id.upload_seek_bar);
+        uploadButtonPause = (RelativeLayout) findViewById(R.id.upload_button_pause);
+        uploadButtonCancel = (RelativeLayout) findViewById(R.id.upload_button_cancel);
+        uploadButton = (RelativeLayout) findViewById(R.id.upload_button);
+        uploadButtonText = (TextView) findViewById(R.id.upload_button_text);
+        uploadInputTitle = (EditText) findViewById(R.id.upload_input_title);
+        uploadInputDescription = (EditText) findViewById(R.id.upload_description);
+
+        uploadButtonPause.setOnClickListener(this);
+        uploadButtonCancel.setOnClickListener(this);
+        uploadButton.setOnClickListener(this);
+    }
+
+    private void showFileChooser() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        startActivityForResult(Intent.createChooser(intent, "Select a file to upload"), UPLOAD_FILE_CODE);
+    }
+
+    public static String getPath(Context context, Uri uri) throws URISyntaxException {
+        if ("content".equalsIgnoreCase(uri.getScheme())) {
+            String[] projection = { "_data" };
+            Cursor cursor = null;
+
+            try {
+                cursor = context.getContentResolver().query(uri, projection, null, null, null);
+                int column_index = cursor.getColumnIndexOrThrow("_data");
+                if (cursor.moveToFirst()) {
+                    return cursor.getString(column_index);
+                }
+            } catch (Exception e) {
+                // Eat it
+            }
+        }
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+
+        return null;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == UPLOAD_FILE_CODE) {
+            if(resultCode == 1) {
+                Uri uri = data.getData();
+                try {
+                    String path = getPath(this, uri);
+
+//                File file = new File(path);
+                    Toast.makeText(getBaseContext(), "Path : " + path, Toast.LENGTH_SHORT).show();
+                    showUploadForm();
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void showUploadForm() {
+        panelUpload.setVisibility(View.VISIBLE);
+        isUploadFormShowing = true;
+
+        uploadFileName.setText("");
+        uploadProgress.setProgress(0);
+        uploadButtonText.setText("SUBMIT");
+        uploadButtonText.setTextColor(getResources().getColor(R.color.dark_purple_font));
+    }
+
+    private void closeUploadForm() {
+        // TODO cancel upload
+        panelUpload.setVisibility(View.INVISIBLE);
+        isUploadFormShowing = false;
+    }
+
     private RelativeLayout getCurrentPanel(PanelState state) {
         switch (state) {
             case PANEL_NEW_POST:
@@ -396,6 +663,10 @@ public class MainActivity extends AppCompatActivity
             case PANEL_DOWNLOAD:
                 Log.d("CURRENT PANEL", "DOWNLOAD");
                 return panelDownloads;
+
+            case PANEL_SETTING:
+                Log.d("CURRENT PANEL", "SETTING");
+                return panelSettings;
         }
         return null;
     }
@@ -441,6 +712,12 @@ public class MainActivity extends AppCompatActivity
             case PANEL_DOWNLOAD:
                 panelDownloads.setVisibility(View.VISIBLE);
                 panelState = PanelState.PANEL_DOWNLOAD;
+                fabMenu.setVisibility(View.INVISIBLE);
+                break;
+
+            case PANEL_SETTING:
+                panelSettings.setVisibility(View.VISIBLE);
+                panelState = PanelState.PANEL_SETTING;
                 fabMenu.setVisibility(View.INVISIBLE);
                 break;
         }
@@ -498,19 +775,30 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else if(CustomMediaPlayer.getInstance().isVideoPlayerShowing) {
+
+        if(CustomMediaPlayer.getInstance().isVideoPlayerShowing) {
             CustomMediaPlayer.getInstance().closeVideoPlayer();
         } else if(CustomMediaPlayer.getInstance().isNewsDetailShowing) {
             CustomMediaPlayer.getInstance().closeNewsDetail();
+        } else if(drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else if(isUploadFormShowing) {
+            closeUploadForm();
+        }else if(getCurrentPanel(panelState) != panelNewPost) {
+            changePanel(PanelState.PANEL_NEW_POST);
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            }
         } else {
+
             DataPool.getInstance().listHomeBanner.clear();
             DataPool.getInstance().listHomeTopVideos.clear();
             DataPool.getInstance().listHomeTopMusic.clear();
+
             MainActivity.this.finish();
-            super.onBackPressed();
+//                super.onBackPressed();
         }
+
     }
 
     @Override
@@ -537,42 +825,64 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
 
-        if (id == R.id.nav_new_post) {
-            // TODO handle new post
+    @Override
+    public void onClick(View view) {
+        // SIDE MENU
+        if(view == sideMenuTopup) {
+            Toast.makeText(getBaseContext(), "Top Up", Toast.LENGTH_SHORT).show();
+        }
+
+        if(view == sideMenuHome) {
+            if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
+                CustomMediaPlayer.getInstance().closeNewsDetail();
             changePanel(PanelState.PANEL_NEW_POST);
-            Toast.makeText(getBaseContext(), "New Post", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_library) {
-            // TODO handle library
+        }
+
+        if(view == sideMenuLibrary) {
+            if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
+                CustomMediaPlayer.getInstance().closeNewsDetail();
             changePanel(PanelState.PANEL_LIBRARY);
-            Toast.makeText(getBaseContext(), "Library", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_music) {
-            // TODO handle shop music
+        }
+
+        if(view == sideMenuShopMusic) {
+            if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
+                CustomMediaPlayer.getInstance().closeNewsDetail();
             changePanel(PanelState.PANEL_SHOP_MUSIC);
-            Toast.makeText(getBaseContext(), "Shop Music", Toast.LENGTH_SHORT).show();
-            // TODO to music tab
-        } else if (id == R.id.nav_video) {
-            // TODO handle shop video
+        }
+
+        if(view == sideMenuShopVideo) {
+            if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
+                CustomMediaPlayer.getInstance().closeNewsDetail();
             changePanel(PanelState.PANEL_SHOP_VIDEO);
-            Toast.makeText(getBaseContext(), "Shop Video", Toast.LENGTH_SHORT).show();
-            // TODO to video tab
-        } else if (id == R.id.nav_downloads) {
-            // TODO handle downloads
+        }
+
+        if(view == sideMenuDownloads) {
+            if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
+                CustomMediaPlayer.getInstance().closeNewsDetail();
             changePanel(PanelState.PANEL_DOWNLOAD);
-            Toast.makeText(getBaseContext(), "Download", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_settings) {
-            // TODO handle settings
-        } else if (id == R.id.nav_signout) {
-            // TODO handle signout
+        }
+
+        if(view == sideMenuSetting) {
+            if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
+                CustomMediaPlayer.getInstance().closeNewsDetail();
+            changePanel(PanelState.PANEL_SETTING);
+        }
+
+        if(view == sideMenuSignOut) {
+            userLoginData.signOut();
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            MainActivity.this.finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        return true;
+        // SIDE MENU END
+
+        // UPLOAD
+        if(view == uploadButton) {
+            Toast.makeText(getBaseContext(), "Upload File", Toast.LENGTH_SHORT).show();
+        }
+        // UPLOAD END
     }
 }

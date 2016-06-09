@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_bg"
+    android:orientation="vertical">
+
+    <!-- Top Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/profile_preview_top_section_height"
+        android:background="@drawable/bg_profile_preview"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/profile_preview_prof_pic"
+                android:layout_width="@dimen/profile_preview_thumbnail_width"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/thumb_sample" />
+        </RelativeLayout>
+
+        <!-- Name -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/profile_preview_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Username"
+                    android:textColor="@color/white_font"
+                    android:textSize="@dimen/profile_preview_top_large_text" />
+
+                <ImageView
+                    android:id="@+id/profile_preview_name_edit"
+                    android:layout_width="@dimen/profile_preview_top_icon_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/icon_editable" />
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/profile_preview_country"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Indonesia"
+                    android:textColor="@color/white_font"
+                    android:textSize="@dimen/profile_preview_top_medium_text" />
+
+                <ImageView
+                    android:id="@+id/profile_preview_country_edit"
+                    android:layout_width="@dimen/profile_preview_top_icon_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/icon_editable" />
+            </RelativeLayout>
+
+
+            <!-- Like Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="@dimen/profile_preview_like_margin">
+
+                <!-- Like -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="@dimen/profile_preview_like_icon_width"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/icon_profile_like" />
+
+                    <TextView
+                        android:id="@+id/profile_preview_like_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/profile_preview_like_margin"
+                        android:text="115"
+                        android:textColor="@color/white_font"
+                        android:textSize="@dimen/profile_preview_top_medium_text" />
+
+                </LinearLayout>
+
+                <!-- Music -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="@dimen/profile_preview_like_icon_width"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/icon_profile_like" />
+
+                    <TextView
+                        android:id="@+id/profile_preview_music_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/profile_preview_like_margin"
+                        android:text="115"
+                        android:textColor="@color/white_font"
+                        android:textSize="@dimen/profile_preview_top_medium_text" />
+
+                </LinearLayout>
+
+                <!-- Video -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="@dimen/profile_preview_like_icon_width"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/icon_profile_like" />
+
+                    <TextView
+                        android:id="@+id/profile_preview_video_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/profile_preview_like_margin"
+                        android:text="115"
+                        android:textColor="@color/white_font"
+                        android:textSize="@dimen/profile_preview_top_medium_text" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- City -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:orientation="vertical">
+
+            <!-- Blank Space -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+            </LinearLayout>
+
+            <!-- Country -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/profile_preview_city"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/profile_preview_city_margin"
+                    android:text="Jakarta"
+                    android:textColor="@color/white_font"
+                    android:textSize="@dimen/profile_preview_top_medium_text" />
+
+                <ImageView
+                    android:id="@+id/profile_preview_city_edit"
+                    android:layout_width="@dimen/profile_preview_top_icon_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/icon_editable" />
+            </RelativeLayout>
+
+            <!-- Share -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+    <!-- Top Section End -->
+
+    <!-- Main Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- About -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="@dimen/profile_preview_description_margin">
+
+                <TextView
+                    android:id="@+id/profile_preview_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="left"
+                    android:text="Description"
+                    android:textColor="@color/white_font"
+                    android:textSize="@dimen/profile_preview_description_text" />
+
+            </LinearLayout>
+            <!-- About End -->
+
+            <!-- Content -->
+
+            <!-- Content End -->
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- Main Content End -->
+</LinearLayout>

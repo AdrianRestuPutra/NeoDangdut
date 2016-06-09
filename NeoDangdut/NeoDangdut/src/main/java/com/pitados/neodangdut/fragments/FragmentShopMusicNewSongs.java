@@ -9,12 +9,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomListShopMusicAdapter;
 import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.CustomMediaPlayer;
 import com.pitados.neodangdut.util.DataPool;
 
 /**
@@ -71,7 +71,7 @@ public class FragmentShopMusicNewSongs extends Fragment {
         listNewSongs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(context, "TODO on item "+i, Toast.LENGTH_SHORT).show();
+                CustomMediaPlayer.getInstance().playTrack(DataPool.getInstance().listShopMusicNewSongs.get(i), true);
             }
         });
 

@@ -19,7 +19,7 @@ public class CommunityContentData {
     public int totalLikes;
     public int totalViews;
     public String created;
-    public String isLikeable;
+    public boolean isLikeable;
 
     public CommunityContentData(String ID, String userID, String userName, String firstName, String lastName, String photoURL, int userTotalLikes,
                                 String songName, String description, String category, String fileURL, String coverURL,
@@ -39,6 +39,9 @@ public class CommunityContentData {
         this.totalLikes = totalLikes;
         this.totalViews = totalViews;
         this.created = created;
-        this.isLikeable = isLikeable;
+        if(isLikeable.equalsIgnoreCase("true"))
+            this.isLikeable = true;
+        else
+            this.isLikeable = false;
     }
 }

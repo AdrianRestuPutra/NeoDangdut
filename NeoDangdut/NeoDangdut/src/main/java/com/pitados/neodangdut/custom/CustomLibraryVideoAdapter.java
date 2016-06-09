@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.pitados.neodangdut.R;
-import com.pitados.neodangdut.model.VideoData;
+import com.pitados.neodangdut.model.LibraryData;
 
 import java.util.List;
 
@@ -17,9 +17,9 @@ import java.util.List;
  */
 public class CustomLibraryVideoAdapter extends BaseAdapter {
     private Context context;
-    private List<VideoData> listVideo;
+    private List<LibraryData> listVideo;
 
-    public CustomLibraryVideoAdapter(Context context, List<VideoData> listVideo) {
+    public CustomLibraryVideoAdapter(Context context, List<LibraryData> listVideo) {
         this.context = context;
         this.listVideo = listVideo;
     }

@@ -3,6 +3,7 @@ package com.pitados.neodangdut.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +43,8 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
     private CustomListTopTrackAdapter listTrackAdapter;
     private CustomListTopVideoAdapter listVideoAdapter;
     private CustomCommunityNewsAdapter listNewsAdapter;
+
+    private SwipeRefreshLayout swipeRefresh;
 
 
     public static FragmentHome newInstance(int page, String title) {
@@ -87,6 +90,35 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
         listViewLatestNews = (ListView) view.findViewById(R.id.list_view_latest_news);
         listViewLatestNews.setFocusable(false);
 
+        swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.home_swipe_refresh);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                homeBanner.removeAllSliders();
+
+                ApiManager.getInstance().getToken();
+                ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
+                    @Override
+                    public void onTokenSaved() {
+                        ApiManager.getInstance().getHomeBanner();
+                        ApiManager.getInstance().getHomeTopMusic();
+                        ApiManager.getInstance().getHomeTopVideos();
+                        ApiManager.getInstance().getHomeLatestNews();
+                    }
+
+                    @Override
+                    public void onUserAccessTokenSaved() {
+
+                    }
+
+                    @Override
+                    public void onError(String message) {
+
+                    }
+                });
+            }
+        });
+
         loadData();
 
         // On click listener
@@ -121,6 +153,9 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
                     Log.d("DATA RECEIVED", "News");
                     loadLatestNews();
                 }
+
+                if(swipeRefresh != null)
+                    swipeRefresh.setRefreshing(false);
             }
         });
     }

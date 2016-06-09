@@ -14,11 +14,9 @@ import android.widget.Toast;
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomLibraryMusicAdapter;
-import com.pitados.neodangdut.model.MusicData;
+import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.DataPool;
 import com.pitados.neodangdut.util.StateManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by adrianrestuputranto on 4/10/16.
@@ -70,51 +68,8 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
         // TODO init widgets
         listViewMusic = (GridView) view.findViewById(R.id.list_view_library_music);
 
-        // TODO insert data
-        // TEST
-        List<MusicData> listTopTrack = new ArrayList<>();
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listTopTrack.add(new MusicData());
-        listAdapter = new CustomLibraryMusicAdapter(context, listTopTrack);
-        listViewMusic.setAdapter(listAdapter);
+
+        loadData();
 
         initAlbumView(view);
 
@@ -126,6 +81,26 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
 
     private void initAlbumView(View view) {
         albumView = (LinearLayout) view.findViewById(R.id.library_music_album_view);
+    }
+
+    public void loadData() {
+        // TODO search local data
+        if(DataPool.getInstance().listLibraryMusic.size() > 0) {
+            listAdapter = new CustomLibraryMusicAdapter(context, DataPool.getInstance().listLibraryMusic);
+            listViewMusic.setAdapter(listAdapter);
+
+        }
+
+        ApiManager.getInstance().setOnLibraryMusicListener(new ApiManager.OnLibraryMusicReceived() {
+            @Override
+            public void onDataLoaded(ApiManager.ApiType type) {
+                listAdapter = new CustomLibraryMusicAdapter(context, DataPool.getInstance().listLibraryMusic);
+                listViewMusic.setAdapter(listAdapter);
+
+                listAdapter.notifyDataSetChanged();
+            }
+        });
+
     }
 
     @Override

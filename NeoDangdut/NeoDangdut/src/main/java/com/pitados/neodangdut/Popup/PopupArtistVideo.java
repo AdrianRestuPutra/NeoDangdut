@@ -11,16 +11,18 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.pitados.neodangdut.R;
-import com.pitados.neodangdut.model.MusicData;
 import com.pitados.neodangdut.model.VideoData;
+import com.pitados.neodangdut.util.CustomMediaPlayer;
 
 /**
  * Created by adrianrestuputranto on 5/31/16.
  */
 public class PopupArtistVideo extends Dialog implements View.OnClickListener{
+    private Context context;
+
     private ImageView thumbnail;
-    private TextView price, title, artistName, albumName, listenCount, likeCount;
-    private RelativeLayout buttonPlay, buttonLike, buttonAlbum, buttonShareFB, buttonShareTwitter;
+    private TextView price, title, artistName, viewCount, likeCount;
+    private RelativeLayout buttonPlay, buttonLike, buttonShareFB, buttonShareTwitter;
 
     private VideoData videoData;
 
@@ -29,6 +31,7 @@ public class PopupArtistVideo extends Dialog implements View.OnClickListener{
 
     public PopupArtistVideo(Context context, int themeResId) {
         super(context, themeResId);
+        this.context = context;
         this.setContentView(R.layout.popup_artist_video);
 
         this.setCanceledOnTouchOutside(true);
@@ -40,17 +43,15 @@ public class PopupArtistVideo extends Dialog implements View.OnClickListener{
         thumbnail = (ImageView) findViewById(R.id.popup_artist_video_thumbnail);
         price = (TextView) findViewById(R.id.popup_artist_video_price);
         title = (TextView) findViewById(R.id.popup_artist_video_title);
-        artistName = (TextView) findViewById(R.id.popup_artist_song_artist_name);
-        albumName = (TextView) findViewById(R.id.popup_artist_song_album);
-        // TODO listen count
-        // TODO like count
+        artistName = (TextView) findViewById(R.id.popup_artist_video_artist_name);
+        viewCount = (TextView) findViewById(R.id.popup_artist_video_view_count);
+        likeCount = (TextView) findViewById(R.id.popup_artist_video_like_count);
 
         // Button
-        buttonPlay = (RelativeLayout) findViewById(R.id.popup_artist_song_button_play);
-        buttonLike = (RelativeLayout) findViewById(R.id.popup_artist_song_button_like);
-        buttonAlbum = (RelativeLayout) findViewById(R.id.popup_artist_song_button_album);
-        buttonShareFB = (RelativeLayout) findViewById(R.id.popup_artist_song_button_share_fb);
-        buttonShareTwitter = (RelativeLayout) findViewById(R.id.popup_artist_song_button_share_twitter);
+        buttonPlay = (RelativeLayout) findViewById(R.id.popup_artist_video_button_play);
+//        buttonLike = (RelativeLayout) findViewById(R.id.popup_artist_video_button_like);
+        buttonShareFB = (RelativeLayout) findViewById(R.id.popup_artist_video_button_share_fb);
+        buttonShareTwitter = (RelativeLayout) findViewById(R.id.popup_artist_video_button_share_twitter);
 
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()
@@ -63,20 +64,20 @@ public class PopupArtistVideo extends Dialog implements View.OnClickListener{
                 .build();
 
         buttonPlay.setOnClickListener(this);
-        buttonLike.setOnClickListener(this);
-        buttonAlbum.setOnClickListener(this);
+//        buttonLike.setOnClickListener(this);
         buttonShareFB.setOnClickListener(this);
         buttonShareTwitter.setOnClickListener(this);
     }
 
-    public void showPopupArtistSong(MusicData data) {
-        musicData = data;
+    public void showPopupArtistVideo(VideoData data) {
+        videoData = data;
 
-        imageLoader.displayImage(data.albumCover, thumbnail, opts);
+        imageLoader.displayImage(data.cover, thumbnail, opts);
         price.setText(data.price);
-        title.setText(data.songTitle);
+        title.setText(data.videoTitle);
         artistName.setText(data.singerName);
-        albumName.setText(data.albumName);
+        viewCount.setText("0");
+        likeCount.setText("0");
 
         this.show();
     }
@@ -88,14 +89,12 @@ public class PopupArtistVideo extends Dialog implements View.OnClickListener{
     @Override
     public void onClick(View view) {
         if(view == buttonPlay) {
-
+            CustomMediaPlayer.getInstance().playVideo(videoData);
+            closePopupArtistSong();
         }
-        if(view == buttonLike) {
-
-        }
-        if(view == buttonAlbum) {
-
-        }
+//        if(view == buttonLike) {
+//            ApiManager.getInstance().likeItem(ApiManager.LikeType.VIDEO, videoData.ID);
+//        }
         if(view == buttonShareFB) {
 
         }

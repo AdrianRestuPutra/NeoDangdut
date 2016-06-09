@@ -9,11 +9,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.pitados.neodangdut.Popup.PopupArtistSong;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.MusicData;
 
@@ -28,6 +28,8 @@ public class CustomListTopTrackAdapter extends BaseAdapter {
 
     private ImageLoader imageLoader;
     private DisplayImageOptions opts;
+
+    private PopupArtistSong popupArtisSong;
 
     static class ViewHolder {
         ImageView thumbnail;
@@ -51,6 +53,8 @@ public class CustomListTopTrackAdapter extends BaseAdapter {
                 .resetViewBeforeLoading(true)
                 .imageScaleType(ImageScaleType.EXACTLY)
                 .build();
+
+        popupArtisSong = new PopupArtistSong(context, R.style.custom_dialog);
     }
 
     @Override
@@ -88,7 +92,7 @@ public class CustomListTopTrackAdapter extends BaseAdapter {
             holder.optButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(context, "TODO handle opt " + index, Toast.LENGTH_SHORT).show();
+                    popupArtisSong.showPopupArtistSong(listTopTrack.get(index));
                 }
             });
 

@@ -7,10 +7,14 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -23,11 +27,18 @@ import com.devbrackets.android.exomedia.manager.EMPlaylistManager;
 import com.devbrackets.android.exomedia.service.EMPlaylistService;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.CommunityContentData;
 import com.pitados.neodangdut.model.MusicData;
 import com.pitados.neodangdut.model.NewsData;
 import com.pitados.neodangdut.model.VideoData;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by adrianrestuputranto on 4/16/16.
@@ -57,6 +68,8 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
     // News
     private ImageView newsThumbnail;
     private TextView newsDetailTitle, newsDetailDate, newsDescription;
+    private RelativeLayout loadingBar;
+    private ScrollView newsScrollView;
 
     private ImageLoader imageLoader;
     private DisplayImageOptions opts;
@@ -105,12 +118,14 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         this.videoDescription = videoDescription;
     }
 
-    public void setNewsPanel(View panelNewsDetail, ImageView newsThumbnail, TextView newsDetailTitle, TextView newsDetailDate, TextView newsDescription) {
+    public void setNewsPanel(View panelNewsDetail, ImageView newsThumbnail, TextView newsDetailTitle, TextView newsDetailDate, TextView newsDescription, RelativeLayout loadingBar, ScrollView newsScrollView) {
         this.panelNewsDetail = panelNewsDetail;
         this.newsThumbnail = newsThumbnail;
         this.newsDetailTitle = newsDetailTitle;
         this.newsDetailDate = newsDetailDate;
         this.newsDescription = newsDescription;
+        this.loadingBar = loadingBar;
+        this.newsScrollView = newsScrollView;
     }
 
     public void playTrack(final MusicData data, boolean isPreview) {
@@ -142,6 +157,75 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 audioPlayerSongTitle.setText(data.songTitle);
                 audioPlayerArtistName.setText(data.singerName);
                 audioPlayerDuration.setText(data.duration);
+
+                int duration = (int)audioPlayer.getDuration() / 1000;
+                audioProgress.setMax(duration);
+            }
+        });
+
+        final Handler mHandler = new Handler();
+        Activity currentActivity =  (Activity) context;
+        currentActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(audioPlayer != null) {
+                    int mCurrentPos = (int)audioPlayer.getCurrentPosition() / 1000;
+                    audioProgress.setProgress(mCurrentPos);
+                }
+
+                mHandler.postDelayed(this, 1000);
+            }
+        });
+
+        audioProgress.setThumb(ContextCompat.getDrawable(context, R.color.transparent));
+        audioProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int pos, boolean fromUser) {
+                if(audioPlayer != null && fromUser) {
+                    audioPlayer.seekTo(pos * 1000);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO set seek thumb
+//                seekBar.setThumb(ContextCompat.getDrawable(context, R.color.colorPrimary));
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // TODO set seek thumb transparent
+//                seekBar.setThumb(ContextCompat.getDrawable(context, R.color.colorPrimary));
+            }
+        });
+    }
+
+    public void playTrack(final CommunityContentData data) {
+        if (panelMusicPlayer.getVisibility() != View.VISIBLE) {
+            showMusicPlayer();
+
+        }
+        // TODO set panel music player default / loading
+        panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
+        audioPauseIcon.setImageResource(R.drawable.icon_play);
+
+        if(audioPlayer.isPlaying())
+            audioPlayer.stopPlayback();
+
+        audioPlayer.setDataSource(context, Uri.parse(data.fileURL));
+        audioPlayer.prepareAsync();
+        audioPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                audioPlayer.start();
+                panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
+                audioPauseIcon.setImageResource(R.drawable.icon_pause);
+
+                // TODO change audio data
+                imageLoader.displayImage(data.coverURL, audioPlayerThumbnail, opts);
+                audioPlayerSongTitle.setText(data.songName);
+                audioPlayerArtistName.setText(data.userName);
+                audioPlayerDuration.setText("");
 
                 int duration = (int)audioPlayer.getDuration() / 1000;
                 audioProgress.setMax(duration);
@@ -222,7 +306,8 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         });
 
         videoDate.setText(videoData.songName);
-        videoDescription.setText(videoData.description);
+        if(videoData.description.length() > 0)
+            videoDescription.setText(videoData.description);
     }
 
     // Animate panel
@@ -285,13 +370,27 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         isVideoPlayerShowing = false;
     }
 
-    public void showNewsDetail(NewsData newsData) {
+    public void showNewsDetail(final NewsData newsData) {
         panelNewsDetail.setVisibility(View.VISIBLE);
-
-        imageLoader.displayImage(newsData.thumbnailURL, newsThumbnail, opts);
-        newsDetailTitle.setText(newsData.title);
-        newsDetailDate.setText(newsData.created);
-        newsDescription.setText(newsData.content);
+        newsScrollView.fullScroll(ScrollView.FOCUS_UP);
+//        ApiManager.getInstance().getToken();
+//        ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
+//            @Override
+//            public void onTokenSaved() {
+//                getNewsDetail(ApiManager.getInstance().TOKEN, newsData.ID);
+//            }
+//
+//            @Override
+//            public void onUserAccessTokenSaved() {
+//
+//            }
+//
+//            @Override
+//            public void onError(String message) {
+//
+//            }
+//        });
+        getNewsDetail(ApiManager.getInstance().TOKEN, newsData.ID);
 
         isNewsDetailShowing = true;
     }
@@ -300,6 +399,53 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         panelNewsDetail.setVisibility(View.GONE);
 
         isNewsDetailShowing = false;
+    }
+
+    public void getNewsDetail(String token, String id) {
+        Map<String, String> params = new HashMap<>();
+
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_NEWS+"/"+id, token, params);
+
+        request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                // TODO close loading
+                if (result != null) {
+                    Log.d("News", result);
+                    try {
+                        JSONObject rawData = new JSONObject(result);
+                        JSONObject article = rawData.getJSONObject("article");
+
+                        String ID = article.getString("id");
+                        String title = article.getString("title");
+                        String thumbnailURL = article.getString("image");
+                        String content = article.getString("content");
+                        String tags = article.getString("tags");
+                        String slug = article.getString("slug");
+                        String totalLikes = article.getString("total_likes");
+                        String created = article.getString("created");
+                        // TODO related
+                        String isLikeable = article.getString("is_likeable");
+
+                        imageLoader.displayImage(thumbnailURL, newsThumbnail, opts);
+                        newsDetailTitle.setText(title);
+                        newsDetailDate.setText(created);
+                        newsDescription.setText(Html.fromHtml(content));
+
+                        loadingBar.setVisibility(View.INVISIBLE);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void beforeExecute() {
+                loadingBar.setVisibility(View.VISIBLE);
+            }
+        });
+
+        request.execute();
     }
 
     @Override

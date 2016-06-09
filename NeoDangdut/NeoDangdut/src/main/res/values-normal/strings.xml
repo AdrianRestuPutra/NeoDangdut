@@ -10,4 +10,7 @@
     <!-- toolbar -->
     <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
+
+    <!-- Setting -->
+    <string name="setting_help_support">Help \u0026 Support</string>
 </resources>

@@ -78,6 +78,7 @@
                 android:layout_width="@dimen/shop_opt_icon_width"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
+                android:layout_marginRight="@dimen/dialog_artist_price_margin"
                 android:layout_centerVertical="true"
                 android:adjustViewBounds="true"
                 android:src="@drawable/icon_more_white" />

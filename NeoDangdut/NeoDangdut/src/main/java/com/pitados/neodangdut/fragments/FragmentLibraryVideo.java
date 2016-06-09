@@ -8,19 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.devbrackets.android.exomedia.EMVideoView;
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomLibraryVideoAdapter;
-import com.pitados.neodangdut.model.VideoData;
-import com.pitados.neodangdut.util.CustomMediaPlayer;
-import com.pitados.neodangdut.util.StateManager;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.DataPool;
 
 /**
  * Created by adrianrestuputranto on 4/10/16.
@@ -36,10 +30,6 @@ public class FragmentLibraryVideo extends Fragment implements AdapterView.OnItem
     // Adapters
     private CustomLibraryVideoAdapter listAdapter;
 
-    // Media Player
-    private LinearLayout videoPlayerPanel;
-    private EMVideoView videoView;
-    private boolean isVideoPlayerShowing;
 
     public static FragmentLibraryVideo newInstance(int page, String title) {
         FragmentLibraryVideo home = new FragmentLibraryVideo();
@@ -71,23 +61,6 @@ public class FragmentLibraryVideo extends Fragment implements AdapterView.OnItem
         // TODO init widgets
         listViewVideo = (GridView) view.findViewById(R.id.list_view_library_video);
 
-        // Video Player
-
-
-        isVideoPlayerShowing = false;
-
-        // TODO insert data
-        // TEST
-        List<VideoData> listData = new ArrayList<>();
-        listData.add(new VideoData());
-        listData.add(new VideoData());
-        listData.add(new VideoData());
-        listData.add(new VideoData());
-        listData.add(new VideoData());
-        listData.add(new VideoData());
-        listData.add(new VideoData());
-        listAdapter = new CustomLibraryVideoAdapter(context, listData);
-        listViewVideo.setAdapter(listAdapter);
 
         // TODO handle onItemClick
         listViewVideo.setOnItemClickListener(this);
@@ -95,25 +68,27 @@ public class FragmentLibraryVideo extends Fragment implements AdapterView.OnItem
         return view;
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        if(adapterView == listViewVideo && !isVideoPlayerShowing && !StateManager.isTopView) {
-            Toast.makeText(context, "TODO handle lib video item : " + i, Toast.LENGTH_SHORT).show();
+    public void loadData() {
+        if(DataPool.getInstance().listLibraryVideo.size() > 0) {
+            listAdapter = new CustomLibraryVideoAdapter(context, DataPool.getInstance().listLibraryVideo);
+            listViewVideo.setAdapter(listAdapter);
 
-//            isVideoPlayerShowing = true;
-//            ConnManager.getInstance().downloadFile(Consts.VIDEO_SAMPLE_URL, ConnManager.DataType.VIDEO, null, "Video-"+i);
         }
+
+        ApiManager.getInstance().setOnCommunityMusicListener(new ApiManager.OnCommunityMusicReceived() {
+            @Override
+            public void onDataLoaded(ApiManager.ApiType type) {
+                listAdapter = new CustomLibraryVideoAdapter(context, DataPool.getInstance().listLibraryVideo);
+                listViewVideo.setAdapter(listAdapter);
+
+                listAdapter.notifyDataSetChanged();
+            }
+        });
+
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        if(!isVisibleToUser) {
-            if(videoView != null) {
-                CustomMediaPlayer.getInstance().closeVideoPlayer();
-                isVideoPlayerShowing = false;
-            }
-        }
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Toast.makeText(context, "TODO handle lib video item : " + i, Toast.LENGTH_SHORT).show();
     }
 }

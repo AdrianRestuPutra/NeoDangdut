@@ -271,4 +271,16 @@
     </RelativeLayout>
     <!-- News Detail End -->
 
+    <!-- Upload -->
+    <RelativeLayout
+        android:id="@+id/upload_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:visibility="gone">
+
+        <include layout="@layout/layout_upload_file" />
+    </RelativeLayout>
+    <!-- Upload End -->
+
 </android.support.design.widget.CoordinatorLayout>

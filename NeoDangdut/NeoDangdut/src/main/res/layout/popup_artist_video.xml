@@ -81,8 +81,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Abang Kapan Pulang"
-                            android:textSize="@dimen/tab_text_large_size"
-                            android:textColor="@color/white_font" />
+                            android:textColor="@color/white_font"
+                            android:textSize="@dimen/tab_text_large_size" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -104,7 +104,63 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:visibility="invisible">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:orientation="horizontal">
+
+                        <!-- Listen -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="@dimen/dialog_artist_icon_width"
+                                android:layout_height="wrap_content"
+                                android:adjustViewBounds="true"
+                                android:src="@drawable/icon_views" />
+
+                            <TextView
+                                android:id="@+id/popup_artist_video_view_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/dialog_artist_text_margin"
+                                android:text="155"
+                                android:textColor="@color/white_font"
+                                android:textSize="@dimen/dialog_artist_text" />
+                        </LinearLayout>
+
+                        <!-- Like -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/dialog_artist_icon_margin"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="@dimen/dialog_artist_icon_width"
+                                android:layout_height="wrap_content"
+                                android:adjustViewBounds="true"
+                                android:src="@drawable/icon_popup_like" />
+
+                            <TextView
+                                android:id="@+id/popup_artist_video_like_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/dialog_artist_text_margin"
+                                android:text="155"
+                                android:textColor="@color/white_font"
+                                android:textSize="@dimen/dialog_artist_text" />
+                        </LinearLayout>
+
+                    </LinearLayout>
 
                 </RelativeLayout>
 
@@ -119,7 +175,7 @@
 
                 <!-- Play -->
                 <RelativeLayout
-                    android:id="@+id/popup_artist_song_button_play"
+                    android:id="@+id/popup_artist_video_button_play"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1">
@@ -146,11 +202,11 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/divider_height"
-                    android:background="@color/tab_divider"/>
+                    android:background="@color/tab_divider" />
 
-                <!-- Like -->
+                <!-- Like
                 <RelativeLayout
-                    android:id="@+id/popup_artist_song_button_like"
+                    android:id="@+id/popup_artist_video_button_like"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1">
@@ -161,7 +217,7 @@
                         android:layout_alignParentLeft="true"
                         android:layout_centerVertical="true"
                         android:adjustViewBounds="true"
-                        android:src="@drawable/icon_popup_play" />
+                        android:src="@drawable/icon_popup_like" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -176,41 +232,17 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/divider_height"
-                    android:background="@color/tab_divider"/>
-
-                <!-- Go to Album -->
-                <RelativeLayout
-                    android:id="@+id/popup_artist_song_button_album"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1">
-
-                    <ImageView
-                        android:layout_width="@dimen/dialog_artist_price_button_icon"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:adjustViewBounds="true"
-                        android:src="@drawable/icon_popup_play" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="@dimen/dialog_artist_button_text_margin"
-                        android:text="Go to Album"
-                        android:textColor="@color/white_font"
-                        android:textSize="@dimen/tab_text_size" />
-                </RelativeLayout>
+                    android:background="@color/tab_divider" />
+                -->
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/divider_height"
-                    android:background="@color/tab_divider"/>
+                    android:background="@color/tab_divider" />
 
                 <!-- Share FB -->
                 <RelativeLayout
-                    android:id="@+id/popup_artist_song_button_share_fb"
+                    android:id="@+id/popup_artist_video_button_share_fb"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1">
@@ -221,7 +253,7 @@
                         android:layout_alignParentLeft="true"
                         android:layout_centerVertical="true"
                         android:adjustViewBounds="true"
-                        android:src="@drawable/icon_popup_play" />
+                        android:src="@drawable/icon_popup_fb" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -236,11 +268,11 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/divider_height"
-                    android:background="@color/tab_divider"/>
+                    android:background="@color/tab_divider" />
 
                 <!-- Share Twitter -->
                 <RelativeLayout
-                    android:id="@+id/popup_artist_song_button_share_twitter"
+                    android:id="@+id/popup_artist_video_button_share_twitter"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1">
@@ -251,7 +283,7 @@
                         android:layout_alignParentLeft="true"
                         android:layout_centerVertical="true"
                         android:adjustViewBounds="true"
-                        android:src="@drawable/icon_popup_play" />
+                        android:src="@drawable/icon_popup_tweeter" />
 
                     <TextView
                         android:layout_width="wrap_content"

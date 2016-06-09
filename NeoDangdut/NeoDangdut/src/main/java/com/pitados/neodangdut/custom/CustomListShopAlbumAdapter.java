@@ -8,6 +8,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,7 +34,9 @@ public class CustomListShopAlbumAdapter extends BaseAdapter {
         ImageView thumbnail;
         TextView artistName;
         TextView albumName;
-        ImageView optButton;
+        TextView price;
+        RelativeLayout buyButton;
+        RelativeLayout optButton;
     }
 
     public CustomListShopAlbumAdapter(Context context, List<AlbumData> listTopAlbum) {
@@ -82,8 +85,18 @@ public class CustomListShopAlbumAdapter extends BaseAdapter {
             holder.artistName = (TextView) view.findViewById(R.id.list_view_shop_music_top_album_artist_name);
             holder.albumName = (TextView) view.findViewById(R.id.list_view_shop_music_top_album_song_title);
 
+            holder.price = (TextView) view.findViewById(R.id.list_view_shop_music_top_album_price);
+            holder.buyButton = (RelativeLayout) view.findViewById(R.id.list_view_shop_music_top_album_button);
+
+            holder.buyButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+
             final int index = i;
-            holder.optButton = (ImageView) view.findViewById(R.id.list_view_shop_music_top_album_opt_button);
+            holder.optButton = (RelativeLayout) view.findViewById(R.id.list_view_shop_music_top_album_opt_button);
             holder.optButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -100,6 +113,8 @@ public class CustomListShopAlbumAdapter extends BaseAdapter {
         imageLoader.displayImage(listTopAlbum.get(i).coverURL, holder.thumbnail, opts);
         holder.artistName.setText(listTopAlbum.get(i).singerName);
         holder.albumName.setText(listTopAlbum.get(i).albumName);
+
+        holder.price.setText("Rp "+listTopAlbum.get(i).price);
 
         return view;
     }

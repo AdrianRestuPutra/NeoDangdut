@@ -12,11 +12,14 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.MusicData;
+import com.pitados.neodangdut.util.CustomMediaPlayer;
 
 /**
  * Created by adrianrestuputranto on 5/31/16.
  */
 public class PopupArtistSong extends Dialog implements View.OnClickListener{
+    private Context context;
+
     private ImageView thumbnail;
     private TextView price, title, artistName, albumName, listenCount, likeCount;
     private RelativeLayout buttonPlay, buttonLike, buttonAlbum, buttonShareFB, buttonShareTwitter;
@@ -28,6 +31,7 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
 
     public PopupArtistSong(Context context, int themeResId) {
         super(context, themeResId);
+        this.context = context;
         this.setContentView(R.layout.popup_artist_song);
 
         this.setCanceledOnTouchOutside(true);
@@ -41,12 +45,12 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
         title = (TextView) findViewById(R.id.popup_artist_song_title);
         artistName = (TextView) findViewById(R.id.popup_artist_song_artist_name);
         albumName = (TextView) findViewById(R.id.popup_artist_song_album);
-        // TODO listen count
-        // TODO like count
+        listenCount = (TextView) findViewById(R.id.popup_artist_listen_count);
+        likeCount = (TextView) findViewById(R.id.popup_artist_like_count);
 
         // Button
         buttonPlay = (RelativeLayout) findViewById(R.id.popup_artist_song_button_play);
-        buttonLike = (RelativeLayout) findViewById(R.id.popup_artist_song_button_like);
+//        buttonLike = (RelativeLayout) findViewById(R.id.popup_artist_song_button_like);
         buttonAlbum = (RelativeLayout) findViewById(R.id.popup_artist_song_button_album);
         buttonShareFB = (RelativeLayout) findViewById(R.id.popup_artist_song_button_share_fb);
         buttonShareTwitter = (RelativeLayout) findViewById(R.id.popup_artist_song_button_share_twitter);
@@ -62,7 +66,7 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
                 .build();
 
         buttonPlay.setOnClickListener(this);
-        buttonLike.setOnClickListener(this);
+//        buttonLike.setOnClickListener(this);
         buttonAlbum.setOnClickListener(this);
         buttonShareFB.setOnClickListener(this);
         buttonShareTwitter.setOnClickListener(this);
@@ -76,7 +80,8 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
         title.setText(data.songTitle);
         artistName.setText(data.singerName);
         albumName.setText(data.albumName);
-
+        listenCount.setText("0");
+        likeCount.setText("0");
         this.show();
     }
 
@@ -87,11 +92,12 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
     @Override
     public void onClick(View view) {
         if(view == buttonPlay) {
-
+            CustomMediaPlayer.getInstance().playTrack(musicData, true);
+            closePopupArtistSong();
         }
-        if(view == buttonLike) {
-
-        }
+//        if(view == buttonLike) {
+//            ApiManager.getInstance().likeItem(ApiManager.LikeType.MUSIC, musicData.ID);
+//        }
         if(view == buttonAlbum) {
 
         }

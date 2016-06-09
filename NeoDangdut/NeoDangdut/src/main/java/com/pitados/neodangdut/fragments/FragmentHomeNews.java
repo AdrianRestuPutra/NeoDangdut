@@ -3,9 +3,11 @@ package com.pitados.neodangdut.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -28,11 +30,14 @@ public class FragmentHomeNews extends Fragment {
 
     private CustomCommunityNewsAdapter listAdapter;
 
+    private boolean isLoadingMore;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
         this.context = context;
+        isLoadingMore = false;
     }
 
     public static FragmentHomeNews newInstance(int page, String title) {
@@ -69,6 +74,22 @@ public class FragmentHomeNews extends Fragment {
             }
         });
 
+        listNews.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                int lastItem = firstVisibleItem + visibleItemCount;
+
+                if(lastItem == totalItemCount && totalItemCount != 0) {
+                    loadMore();
+                }
+            }
+        });
+
         return view;
     }
 
@@ -80,6 +101,8 @@ public class FragmentHomeNews extends Fragment {
             ApiManager.getInstance().setOnCommunityNewsListener(new ApiManager.OnCommunityNewsReceived() {
                 @Override
                 public void onDataLoaded(ApiManager.ApiType type) {
+                    isLoadingMore = false;
+                    Log.d("MORE", "News received");
                     listAdapter = new CustomCommunityNewsAdapter(context, DataPool.getInstance().listAllNews);
                     listNews.setAdapter(listAdapter);
 
@@ -87,5 +110,15 @@ public class FragmentHomeNews extends Fragment {
                 }
             });
         }
+    }
+
+    public void loadMore() {
+        if(!isLoadingMore) {
+            isLoadingMore = true;
+            Log.d("MORE", "News");
+
+            ApiManager.getInstance().getAllNews();
+        }
+
     }
 }

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_login"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/signup_username"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/login_edittext_height"
+        android:background="@drawable/bg_input"
+        android:hint="Username"
+        android:paddingLeft="@dimen/signup_padding"
+        android:textColor="@color/white_font"
+        android:textColorHint="@color/purple_font" />
+
+    <EditText
+        android:id="@+id/signup_password"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/login_edittext_height"
+        android:layout_marginTop="@dimen/login_button_margin_top"
+        android:background="@drawable/bg_input"
+        android:hint="Password"
+        android:paddingLeft="@dimen/signup_padding"
+        android:textColor="@color/white_font"
+        android:textColorHint="@color/purple_font" />
+
+    <EditText
+        android:id="@+id/signup_confirm_password"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/login_edittext_height"
+        android:layout_marginTop="@dimen/login_button_margin_top"
+        android:background="@drawable/bg_input"
+        android:hint="Confirm Password"
+        android:paddingLeft="@dimen/signup_padding"
+        android:textColor="@color/white_font"
+        android:textColorHint="@color/purple_font" />
+
+    <EditText
+        android:id="@+id/signup_email"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/login_edittext_height"
+        android:layout_marginTop="@dimen/login_button_margin_top"
+        android:background="@drawable/bg_input"
+        android:hint="Email"
+        android:paddingLeft="@dimen/signup_padding"
+        android:textColor="@color/white_font"
+        android:textColorHint="@color/purple_font" />
+
+    <EditText
+        android:id="@+id/signup_confirm_email"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/login_edittext_height"
+        android:layout_marginTop="@dimen/login_button_margin_top"
+        android:background="@drawable/bg_input"
+        android:hint="Confirm Email"
+        android:paddingLeft="@dimen/signup_padding"
+        android:textColor="@color/white_font"
+        android:textColorHint="@color/purple_font" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/signup_button_next"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/login_button_height"
+            android:layout_alignParentBottom="true"
+            android:text="NEXT"
+            android:textColor="@color/white_font"
+            android:background="@drawable/bg_btn_dark_purple" />
+    </RelativeLayout>
+
+
+</LinearLayout>

@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.pitados.neodangdut.R;
-import com.pitados.neodangdut.model.MusicData;
+import com.pitados.neodangdut.model.LibraryData;
 
 import java.util.List;
 
@@ -17,9 +17,9 @@ import java.util.List;
  */
 public class CustomLibraryMusicAdapter extends BaseAdapter {
     private Context context;
-    private List<MusicData> listMusic;
+    private List<LibraryData> listMusic;
 
-    public CustomLibraryMusicAdapter(Context context, List<MusicData> listMusic) {
+    public CustomLibraryMusicAdapter(Context context, List<LibraryData> listMusic) {
         this.context = context;
         this.listMusic = listMusic;
     }

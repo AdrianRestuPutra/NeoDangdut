@@ -5,36 +5,41 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ScrollView
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/home_swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/main_bg">
+        android:layout_height="match_parent">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:background="@color/main_bg">
 
-            <!-- Image Slider -->
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/image_slider_height"
-                android:background="@color/black_panel">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-                <com.daimajia.slider.library.SliderLayout
-                    android:id="@+id/home_slider"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    custom:auto_cycle="true"/>
+                <!-- Image Slider -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/image_slider_height"
+                    android:background="@color/black_panel">
 
-                <com.daimajia.slider.library.Indicators.PagerIndicator
-                    android:id="@+id/home_slider_indicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="10dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_alignParentBottom="true"
-                    custom:selected_drawable="@drawable/icon_carousel_selected"
-                    custom:unselected_drawable="@drawable/icon_carousel_default"/>
+                    <com.daimajia.slider.library.SliderLayout
+                        android:id="@+id/home_slider"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        custom:auto_cycle="true" />
+
+                    <com.daimajia.slider.library.Indicators.PagerIndicator
+                        android:id="@+id/home_slider_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="10dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        custom:selected_drawable="@drawable/icon_carousel_selected"
+                        custom:unselected_drawable="@drawable/icon_carousel_default" />
                     <!--
                     custom:selected_padding_left="6dp"
                     custom:selected_padding_right="6dp"
@@ -46,143 +51,143 @@
                     custom:unselected_height="6dp" />
                     -->
 
-            </RelativeLayout>
-            <!-- End of Image Slider -->
+                </RelativeLayout>
+                <!-- End of Image Slider -->
 
-            <!-- Top List -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
+                <!-- Top List -->
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:padding="@dimen/top_list_padding">
-
-                    <!-- Top Track Title -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/title_list_height"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="@dimen/icon_width"
-                            android:layout_height="wrap_content"
-                            android:adjustViewBounds="true"
-                            android:src="@drawable/icon_music" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Top Tracks"
-                            android:textColor="@color/white_font" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/divider_height"
-                        android:background="@color/tab_divider" />
-
-                    <ListView
-                        android:id="@+id/list_view_top_track"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/top_list_height"
-                        android:layout_marginTop="@dimen/top_list_padding">
-
-                    </ListView>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:padding="@dimen/top_list_padding">
-
-                    <!-- Top Video Title -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/title_list_height"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="@dimen/icon_width"
-                            android:layout_height="wrap_content"
-                            android:adjustViewBounds="true"
-                            android:src="@drawable/icon_video" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Top Videos"
-                            android:textColor="@color/white_font" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/divider_height"
-                        android:background="@color/tab_divider" />
-
-                    <ListView
-                        android:id="@+id/list_view_top_video"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/top_list_padding">
-
-                    </ListView>
-
-                </LinearLayout>
-            </LinearLayout>
-            <!-- End of Top List -->
-
-            <!-- News -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/latest_news_height"
-                android:orientation="vertical"
-                android:padding="@dimen/top_list_padding">
-
-                <!-- News Title -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/title_list_height"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="@dimen/icon_width"
-                        android:layout_height="wrap_content"
-                        android:adjustViewBounds="true"
-                        android:src="@drawable/icon_notif" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="News"
-                        android:textColor="@color/white_font" />
-                </LinearLayout>
-                <!-- End of News Title -->
-
-                <!-- News List -->
-                <ListView
-                    android:id="@+id/list_view_latest_news"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1">
+                    android:orientation="horizontal">
 
-                </ListView>
-                <!-- End of News List -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:padding="@dimen/top_list_padding">
+
+                        <!-- Top Track Title -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/title_list_height"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="@dimen/icon_width"
+                                android:layout_height="wrap_content"
+                                android:adjustViewBounds="true"
+                                android:src="@drawable/icon_music" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Top Tracks"
+                                android:textColor="@color/white_font" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/divider_height"
+                            android:background="@color/tab_divider" />
+
+                        <ListView
+                            android:id="@+id/list_view_top_track"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/top_list_height"
+                            android:layout_marginTop="@dimen/top_list_padding">
+
+                        </ListView>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:padding="@dimen/top_list_padding">
+
+                        <!-- Top Video Title -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/title_list_height"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="@dimen/icon_width"
+                                android:layout_height="wrap_content"
+                                android:adjustViewBounds="true"
+                                android:src="@drawable/icon_video" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Top Videos"
+                                android:textColor="@color/white_font" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/divider_height"
+                            android:background="@color/tab_divider" />
+
+                        <ListView
+                            android:id="@+id/list_view_top_video"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/top_list_padding">
+
+                        </ListView>
+
+                    </LinearLayout>
+                </LinearLayout>
+                <!-- End of Top List -->
+
+                <!-- News -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/latest_news_height"
+                    android:orientation="vertical"
+                    android:padding="@dimen/top_list_padding">
+
+                    <!-- News Title -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/title_list_height"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="@dimen/icon_width"
+                            android:layout_height="wrap_content"
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/icon_notif" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="News"
+                            android:textColor="@color/white_font" />
+                    </LinearLayout>
+                    <!-- End of News Title -->
+
+                    <!-- News List -->
+                    <ListView
+                        android:id="@+id/list_view_latest_news"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                    </ListView>
+                    <!-- End of News List -->
+
+                </LinearLayout>
+                <!-- End of News -->
 
             </LinearLayout>
-            <!-- End of News -->
-
-        </LinearLayout>
-    </ScrollView>
-
+        </ScrollView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </LinearLayout>

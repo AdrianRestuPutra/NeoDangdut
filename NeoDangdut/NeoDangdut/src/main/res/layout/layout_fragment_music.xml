@@ -4,11 +4,16 @@
     android:layout_height="match_parent"
     android:background="@color/main_bg">
 
-    <ListView
-        android:id="@+id/community_music_listview"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/community_music_swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-    </ListView>
+        <ListView
+            android:id="@+id/community_music_listview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
+        </ListView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 </RelativeLayout>

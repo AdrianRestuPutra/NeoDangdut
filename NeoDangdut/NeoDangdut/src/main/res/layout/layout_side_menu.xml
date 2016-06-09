@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/main_bg"
+        android:orientation="vertical"
+        android:padding="@dimen/side_menu_padding">
+        
+        <!-- Wallet -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/side_menu_wallet_section_height"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="My Wallet"
+                android:textColor="@color/white_font"
+                android:textSize="@dimen/side_menu_text"/>
+
+            <LinearLayout
+                android:id="@+id/side_menu_topup"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/side_menu_user_wallet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="999999"
+                    android:textColor="@color/white_font"
+                    android:textSize="@dimen/setting_text_small"/>
+
+                <ImageView
+                    android:layout_width="@dimen/side_menu_icon_width"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:layout_marginLeft="@dimen/side_menu_wallet_margin"
+                    android:src="@drawable/icon_coin"/>
+
+                <ImageView
+                    android:layout_width="@dimen/side_menu_icon_width"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:layout_marginLeft="@dimen/side_menu_wallet_margin"
+                    android:src="@drawable/icon_topup"/>
+
+            </LinearLayout>
+        </LinearLayout>
+        <!-- Wallet End -->
+        
+        <!-- Home -->
+        <LinearLayout
+            android:id="@+id/side_menu_home"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/side_menu_item_height"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5">
+
+                <ImageView
+                    android:layout_width="@dimen/side_menu_icon_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/icon_sidebar_home" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="Home"
+                    android:textColor="@color/white_font"
+                    android:textSize="@dimen/side_menu_text" />
+            </RelativeLayout>
+
+
+        </LinearLayout>
+        <!-- Home End -->
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:background="@color/tab_divider" />
+
+        <!-- Library -->
+        <LinearLayout
+            android:id="@+id/side_menu_library"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/side_menu_item_height"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5">
+
+                <ImageView
+                    android:layout_width="@dimen/side_menu_icon_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/icon_sidebar_library" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="Library"
+                    android:textColor="@color/white_font"
+                    android:textSize="@dimen/side_menu_text" />
+            </RelativeLayout>
+
+
+        </LinearLayout>
+        <!-- Library End -->
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:background="@color/tab_divider" />
+
+        <!-- Shop -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/side_menu_item_height"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5">
+
+                <ImageView
+                    android:layout_width="@dimen/side_menu_icon_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/icon_sidebar_shop" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="Shop"
+                    android:textColor="@color/white_font"
+                    android:textSize="@dimen/side_menu_text" />
+            </RelativeLayout>
+
+
+        </LinearLayout>
+        <!-- Shop End -->
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:layout_marginLeft="@dimen/side_menu_shop_margin"
+            android:background="@color/tab_divider"/>
+
+        <!-- Shop Music -->
+        <LinearLayout
+            android:id="@+id/side_menu_shop_music"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/side_menu_item_height"
+            android:layout_marginLeft="@dimen/side_menu_shop_margin"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5">
+
+                <ImageView
+                    android:layout_width="@dimen/side_menu_icon_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/icon_sidebar_music" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="Music"
+                    android:textColor="@color/white_font"
+                    android:textSize="@dimen/side_menu_text" />
+            </RelativeLayout>
+
+
+        </LinearLayout>
+        <!-- Shop Music End -->
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:layout_marginLeft="@dimen/side_menu_shop_margin"
+            android:background="@color/tab_divider"/>
+
+        <!-- Shop Video -->
+        <LinearLayout
+            android:id="@+id/side_menu_shop_video"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/side_menu_item_height"
+            android:layout_marginLeft="@dimen/side_menu_shop_margin"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5">
+
+                <ImageView
+                    android:layout_width="@dimen/side_menu_icon_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/icon_sidebar_video" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="Video"
+                    android:textColor="@color/white_font"
+                    android:textSize="@dimen/side_menu_text" />
+            </RelativeLayout>
+
+
+        </LinearLayout>
+        <!-- Shop Video End -->
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:layout_marginLeft="@dimen/side_menu_shop_margin"
+            android:background="@color/tab_divider"/>
+
+        <!-- Download -->
+        <LinearLayout
+            android:id="@+id/side_menu_download"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/side_menu_item_height"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5">
+
+                <ImageView
+                    android:layout_width="@dimen/side_menu_icon_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/icon_sidebar_downloads" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="Downloads"
+                    android:textColor="@color/white_font"
+                    android:textSize="@dimen/side_menu_text" />
+            </RelativeLayout>
+
+
+        </LinearLayout>
+        <!-- Download End -->
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:background="@color/tab_divider"/>
+
+        <!-- App Setting -->
+        <LinearLayout
+            android:id="@+id/side_menu_setting"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/side_menu_item_height"
+            android:layout_marginTop="@dimen/side_menu_shop_margin"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="App Settings"
+                android:textColor="@color/white_font"
+                android:textSize="@dimen/side_menu_text" />
+
+
+        </LinearLayout>
+        <!-- App Setting End -->
+
+        <!-- Sign Out -->
+        <LinearLayout
+            android:id="@+id/side_menu_signout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/side_menu_item_height"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sign Out"
+                android:textColor="@color/white_font"
+                android:textSize="@dimen/side_menu_text" />
+
+
+        </LinearLayout>
+        <!-- Sign Out End -->
+
+    </LinearLayout>
+
+
+</ScrollView>

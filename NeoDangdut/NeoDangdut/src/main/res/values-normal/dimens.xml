@@ -10,7 +10,21 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="divider_height">1dp</dimen>
     <dimen name="icon_width">30dp</dimen>
+    <dimen name="setting_icon_width">20dp</dimen>
     <dimen name="option_icon_width">20dp</dimen>
+
+    <!-- Nav Header -->
+    <dimen name="nav_header_pp_width">60dp</dimen>
+    <dimen name="nav_header_name_section_height">50dp</dimen>
+    <dimen name="nav_header_divider_spacing">5dp</dimen>
+    <!-- Side Menu -->
+    <dimen name="side_menu_item_height">50dp</dimen>
+    <dimen name="side_menu_icon_width">15dp</dimen>
+    <dimen name="side_menu_padding">15dp</dimen>
+    <dimen name="side_menu_text">7pt</dimen>
+    <dimen name="side_menu_shop_margin">50dp</dimen>
+    <dimen name="side_menu_wallet_section_height">30dp</dimen>
+    <dimen name="side_menu_wallet_margin">2dp</dimen>
 
     <!-- splash screen -->
     <dimen name="splash_icon_width">120dp</dimen>
@@ -22,7 +36,17 @@
     <dimen name="login_edittext_height">40dp</dimen>
     <dimen name="login_button_height">35dp</dimen>
     <!-- Signup -->
+    <dimen name="signup_padding">10dp</dimen>
     <dimen name="signup_logo_container_height">200dp</dimen>
+    <dimen name="signup_logo_width">100dp</dimen>
+    <dimen name="signup_divider_height">2dp</dimen>
+    <dimen name="signup_text_title">20pt</dimen>
+    <dimen name="signup_text_input">8pt</dimen>
+    <dimen name="signup_date_picker">50dp</dimen>
+    <dimen name="signup_year_picker">100dp</dimen>
+    <dimen name="signup_picker_margin">10dp</dimen>
+    <dimen name="signup_gender_container">50dp</dimen>
+    <dimen name="signup_checkbox_size">30dp</dimen>
 
     <!-- main content -->
     <dimen name="margin_pager_tab">15dp</dimen>
@@ -43,7 +67,7 @@
     <dimen name="top_list_font_title">5pt</dimen>
     <dimen name="top_list_font_regular">3pt</dimen>
     <dimen name="top_list_padding">15dp</dimen>
-    <dimen name="latest_news_height">550dp</dimen>
+    <dimen name="latest_news_height">600dp</dimen>
     <!-- News -->
     <dimen name="list_item_news_height">100dp</dimen>
 
@@ -81,15 +105,42 @@
     <dimen name="news_detail_share_container_height">40dp</dimen>
     <dimen name="news_detail_title_font">15dp</dimen>
     <dimen name="news_detail_date_font">10dp</dimen>
+    <dimen name="news_detail_padding">15dp</dimen>
 
     <!-- Shop Music -->
-    <dimen name="shop_music_top_song_featured_panel_height">120dp</dimen>
+    <dimen name="shop_music_top_song_featured_panel_height">150dp</dimen>
     <dimen name="shop_music_list_item_height">60dp</dimen>
     <dimen name="shop_music_top_song_list_height">3100dp</dimen>
     <dimen name="shop_music_list_text_margin">10dp</dimen>
     <dimen name="shop_music_button_width">60dp</dimen>
     <dimen name="shop_music_button_height">15dp</dimen>
     <dimen name="shop_opt_icon_width">20dp</dimen>
+    <dimen name="shop_price_button_width">60dp</dimen>
+    <!-- Featured -->
+    <dimen name="shop_featured_width">70dp</dimen>
+    <dimen name="shop_featured_height">157dp</dimen>
+    <dimen name="shop_featured_top_title_margin_left">10dp</dimen>
+    <dimen name="shop_featured_thumbnail_width">50dp</dimen>
+    <dimen name="shop_featured_spacing">10dp</dimen>
+    <dimen name="shop_featured_title_section">20dp</dimen>
+    <dimen name="shop_featured_name_section">17dp</dimen>
+    <dimen name="shop_featured_button_section">15dp</dimen>
+    <dimen name="shop_featured_title_text">4pt</dimen>
+    <dimen name="shop_featured_name_text">3pt</dimen>
+    <dimen name="shop_featured_price_text">4pt</dimen>
+    <dimen name="shop_featured_price_margin_left">5dp</dimen>
+
+    <!-- Settings -->
+    <dimen name="setting_padding">20dp</dimen>
+    <dimen name="setting_item_height">120dp</dimen>
+    <dimen name="setting_item_height_large">130dp</dimen>
+    <dimen name="setting_item_margin_top">20dp</dimen>
+    <dimen name="setting_item_margin_top_small">10dp</dimen>
+    <dimen name="setting_text_large">7pt</dimen>
+    <dimen name="setting_text_small">6pt</dimen>
+    <dimen name="setting_text_margin">60dp</dimen>
+    <dimen name="setting_toggle_width">40dp</dimen>
+    <dimen name="setting_icon_margin">180dp</dimen>
 
     <!-- Dialog -->
     <dimen name="dialog_artist_song_upper_panel_height">100dp</dimen>
@@ -101,5 +152,33 @@
     <dimen name="dialog_artist_price_margin">10dp</dimen>
     <dimen name="dialog_artist_price_button_icon">12dp</dimen>
     <dimen name="dialog_artist_button_text_margin">30dp</dimen>
-
+    <dimen name="dialog_artist_icon_width">15dp</dimen>
+    <dimen name="dialog_artist_text">7pt</dimen>
+    <dimen name="dialog_artist_text_margin">2dp</dimen>
+    <dimen name="dialog_artist_icon_margin">10dp</dimen>
+    
+    <!-- Upload -->
+    <dimen name="upload_bar_height">50dp</dimen>
+    <dimen name="upload_content_padding">15dp</dimen>
+    <dimen name="upload_content_item_padding">5dp</dimen>
+    <dimen name="upload_seekbar_width">200dp</dimen>
+    <dimen name="upload_icon_width">15dp</dimen>
+    <dimen name="upload_divider_margin_top">20dp</dimen>
+    <dimen name="upload_edit_text_height">40dp</dimen>
+    <dimen name="upload_description_height">80dp</dimen>
+    <dimen name="upload_input_padding_left">10dp</dimen>
+    <dimen name="upload_waiting_height">30dp</dimen>
+    
+    <!-- Profile -->
+    <dimen name="profile_preview_top_section_height">100dp</dimen>
+    <dimen name="profile_preview_thumbnail_width">60dp</dimen>
+    <dimen name="profile_preview_top_large_text">6pt</dimen>
+    <dimen name="profile_preview_top_medium_text">5pt</dimen>
+    <dimen name="profile_preview_top_icon_width">20dp</dimen>
+    <dimen name="profile_preview_like_icon_width">15dp</dimen>
+    <dimen name="profile_preview_like_margin">2dp</dimen>
+    <dimen name="profile_preview_city_margin">15dp</dimen>
+    <dimen name="profile_preview_description_margin">20dp</dimen>
+    <dimen name="profile_preview_description_text">6pt</dimen>
+    
 </resources>

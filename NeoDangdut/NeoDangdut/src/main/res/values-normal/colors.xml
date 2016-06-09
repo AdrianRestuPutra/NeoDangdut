@@ -5,10 +5,14 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="main_bg">#1b1320</color>
-    <color name="white_font">#EBEBEB</color>
     <color name="black_panel">#222222</color>
     <color name="dividerColor">#F03276</color>
     <color name="transparent">#00000000</color>
+
+    <!-- Font -->
+    <color name="purple_font">#7c6887</color>
+    <color name="white_font">#ebebeb</color>
+    <color name="dark_purple_font">#7c6887</color>
 
     <color name="tab_indicator">#78235a</color>
     <color name="tab_divider">#332839</color>

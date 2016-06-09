@@ -147,10 +147,22 @@
         android:id="@+id/panel_downloads"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimary"
+        android:background="@color/main_bg"
         android:visibility="invisible">
 
         <!-- TODO create download panel -->
+    </RelativeLayout>
+
+    <!-- Settings -->
+
+    <RelativeLayout
+        android:id="@+id/panel_settings"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/main_bg"
+        android:visibility="invisible">
+
+        <include layout="@layout/layout_fragment_settings"/>
     </RelativeLayout>
 
 </RelativeLayout>

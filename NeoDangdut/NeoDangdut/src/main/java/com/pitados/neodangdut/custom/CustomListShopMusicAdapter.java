@@ -37,6 +37,8 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
         TextView musicTitle;
         TextView artistName;
         TextView albumName;
+        TextView price;
+        RelativeLayout buyButton;
         RelativeLayout optButton;
     }
 
@@ -88,6 +90,9 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
             holder.musicTitle = (TextView) view.findViewById(R.id.list_view_shop_music_song_title);
             holder.artistName = (TextView) view.findViewById(R.id.list_view_shop_music_artist_name);
             holder.albumName = (TextView) view.findViewById(R.id.list_view_shop_music_album);
+            holder.price = (TextView) view.findViewById(R.id.list_view_shop_music_price);
+
+            holder.buyButton = (RelativeLayout) view.findViewById(R.id.list_view_shop_music_button);
 
             final int index = i;
             holder.optButton = (RelativeLayout) view.findViewById(R.id.list_view_shop_music_opt_button);
@@ -109,6 +114,9 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
         holder.musicTitle.setText(listTopTrack.get(i).songTitle);
         holder.artistName.setText(listTopTrack.get(i).singerName);
         holder.albumName.setText(listTopTrack.get(i).albumName);
+
+        // TODO check from file
+        holder.price.setText("Rp "+listTopTrack.get(i).price);
 
         return view;
     }

@@ -8,11 +8,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.pitados.neodangdut.Popup.PopupArtistVideo;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.VideoData;
 
@@ -35,6 +35,8 @@ public class CustomListShopVideoAdapter extends BaseAdapter {
         ImageView optButton;
     }
 
+    private PopupArtistVideo popupArtistVideo;
+
     public CustomListShopVideoAdapter(Context context, List<VideoData> listVideo) {
         this.context = context;
         this.listVideo = listVideo;
@@ -49,6 +51,8 @@ public class CustomListShopVideoAdapter extends BaseAdapter {
                 .resetViewBeforeLoading(true)
                 .imageScaleType(ImageScaleType.EXACTLY)
                 .build();
+
+        popupArtistVideo = new PopupArtistVideo(context, R.style.custom_dialog);
     }
 
     @Override
@@ -95,7 +99,7 @@ public class CustomListShopVideoAdapter extends BaseAdapter {
         holder.optButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context, "TODO handle opt " + index, Toast.LENGTH_SHORT).show();
+                popupArtistVideo.showPopupArtistVideo(listVideo.get(index));
             }
         });
         return view;

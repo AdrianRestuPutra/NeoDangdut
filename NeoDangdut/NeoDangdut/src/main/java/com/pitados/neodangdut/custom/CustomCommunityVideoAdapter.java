@@ -7,12 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.pitados.neodangdut.Popup.PopupCommunity;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.CommunityContentData;
 
@@ -29,11 +30,13 @@ public class CustomCommunityVideoAdapter extends BaseAdapter {
         ImageView thumbnail;
         TextView videoTitle;
         TextView artistName;
-        ImageView optButton;
+        RelativeLayout optButton;
     }
 
     private ImageLoader imageLoader;
     private DisplayImageOptions opts;
+
+    private PopupCommunity popupCommunity;
 
     public CustomCommunityVideoAdapter(Context context, List<CommunityContentData> listVideo) {
         this.context = context;
@@ -49,6 +52,8 @@ public class CustomCommunityVideoAdapter extends BaseAdapter {
                 .resetViewBeforeLoading(true)
                 .imageScaleType(ImageScaleType.EXACTLY)
                 .build();
+
+        popupCommunity = new PopupCommunity(context, R.style.custom_dialog);
     }
 
     @Override
@@ -80,7 +85,15 @@ public class CustomCommunityVideoAdapter extends BaseAdapter {
             holder.thumbnail = (ImageView) view.findViewById(R.id.list_view_home_video_thumbnail);
             holder.videoTitle = (TextView) view.findViewById(R.id.list_view_home_video_song_title);
             holder.artistName = (TextView) view.findViewById(R.id.list_view_home_video_artist_name);
-            holder.optButton = (ImageView) view.findViewById(R.id.list_view_home_video_optbutton);
+            holder.optButton = (RelativeLayout) view.findViewById(R.id.list_view_home_video_optbutton);
+
+            final int index = i;
+            holder.optButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    popupCommunity.showPopupCommunity(listVideo.get(index));
+                }
+            });
 
             view.setTag(holder);
         } else {
@@ -92,14 +105,6 @@ public class CustomCommunityVideoAdapter extends BaseAdapter {
             imageLoader.displayImage(listVideo.get(i).photoURL, holder.thumbnail, opts);
         holder.videoTitle.setText(listVideo.get(i).songName);
         holder.artistName.setText(listVideo.get(i).userName);
-
-        final int pos = i;
-        holder.optButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(context, "OPT button item "+pos, Toast.LENGTH_SHORT).show();
-            }
-        });
 
         return view;
     }

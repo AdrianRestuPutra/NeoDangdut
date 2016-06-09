@@ -8,11 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Gallery;
 import android.widget.ListView;
 
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomListShopMusicAdapter;
+import com.pitados.neodangdut.custom.ShopMusicFeaturedAdapter;
 import com.pitados.neodangdut.util.ApiManager;
 import com.pitados.neodangdut.util.CustomMediaPlayer;
 import com.pitados.neodangdut.util.DataPool;
@@ -27,8 +29,10 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
 
     // TODO widgets
     private ListView listTopSong;
+    private Gallery listFeatured;
 
     private CustomListShopMusicAdapter listAdapter;
+    private ShopMusicFeaturedAdapter featuredAdapter;
 
     public static FragmentShopMusicTopSongs newInstance(int page, String title) {
         FragmentShopMusicTopSongs home = new FragmentShopMusicTopSongs();
@@ -63,6 +67,8 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
         listTopSong = (ListView) view.findViewById(R.id.shop_music_top_song_listview);
         listTopSong.setFocusable(false);
 
+        listFeatured = (Gallery) view.findViewById(R.id.shop_music_featured);
+
         loadData();
 
         listTopSong.setOnItemClickListener(this);
@@ -82,6 +88,13 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
                     listTopSong.setAdapter(listAdapter);
 
                     listAdapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onFeaturedLoaded() {
+                    featuredAdapter = new ShopMusicFeaturedAdapter(context, DataPool.getInstance().listShopMusicFeatured);
+                    listFeatured.setAdapter(featuredAdapter);
+                    listFeatured.setSelection(1);
                 }
             });
         }

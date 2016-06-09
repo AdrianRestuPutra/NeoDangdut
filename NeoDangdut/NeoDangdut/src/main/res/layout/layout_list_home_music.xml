@@ -44,14 +44,15 @@
     </LinearLayout>
     
     <RelativeLayout
+        android:id="@+id/list_view_home_music_optbutton"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1">
         <ImageView
-            android:id="@+id/list_view_home_music_optbutton"
             android:layout_width="@dimen/option_icon_width"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/dialog_artist_price_margin"
             android:layout_alignParentRight="true"
             android:adjustViewBounds="true"
             android:src="@drawable/icon_more_white"/>

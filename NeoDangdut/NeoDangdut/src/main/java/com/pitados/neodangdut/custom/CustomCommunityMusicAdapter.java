@@ -7,11 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.pitados.neodangdut.Popup.PopupCommunity;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.CommunityContentData;
 
@@ -24,15 +26,17 @@ public class CustomCommunityMusicAdapter extends BaseAdapter {
     private Context context;
     private List<CommunityContentData> listMusic;
 
+    private ImageLoader imageLoader;
+    private DisplayImageOptions opts;
+
+    private PopupCommunity popupCommunity;
+
     static class ViewHolder {
         ImageView thumbnail;
         TextView musicTitle;
         TextView artistName;
-        ImageView optButton;
+        RelativeLayout optButton;
     }
-
-    private ImageLoader imageLoader;
-    private DisplayImageOptions opts;
 
     public CustomCommunityMusicAdapter(Context context, List<CommunityContentData> listMusic) {
         this.context = context;
@@ -48,6 +52,8 @@ public class CustomCommunityMusicAdapter extends BaseAdapter {
                 .imageScaleType(ImageScaleType.EXACTLY)
                 .resetViewBeforeLoading(true)
                 .build();
+
+        popupCommunity = new PopupCommunity(context, R.style.custom_dialog);
     }
 
     @Override
@@ -79,6 +85,15 @@ public class CustomCommunityMusicAdapter extends BaseAdapter {
             holder.thumbnail = (ImageView) view.findViewById(R.id.list_view_home_music_thumbnail);
             holder.artistName = (TextView) view.findViewById(R.id.list_view_home_music_artist_name);
             holder.musicTitle = (TextView) view.findViewById(R.id.list_view_home_music_song_title);
+            holder.optButton = (RelativeLayout) view.findViewById(R.id.list_view_home_music_optbutton);
+
+            final int index = i;
+            holder.optButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    popupCommunity.showPopupCommunity(listMusic.get(index));
+                }
+            });
 
             view.setTag(holder);
         } else {

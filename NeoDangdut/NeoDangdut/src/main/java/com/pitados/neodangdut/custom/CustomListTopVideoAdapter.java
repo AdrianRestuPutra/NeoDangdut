@@ -9,13 +9,14 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.pitados.neodangdut.Popup.PopupArtistVideo;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.VideoData;
+import com.pitados.neodangdut.util.DataPool;
 
 import java.util.List;
 
@@ -28,6 +29,8 @@ public class CustomListTopVideoAdapter extends BaseAdapter {
 
     private ImageLoader imageLoader;
     private DisplayImageOptions opts;
+
+    private PopupArtistVideo popupArtistVideo;
 
     static class ViewHolder {
         ImageView thumbnail;
@@ -50,6 +53,8 @@ public class CustomListTopVideoAdapter extends BaseAdapter {
                 .resetViewBeforeLoading(true)
                 .imageScaleType(ImageScaleType.EXACTLY)
                 .build();
+
+        popupArtistVideo = new PopupArtistVideo(context, R.style.custom_dialog);
     }
 
     @Override
@@ -86,7 +91,7 @@ public class CustomListTopVideoAdapter extends BaseAdapter {
             holder.optButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(context, "TODO handle opt video " + index, Toast.LENGTH_SHORT).show();
+                    popupArtistVideo.showPopupArtistVideo(DataPool.getInstance().listHomeTopVideos.get(index));
                 }
             });
 

@@ -79,17 +79,17 @@ public class FragmentHomeVideo extends Fragment {
             listAdapter = new CustomCommunityVideoAdapter(context, DataPool.getInstance().listCommunityVideo);
             listViewCommunityVideo.setAdapter(listAdapter);
 
-        } else {
-            ApiManager.getInstance().setOnCommunityVideoListener(new ApiManager.OnCommunityVideoReceived() {
-                @Override
-                public void onDataLoaded(ApiManager.ApiType type) {
-                    listAdapter = new CustomCommunityVideoAdapter(context, DataPool.getInstance().listCommunityVideo);
-                    listViewCommunityVideo.setAdapter(listAdapter);
-
-                    listAdapter.notifyDataSetChanged();
-                }
-            });
         }
+
+        ApiManager.getInstance().setOnCommunityVideoListener(new ApiManager.OnCommunityVideoReceived() {
+            @Override
+            public void onDataLoaded(ApiManager.ApiType type) {
+                listAdapter = new CustomCommunityVideoAdapter(context, DataPool.getInstance().listCommunityVideo);
+                listViewCommunityVideo.setAdapter(listAdapter);
+
+                listAdapter.notifyDataSetChanged();
+            }
+        });
 
     }
 }
