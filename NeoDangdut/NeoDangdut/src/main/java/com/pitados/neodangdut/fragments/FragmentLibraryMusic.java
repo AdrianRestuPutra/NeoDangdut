@@ -76,6 +76,8 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
         // TODO handle onItemClick
         listViewMusic.setOnItemClickListener(this);
 
+        listViewMusic.setFastScrollEnabled(true);
+
         return view;
     }
 

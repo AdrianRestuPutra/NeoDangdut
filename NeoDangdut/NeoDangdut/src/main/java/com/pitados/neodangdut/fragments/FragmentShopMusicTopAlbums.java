@@ -77,6 +77,8 @@ public class FragmentShopMusicTopAlbums extends Fragment {
             }
         });
 
+        listTopAlbums.setFastScrollEnabled(true);
+
         return view;
     }
 

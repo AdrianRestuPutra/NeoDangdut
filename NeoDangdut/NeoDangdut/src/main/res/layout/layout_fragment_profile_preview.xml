@@ -172,12 +172,20 @@
             android:orientation="vertical">
 
             <!-- Blank Space -->
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1">
 
-            </LinearLayout>
+                <ImageView
+                    android:id="@+id/profile_preview_edit"
+                    android:layout_width="@dimen/profile_preview_top_icon_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/icon_editable"/>
+            </RelativeLayout>
 
             <!-- Country -->
             <RelativeLayout

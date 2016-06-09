@@ -235,11 +235,6 @@
                     android:background="@color/tab_divider" />
                 -->
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/divider_height"
-                    android:background="@color/tab_divider" />
-
                 <!-- Share FB -->
                 <RelativeLayout
                     android:id="@+id/popup_artist_video_button_share_fb"

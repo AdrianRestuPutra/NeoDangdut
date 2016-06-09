@@ -75,6 +75,8 @@ public class FragmentShopMusicNewSongs extends Fragment {
             }
         });
 
+        listNewSongs.setFastScrollEnabled(true);
+
         return view;
     }
 

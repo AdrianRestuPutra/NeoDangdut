@@ -90,6 +90,8 @@ public class FragmentHomeNews extends Fragment {
             }
         });
 
+        listNews.setFastScrollEnabled(true);
+
         return view;
     }
 

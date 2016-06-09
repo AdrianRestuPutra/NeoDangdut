@@ -106,6 +106,8 @@ public class FragmentHomeMusic extends Fragment {
             }
         });
 
+        listViewCommunityMusic.setFastScrollEnabled(true);
+
         return view;
     }
 
@@ -114,6 +116,7 @@ public class FragmentHomeMusic extends Fragment {
             listAdapter = new CustomCommunityMusicAdapter(context, DataPool.getInstance().listCommunityMusic);
             listViewCommunityMusic.setAdapter(listAdapter);
 
+            listAdapter.notifyDataSetChanged();
         }
 
         ApiManager.getInstance().setOnCommunityMusicListener(new ApiManager.OnCommunityMusicReceived() {
@@ -124,6 +127,9 @@ public class FragmentHomeMusic extends Fragment {
                 listViewCommunityMusic.setAdapter(listAdapter);
 
                 listAdapter.notifyDataSetChanged();
+
+                if(swipeRefresh != null)
+                    swipeRefresh.setRefreshing(false);
             }
         });
 

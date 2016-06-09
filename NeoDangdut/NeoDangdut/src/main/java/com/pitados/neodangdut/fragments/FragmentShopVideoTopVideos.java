@@ -71,6 +71,8 @@ public class FragmentShopVideoTopVideos extends Fragment {
             }
         });
 
+        listTopVideos.setFastScrollEnabled(true);
+
         return view;
     }
 

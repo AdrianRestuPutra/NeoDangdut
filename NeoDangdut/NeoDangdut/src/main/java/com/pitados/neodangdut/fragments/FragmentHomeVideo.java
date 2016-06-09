@@ -3,6 +3,7 @@ package com.pitados.neodangdut.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ public class FragmentHomeVideo extends Fragment {
     private String pageTitle;
 
     private ListView listViewCommunityVideo;
+    private SwipeRefreshLayout swipeRefresh;
 
     private CustomCommunityVideoAdapter listAdapter;
 
@@ -71,6 +73,27 @@ public class FragmentHomeVideo extends Fragment {
             }
         });
 
+        swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.community_video_swipe_refresh);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                ApiManager.getInstance().getToken();
+                ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
+                    @Override
+                    public void onTokenSaved() {
+                        ApiManager.getInstance().getCommunityVideo();
+                    }
+
+                    @Override
+                    public void onError(String message) {
+
+                    }
+                });
+            }
+        });
+
+        listViewCommunityVideo.setFastScrollEnabled(true);
+
         return view;
     }
 
@@ -79,6 +102,7 @@ public class FragmentHomeVideo extends Fragment {
             listAdapter = new CustomCommunityVideoAdapter(context, DataPool.getInstance().listCommunityVideo);
             listViewCommunityVideo.setAdapter(listAdapter);
 
+            listAdapter.notifyDataSetChanged();
         }
 
         ApiManager.getInstance().setOnCommunityVideoListener(new ApiManager.OnCommunityVideoReceived() {
@@ -88,6 +112,9 @@ public class FragmentHomeVideo extends Fragment {
                 listViewCommunityVideo.setAdapter(listAdapter);
 
                 listAdapter.notifyDataSetChanged();
+
+                if(swipeRefresh != null)
+                    swipeRefresh.setRefreshing(false);
             }
         });
 

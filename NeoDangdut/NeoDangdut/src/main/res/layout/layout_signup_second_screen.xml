@@ -65,14 +65,17 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:layout_weight="3">
-            
-            <DatePicker
+
+
+            <EditText
                 android:id="@+id/signup_birth_day"
                 android:layout_width="@dimen/signup_date_picker"
                 android:layout_height="match_parent"
-                android:background="@drawable/bg_input">
-
-            </DatePicker>
+                android:background="@drawable/bg_input"
+                android:textColor="@color/white_font"
+                android:textAlignment="center"
+                android:hint="dd"
+                android:textColorHint="@color/purple_font"/>
 
             <TextView
                 android:layout_width="@dimen/signup_picker_margin"
@@ -82,13 +85,15 @@
                 android:textSize="@dimen/signup_text_input"
                 android:textColor="@color/purple_font"/>
 
-            <DatePicker
+            <EditText
                 android:id="@+id/signup_birth_month"
                 android:layout_width="@dimen/signup_date_picker"
                 android:layout_height="match_parent"
-                android:background="@drawable/bg_input">
-
-            </DatePicker>
+                android:background="@drawable/bg_input"
+                android:textColor="@color/white_font"
+                android:textAlignment="center"
+                android:hint="mm"
+                android:textColorHint="@color/purple_font"/>
 
             <TextView
                 android:layout_width="@dimen/signup_picker_margin"
@@ -98,13 +103,15 @@
                 android:textSize="@dimen/signup_text_input"
                 android:textColor="@color/purple_font"/>
 
-            <DatePicker
+            <EditText
                 android:id="@+id/signup_birth_year"
-                android:layout_width="@dimen/signup_year_picker"
+                android:layout_width="@dimen/signup_date_picker"
                 android:layout_height="match_parent"
-                android:background="@drawable/bg_input">
-
-            </DatePicker>
+                android:background="@drawable/bg_input"
+                android:textColor="@color/white_font"
+                android:textAlignment="center"
+                android:hint="yyyy"
+                android:textColorHint="@color/purple_font"/>
             
         </LinearLayout>
     </LinearLayout>

@@ -107,11 +107,6 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
                     }
 
                     @Override
-                    public void onUserAccessTokenSaved() {
-
-                    }
-
-                    @Override
                     public void onError(String message) {
 
                     }

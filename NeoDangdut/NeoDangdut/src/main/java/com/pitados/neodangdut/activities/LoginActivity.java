@@ -83,12 +83,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             userLoginData.setPassword(password);
 
             ApiManager.getInstance().getUserAccessToken();
-            ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
-                @Override
-                public void onTokenSaved() {
-                    // DO NOTHING
-                }
-
+            ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
                 @Override
                 public void onUserAccessTokenSaved() {
                     String refreshToken = ApiManager.getInstance().REFRESH_TOKEN;
@@ -97,14 +92,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 }
-
-                @Override
-                public void onError(String message) {
-                    Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
-                }
             });
-
-            ApiManager.getInstance().getUserAccessToken();
 
         } else {
             Toast.makeText(getBaseContext(), "Username or Password incorrect", Toast.LENGTH_SHORT).show();

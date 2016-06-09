@@ -57,24 +57,37 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <Button
+                <RelativeLayout
                     android:id="@+id/list_view_shop_video_button"
                     android:layout_width="@dimen/shop_music_button_width"
                     android:layout_height="@dimen/shop_music_button_height"
-                    android:layout_alignParentBottom="true"
-                    android:background="@drawable/btn_inlibrary_def" />
+                    android:layout_margin="@dimen/dialog_artist_left_panel_margin"
+                    android:background="@drawable/btn_price_artist_song"
+                    android:layout_alignParentBottom="true">
+
+                    <TextView
+                        android:id="@+id/list_view_shop_video_price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/shop_featured_price_margin_left"
+                        android:layout_centerVertical="true"
+                        android:text="Rp 1000"
+                        android:textSize="@dimen/shop_featured_price_text"
+                        android:textColor="@color/purple_font" />
+
+                </RelativeLayout>
             </RelativeLayout>
 
 
         </LinearLayout>
 
         <RelativeLayout
+            android:id="@+id/list_view_shop_video_opt_button"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1">
 
             <ImageView
-                android:id="@+id/list_view_shop_video_opt_button"
                 android:layout_width="@dimen/shop_opt_icon_width"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"

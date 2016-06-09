@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity
     private FloatingActionsMenu fabMenu;
     private com.getbase.floatingactionbutton.FloatingActionButton fabMusic, fabVideo;
     // Panel
-    private RelativeLayout panelNewPost, panelLibrary, panelShopMusic, panelShopVideo, panelDownloads, panelSettings, panelUpload;
+    private RelativeLayout panelNewPost, panelLibrary, panelShopMusic, panelShopVideo, panelDownloads, panelSettings, panelUpload, panelProfile;
     // Media Panel
     private LinearLayout panelMusicPlayer;
     private RelativeLayout musicPlayerPauseButton, musicPlayerShuffleButton, musicPlayerLoopbutton;
@@ -124,6 +124,13 @@ public class MainActivity extends AppCompatActivity
     private SeekBar uploadProgress;
     private RelativeLayout uploadButtonPause, uploadButtonCancel, uploadButton;
     private EditText uploadInputTitle, uploadInputDescription;
+
+    // Profile
+    private ImageView profilePicture;
+    private EditText profileName, profileCountry, profileCity;
+    private ImageView profileEdit, editName, editCountry, editCity;
+    private TextView profileLikeCount, profileMusicCount, profileVideoCount, profileDescription;
+    // TODO content
 
     private boolean notifIsOn, downloadWIFIOnlyOn;
 
@@ -162,8 +169,8 @@ public class MainActivity extends AppCompatActivity
 
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.ic_menu_gallery)
-                .showImageForEmptyUri(R.drawable.ic_menu_gallery)
+                .showImageOnLoading(R.drawable.nd_local_512)
+                .showImageForEmptyUri(R.drawable.nd_local_512)
                 .cacheInMemory(false)
                 .cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
@@ -178,19 +185,22 @@ public class MainActivity extends AppCompatActivity
         panelShopVideo = (RelativeLayout) findViewById(R.id.panel_shop_video);
         panelDownloads = (RelativeLayout) findViewById(R.id.panel_downloads);
         panelSettings = (RelativeLayout) findViewById(R.id.panel_settings);
+        panelProfile = (RelativeLayout) findViewById(R.id.panel_profile);
 
         initMediaPlayer();
         initSideMenu();
-        // TODO init new post
+        // Home
         initPanelNewPost();
-        // TODO init library
+        // Library
         initPanelLibrary();
-        // TODO init shop
+        // Shop
         initPanelShopMusic();
         initPanelShopVideo();
         // TODO init download
         initPanelSetting();
         initUploadForm();
+        // TODO init profile
+        initPanelProfile();
 
         // init state
         panelState = PanelState.PANEL_NEW_POST;
@@ -257,23 +267,25 @@ public class MainActivity extends AppCompatActivity
                 ApiManager.getInstance().getFeaturedShopMusic();
                 ApiManager.getInstance().getShopMusicTopAlbums();
                 ApiManager.getInstance().getShopMusicNewSongs();
-//                ApiManager.getInstance().getShopMusicAllSongs();
+                ApiManager.getInstance().getShopMusicAllSongs();
                 // SHOP VIDEO
                 ApiManager.getInstance().getShopVideoTopVideos();
                 ApiManager.getInstance().getShopVideoNewVideos();
-//                ApiManager.getInstance().getShopVideoAllVideos();
-            }
-
-            @Override
-            public void onUserAccessTokenSaved() {
-                setSideMenuData();
-
-                ApiManager.getInstance().getLibraryMusic();
+                ApiManager.getInstance().getShopVideoAllVideos();
             }
 
             @Override
             public void onError(String message) {
 
+            }
+        });
+
+        ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
+            @Override
+            public void onUserAccessTokenSaved() {
+                setSideMenuData();
+
+                ApiManager.getInstance().getLibraryMusic();
             }
         });
 
@@ -575,6 +587,18 @@ public class MainActivity extends AppCompatActivity
         uploadButtonPause.setOnClickListener(this);
         uploadButtonCancel.setOnClickListener(this);
         uploadButton.setOnClickListener(this);
+    }
+
+    private void initPanelProfile() {
+        profilePicture = (ImageView) findViewById(R.id.profile_preview_prof_pic);
+        profileName = (EditText) findViewById(R.id.profile_preview_name);
+        profileCountry = (EditText) findViewById(R.id.profile_preview_country);
+        profileCity = (EditText) findViewById(R.id.profile_preview_city);
+
+        editName = (ImageView) findViewById(R.id.profile_preview_name_edit);
+        editCountry = (ImageView) findViewById(R.id.profile_preview_country_edit);
+        editCity = (ImageView) findViewById(R.id.profile_preview_city_edit);
+
     }
 
     private void showFileChooser() {

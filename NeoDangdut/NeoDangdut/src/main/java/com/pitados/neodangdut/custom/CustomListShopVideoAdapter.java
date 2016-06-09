@@ -7,7 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -32,7 +34,9 @@ public class CustomListShopVideoAdapter extends BaseAdapter {
         ImageView thumbnail;
         TextView videoTitle;
         TextView artistName;
-        ImageView optButton;
+        TextView price;
+        RelativeLayout buyButton;
+        RelativeLayout optButton;
     }
 
     private PopupArtistVideo popupArtistVideo;
@@ -83,7 +87,9 @@ public class CustomListShopVideoAdapter extends BaseAdapter {
             holder.thumbnail = (ImageView) view.findViewById(R.id.list_view_shop_video_thumbnail);
             holder.videoTitle = (TextView) view.findViewById(R.id.list_view_shop_video_title);
             holder.artistName = (TextView) view.findViewById(R.id.list_view_shop_video_artist_name);
-            holder.optButton = (ImageView) view.findViewById(R.id.list_view_shop_video_opt_button);
+            holder.buyButton = (RelativeLayout) view.findViewById(R.id.list_view_shop_video_button);
+            holder.price = (TextView) view.findViewById(R.id.list_view_shop_video_price);
+            holder.optButton = (RelativeLayout) view.findViewById(R.id.list_view_shop_video_opt_button);
 
             view.setTag(holder);
         } else {
@@ -94,6 +100,14 @@ public class CustomListShopVideoAdapter extends BaseAdapter {
         imageLoader.displayImage(listVideo.get(i).cover, holder.thumbnail, opts);
         holder.videoTitle.setText(listVideo.get(i).videoTitle);
         holder.artistName.setText(listVideo.get(i).singerName);
+        holder.price.setText(listVideo.get(i).price);
+
+        holder.buyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(context, "Buy Video", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         final int index = i;
         holder.optButton.setOnClickListener(new View.OnClickListener() {

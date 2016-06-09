@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -94,15 +95,8 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
 
             holder.buyButton = (RelativeLayout) view.findViewById(R.id.list_view_shop_music_button);
 
-            final int index = i;
             holder.optButton = (RelativeLayout) view.findViewById(R.id.list_view_shop_music_opt_button);
-            holder.optButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
 
-                    popupArtistSong.showPopupArtistSong(listTopTrack.get(index));
-                }
-            });
 
             view.setTag(holder);
         } else {
@@ -117,6 +111,22 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
 
         // TODO check from file
         holder.price.setText("Rp "+listTopTrack.get(i).price);
+
+        holder.buyButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(context, "Buy Music", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        final int index = i;
+        holder.optButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                popupArtistSong.showPopupArtistSong(listTopTrack.get(index));
+            }
+        });
 
         return view;
     }

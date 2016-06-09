@@ -1167,7 +1167,7 @@ public class ApiManager {
                 }
 
                 if(shopAllSongsListener != null)
-                    shopAllSongsListener.onDataloaded(ApiType.SHOP_MUSIC_ALL_SONG);
+                    shopAllSongsListener.onDataLoaded(ApiType.SHOP_MUSIC_ALL_SONG);
             }
 
             @Override
@@ -1560,7 +1560,7 @@ public class ApiManager {
     }
 
     public interface OnShopMusicAllSongsReceived {
-        void onDataloaded(ApiType type);
+        void onDataLoaded(ApiType type);
     }
 
     public interface OnShopVideoTopVideosReceived {

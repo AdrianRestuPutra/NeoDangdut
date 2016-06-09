@@ -29,6 +29,8 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
     private ImageLoader imageLoader;
     private DisplayImageOptions opts;
 
+    private boolean isMusic;
+
     public PopupCommunity(Context context, int themeResId) {
         super(context, themeResId);
         this.context = context;
@@ -43,8 +45,8 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
         thumbnail = (ImageView) findViewById(R.id.popup_community_song_thumbnail);
         title = (TextView) findViewById(R.id.popup_community_song_title);
         artistName = (TextView) findViewById(R.id.popup_community_song_artist_name);
-        // TODO listen count
-        // TODO like count
+        listenCount = (TextView) findViewById(R.id.popup_community_listen_count);
+        likeCount = (TextView) findViewById(R.id.popup_community_like_count);
 
         // Button
         buttonPlay = (RelativeLayout) findViewById(R.id.popup_community_song_button_play);
@@ -76,6 +78,8 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
         imageLoader.displayImage(data.photoURL, thumbnail, opts);
         title.setText(data.songName);
         artistName.setText(data.userName);
+        listenCount.setText(data.totalViews);
+
 
         this.show();
     }

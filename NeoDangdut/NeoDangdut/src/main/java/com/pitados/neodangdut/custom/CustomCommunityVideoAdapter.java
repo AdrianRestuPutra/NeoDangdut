@@ -87,14 +87,6 @@ public class CustomCommunityVideoAdapter extends BaseAdapter {
             holder.artistName = (TextView) view.findViewById(R.id.list_view_home_video_artist_name);
             holder.optButton = (RelativeLayout) view.findViewById(R.id.list_view_home_video_optbutton);
 
-            final int index = i;
-            holder.optButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    popupCommunity.showPopupCommunity(listVideo.get(index));
-                }
-            });
-
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();
@@ -105,6 +97,14 @@ public class CustomCommunityVideoAdapter extends BaseAdapter {
             imageLoader.displayImage(listVideo.get(i).photoURL, holder.thumbnail, opts);
         holder.videoTitle.setText(listVideo.get(i).songName);
         holder.artistName.setText(listVideo.get(i).userName);
+
+        final int index = i;
+        holder.optButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                popupCommunity.showPopupCommunity(listVideo.get(index));
+            }
+        });
 
         return view;
     }

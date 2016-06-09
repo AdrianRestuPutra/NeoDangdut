@@ -3,12 +3,19 @@ package com.pitados.neodangdut.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
+import com.pitados.neodangdut.custom.CustomListShopMusicAdapter;
+import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.CustomMediaPlayer;
+import com.pitados.neodangdut.util.DataPool;
 
 /**
  * Created by adrianrestuputranto on 4/10/16.
@@ -19,6 +26,10 @@ public class FragmentShopMusicAllSongs extends Fragment {
     private String pageTitle;
 
     // TODO widgets
+    private ListView listAllSong;
+
+    private CustomListShopMusicAdapter listAdapter;
+    private SwipeRefreshLayout swipeRefresh;
 
     public static FragmentShopMusicAllSongs newInstance(int page, String title) {
         FragmentShopMusicAllSongs home = new FragmentShopMusicAllSongs();
@@ -46,10 +57,63 @@ public class FragmentShopMusicAllSongs extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.layout_fragment_music, container, false);
+        View view = inflater.inflate(R.layout.layout_fragment_shop_music_all_song, container, false);
         // TODO init widgets
 
+        listAllSong = (ListView) view.findViewById(R.id.shop_music_all_song_listview);
+        swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.shop_music_all_song_swipe_refresh);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                ApiManager.getInstance().getToken();
+                ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
+                    @Override
+                    public void onTokenSaved() {
+                        ApiManager.getInstance().getHomeBanner();
+                        ApiManager.getInstance().getHomeTopMusic();
+                        ApiManager.getInstance().getHomeTopVideos();
+                        ApiManager.getInstance().getHomeLatestNews();
+                    }
+
+                    @Override
+                    public void onError(String message) {
+
+                    }
+                });
+            }
+        });
+
+        loadData();
+
+        listAllSong.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                CustomMediaPlayer.getInstance().playTrack(DataPool.getInstance().listShopMusicAllSongs.get(i), true);
+            }
+        });
+
+        listAllSong.setFastScrollEnabled(true);
 
         return view;
+    }
+
+    public void loadData() {
+        if(DataPool.getInstance().listShopMusicAllSongs.size() > 0) {
+            listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicAllSongs);
+            listAllSong.setAdapter(listAdapter);
+        }
+
+        ApiManager.getInstance().setOnShopMusicAllSongsListener(new ApiManager.OnShopMusicAllSongsReceived() {
+            @Override
+            public void onDataLoaded(ApiManager.ApiType type) {
+                listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicAllSongs);
+                listAllSong.setAdapter(listAdapter);
+
+                listAdapter.notifyDataSetChanged();
+
+                if(swipeRefresh != null)
+                    swipeRefresh.setRefreshing(false);
+            }
+        });
     }
 }

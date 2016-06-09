@@ -3,6 +3,7 @@ package com.pitados.neodangdut.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +31,7 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
     // TODO widgets
     private ListView listTopSong;
     private Gallery listFeatured;
+    private SwipeRefreshLayout swipeRefresh;
 
     private CustomListShopMusicAdapter listAdapter;
     private ShopMusicFeaturedAdapter featuredAdapter;
@@ -67,11 +69,34 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
         listTopSong = (ListView) view.findViewById(R.id.shop_music_top_song_listview);
         listTopSong.setFocusable(false);
 
+        swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.shop_music_top_song_swipe_refresh);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                ApiManager.getInstance().getToken();
+                ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
+                    @Override
+                    public void onTokenSaved() {
+                        ApiManager.getInstance().getShopMusicTopSongs();
+                        ApiManager.getInstance().getFeaturedShopMusic();
+                    }
+
+                    @Override
+                    public void onError(String message) {
+
+                    }
+                });
+
+            }
+        });
+
         listFeatured = (Gallery) view.findViewById(R.id.shop_music_featured);
 
         loadData();
 
         listTopSong.setOnItemClickListener(this);
+
+        listTopSong.setFastScrollEnabled(true);
 
         return view;
     }
@@ -80,6 +105,10 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
         if(DataPool.getInstance().listShopMusicTopSongs.size() > 0) {
             listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicTopSongs);
             listTopSong.setAdapter(listAdapter);
+
+            featuredAdapter = new ShopMusicFeaturedAdapter(context, DataPool.getInstance().listShopMusicFeatured);
+            listFeatured.setAdapter(featuredAdapter);
+            listFeatured.setSelection(2);
         } else {
             ApiManager.getInstance().setOnShopMusicTopSongListener(new ApiManager.OnShopMusicTopSongReceived() {
                 @Override
@@ -88,13 +117,19 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
                     listTopSong.setAdapter(listAdapter);
 
                     listAdapter.notifyDataSetChanged();
+
+                    if (swipeRefresh != null)
+                        swipeRefresh.setRefreshing(false);
                 }
 
                 @Override
                 public void onFeaturedLoaded() {
                     featuredAdapter = new ShopMusicFeaturedAdapter(context, DataPool.getInstance().listShopMusicFeatured);
                     listFeatured.setAdapter(featuredAdapter);
-                    listFeatured.setSelection(1);
+                    listFeatured.setSelection(2);
+
+                    if (swipeRefresh != null)
+                        swipeRefresh.setRefreshing(false);
                 }
             });
         }

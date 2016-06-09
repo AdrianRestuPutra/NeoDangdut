@@ -65,6 +65,8 @@ public class FragmentLibraryVideo extends Fragment implements AdapterView.OnItem
         // TODO handle onItemClick
         listViewVideo.setOnItemClickListener(this);
 
+        listViewVideo.setFastScrollEnabled(true);
+
         return view;
     }
 
