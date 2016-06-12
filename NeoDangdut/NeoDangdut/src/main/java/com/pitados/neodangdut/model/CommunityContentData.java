@@ -1,5 +1,7 @@
 package com.pitados.neodangdut.model;
 
+import android.util.Log;
+
 /**
  * Created by adrianrestuputranto on 5/27/16.
  */
@@ -23,7 +25,7 @@ public class CommunityContentData {
 
     public CommunityContentData(String ID, String userID, String userName, String firstName, String lastName, String photoURL, int userTotalLikes,
                                 String songName, String description, String category, String fileURL, String coverURL,
-                                int totalLikes, int totalViews, String created, String isLikeable) {
+                                int totalLikes, int totalViews, String created, String isLike) {
         this.ID = ID;
         this.userID = userID;
         this.userName = userName;
@@ -39,9 +41,11 @@ public class CommunityContentData {
         this.totalLikes = totalLikes;
         this.totalViews = totalViews;
         this.created = created;
-        if(isLikeable.equalsIgnoreCase("true"))
+        if(isLike.equalsIgnoreCase("true"))
             this.isLikeable = true;
         else
             this.isLikeable = false;
+
+        Log.d("IS LIKEABLE", isLike);
     }
 }

@@ -3,7 +3,6 @@ package com.pitados.neodangdut.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -103,11 +102,13 @@ public class FragmentHomeNews extends Fragment {
             ApiManager.getInstance().setOnCommunityNewsListener(new ApiManager.OnCommunityNewsReceived() {
                 @Override
                 public void onDataLoaded(ApiManager.ApiType type) {
-                    isLoadingMore = false;
-                    Log.d("MORE", "News received");
-                    listAdapter = new CustomCommunityNewsAdapter(context, DataPool.getInstance().listAllNews);
-                    listNews.setAdapter(listAdapter);
 
+                    if(!isLoadingMore) {
+                        listAdapter = new CustomCommunityNewsAdapter(context, DataPool.getInstance().listAllNews);
+                        listNews.setAdapter(listAdapter);
+                    }
+
+                    isLoadingMore = false;
                     listAdapter.notifyDataSetChanged();
                 }
             });
@@ -117,7 +118,6 @@ public class FragmentHomeNews extends Fragment {
     public void loadMore() {
         if(!isLoadingMore) {
             isLoadingMore = true;
-            Log.d("MORE", "News");
 
             ApiManager.getInstance().getAllNews();
         }

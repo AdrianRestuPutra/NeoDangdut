@@ -6,6 +6,7 @@ import com.pitados.neodangdut.model.CommunityContentData;
 import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.model.MusicData;
 import com.pitados.neodangdut.model.NewsData;
+import com.pitados.neodangdut.model.UserProfileData;
 import com.pitados.neodangdut.model.VideoData;
 
 import java.util.ArrayList;
@@ -16,6 +17,8 @@ import java.util.List;
  */
 public class DataPool {
     private static DataPool instance;
+
+    public UserProfileData userProfileData;
 
     // List
     // HOME
@@ -43,6 +46,8 @@ public class DataPool {
     public List<VideoData> listShopVideoAllVideos;
 
     public DataPool() {
+        userProfileData = new UserProfileData();
+
         listHomeBanner = new ArrayList<>();
         listHomeTopMusic = new ArrayList<>();
         listHomeTopVideos = new ArrayList<>();

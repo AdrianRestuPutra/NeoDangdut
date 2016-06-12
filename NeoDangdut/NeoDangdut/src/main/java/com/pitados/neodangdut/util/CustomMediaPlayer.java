@@ -30,6 +30,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.CommunityContentData;
+import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.model.MusicData;
 import com.pitados.neodangdut.model.NewsData;
 import com.pitados.neodangdut.model.VideoData;
@@ -64,6 +65,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
     private TextView audioPlayerSongTitle, audioPlayerArtistName, audioPlayerDuration;
     // Video
     private EMVideoView videoPlayer;
+    private ImageView videoThumbnail;
     private TextView videoDate, videoDescription;
     // News
     private ImageView newsThumbnail;
@@ -111,11 +113,12 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         this.audioProgress = audioProgress;
     }
 
-    public void setVideoPanel(View panelVideoPlayer, final EMVideoView videoPlayer, TextView videoDate, TextView videoDescription) {
+    public void setVideoPanel(View panelVideoPlayer, final EMVideoView videoPlayer, TextView videoDate, TextView videoDescription, ImageView videoThumbnail) {
         this.panelVideoPlayer = panelVideoPlayer;
         this.videoPlayer = videoPlayer;
         this.videoDate = videoDate;
         this.videoDescription = videoDescription;
+        this.videoThumbnail = videoThumbnail;
     }
 
     public void setNewsPanel(View panelNewsDetail, ImageView newsThumbnail, TextView newsDetailTitle, TextView newsDetailDate, TextView newsDescription, RelativeLayout loadingBar, ScrollView newsScrollView) {
@@ -269,6 +272,98 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         });
     }
 
+    public void playItem(final LibraryData data) {
+        if(data.category.equalsIgnoreCase("music")) {
+            // Music
+
+            if (panelMusicPlayer.getVisibility() != View.VISIBLE) {
+                showMusicPlayer();
+
+            }
+            // TODO set panel music player default / loading
+            panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
+            audioPauseIcon.setImageResource(R.drawable.icon_play);
+
+            if(audioPlayer.isPlaying())
+                audioPlayer.stopPlayback();
+
+            // TODO from local
+            audioPlayer.setDataSource(context, Uri.parse(data.fileURL));
+            audioPlayer.prepareAsync();
+            audioPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    audioPlayer.start();
+                    panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
+                    audioPauseIcon.setImageResource(R.drawable.icon_pause);
+
+                    // TODO change audio data
+                    imageLoader.displayImage(data.coverURL, audioPlayerThumbnail, opts);
+                    audioPlayerSongTitle.setText(data.songTitle);
+                    audioPlayerArtistName.setText(data.singerName);
+                    audioPlayerDuration.setText("");
+
+                    int duration = (int)audioPlayer.getDuration() / 1000;
+                    audioProgress.setMax(duration);
+                }
+            });
+
+            final Handler mHandler = new Handler();
+            Activity currentActivity =  (Activity) context;
+            currentActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(audioPlayer != null) {
+                        int mCurrentPos = (int)audioPlayer.getCurrentPosition() / 1000;
+                        audioProgress.setProgress(mCurrentPos);
+                    }
+
+                    mHandler.postDelayed(this, 1000);
+                }
+            });
+
+            audioProgress.setThumb(ContextCompat.getDrawable(context, R.color.transparent));
+            audioProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int pos, boolean fromUser) {
+                    if(audioPlayer != null && fromUser) {
+                        audioPlayer.seekTo(pos * 1000);
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                    // TODO set seek thumb
+//                seekBar.setThumb(ContextCompat.getDrawable(context, R.color.colorPrimary));
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    // TODO set seek thumb transparent
+//                seekBar.setThumb(ContextCompat.getDrawable(context, R.color.colorPrimary));
+                }
+            });
+        } else {
+            // Video
+
+            showVideoPlayer();
+            videoPlayer.setVideoURI(Uri.parse(data.fileURL)); // TODO change url
+            videoPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    // TODO close buffering indicator
+                    videoPlayer.start();
+                }
+            });
+
+            imageLoader.displayImage(data.coverURL, videoThumbnail, opts);
+            videoDate.setText(data.songTitle);
+            videoDescription.setText("");
+        }
+
+
+    }
+
     public void stopTrack() {
         closeMusicPlayer();
         audioPlayer.stopPlayback();
@@ -289,6 +384,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
             }
         });
 
+        imageLoader.displayImage(videoData.cover, videoThumbnail, opts);
         videoDate.setText(videoData.videoTitle);
         if(videoData.description.length() > 0)
             videoDescription.setText(videoData.description);
@@ -305,6 +401,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
             }
         });
 
+        imageLoader.displayImage(videoData.coverURL, videoThumbnail, opts);
         videoDate.setText(videoData.songName);
         if(videoData.description.length() > 0)
             videoDescription.setText(videoData.description);

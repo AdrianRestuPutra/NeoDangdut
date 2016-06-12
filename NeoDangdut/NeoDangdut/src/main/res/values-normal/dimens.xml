@@ -45,7 +45,7 @@
     <dimen name="signup_date_picker">50dp</dimen>
     <dimen name="signup_year_picker">100dp</dimen>
     <dimen name="signup_picker_margin">10dp</dimen>
-    <dimen name="signup_gender_container">50dp</dimen>
+    <dimen name="signup_gender_container">80dp</dimen>
     <dimen name="signup_checkbox_size">30dp</dimen>
 
     <!-- main content -->
@@ -116,9 +116,13 @@
     <dimen name="shop_music_button_height">15dp</dimen>
     <dimen name="shop_opt_icon_width">20dp</dimen>
     <dimen name="shop_price_button_width">60dp</dimen>
+    <!-- Shop Video -->
+    <dimen name="shop_video_top_video_featured_panel_height">170dp</dimen>
+    <dimen name="shop_video_top_video_list_height">3200dp</dimen>
+
     <!-- Featured -->
     <dimen name="shop_featured_width">70dp</dimen>
-    <dimen name="shop_featured_height">157dp</dimen>
+    <dimen name="shop_featured_height">170dp</dimen>
     <dimen name="shop_featured_top_title_margin_left">10dp</dimen>
     <dimen name="shop_featured_thumbnail_width">50dp</dimen>
     <dimen name="shop_featured_spacing">10dp</dimen>
@@ -129,6 +133,10 @@
     <dimen name="shop_featured_name_text">3pt</dimen>
     <dimen name="shop_featured_price_text">4pt</dimen>
     <dimen name="shop_featured_price_margin_left">5dp</dimen>
+    <!-- Video -->
+    <dimen name="shop_video_featured_width">100dp</dimen>
+    <dimen name="shop_video_featured_thumbnail_width">80dp</dimen>
+    <dimen name="shop_video_featured_button_buy_width">60dp</dimen>
 
     <!-- Settings -->
     <dimen name="setting_padding">20dp</dimen>
@@ -156,6 +164,10 @@
     <dimen name="dialog_artist_text">7pt</dimen>
     <dimen name="dialog_artist_text_margin">2dp</dimen>
     <dimen name="dialog_artist_icon_margin">10dp</dimen>
+    <!-- Loading -->
+    <dimen name="dialog_loading_width">150dp</dimen>
+    <dimen name="dialog_loading_height">100dp</dimen>
+    <dimen name="dialog_loading_text">8pt</dimen>
     
     <!-- Upload -->
     <dimen name="upload_bar_height">50dp</dimen>

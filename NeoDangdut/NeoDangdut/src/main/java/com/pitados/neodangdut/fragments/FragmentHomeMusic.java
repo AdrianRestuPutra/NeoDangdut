@@ -87,7 +87,7 @@ public class FragmentHomeMusic extends Fragment {
                 int lastItem = firstVisibleItem + visibleItemCount;
 
                 if (lastItem == totalItemCount && totalItemCount != 0) {
-//                    loadMore();
+                    loadMore();
                 }
             }
         });
@@ -96,13 +96,15 @@ public class FragmentHomeMusic extends Fragment {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                ApiManager.getInstance().getUserAccessToken();
-                ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
-                    @Override
-                    public void onUserAccessTokenSaved() {
-                        ApiManager.getInstance().getCommunityMusic();
-                    }
-                });
+//                ApiManager.getInstance().getUserAccessToken();
+//                ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
+//                    @Override
+//                    public void onUserAccessTokenSaved() {
+//                        ApiManager.getInstance().getCommunityMusic();
+//                    }
+//                });
+
+                ApiManager.getInstance().getCommunityMusic();
             }
         });
 
@@ -122,9 +124,12 @@ public class FragmentHomeMusic extends Fragment {
         ApiManager.getInstance().setOnCommunityMusicListener(new ApiManager.OnCommunityMusicReceived() {
             @Override
             public void onDataLoaded(ApiManager.ApiType type) {
+                if(!isLoadingMore) {
+                    listAdapter = new CustomCommunityMusicAdapter(context, DataPool.getInstance().listCommunityMusic);
+                    listViewCommunityMusic.setAdapter(listAdapter);
+                }
+
                 isLoadingMore = false;
-                listAdapter = new CustomCommunityMusicAdapter(context, DataPool.getInstance().listCommunityMusic);
-                listViewCommunityMusic.setAdapter(listAdapter);
 
                 listAdapter.notifyDataSetChanged();
 

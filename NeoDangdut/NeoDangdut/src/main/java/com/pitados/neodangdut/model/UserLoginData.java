@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.pitados.neodangdut.util.ApiManager;
+
 /**
  * Created by adrianrestuputranto on 6/3/16.
  */
@@ -22,7 +24,6 @@ public class UserLoginData {
     private String LAST_NAME = "Last";
     private String PHOTO_URL = "URL";
     private String CREDIT = "COINS";
-    // TODO all
 
     public UserLoginData(Context context) {
         preferences = context.getSharedPreferences(USER_DATA, Activity.MODE_PRIVATE);
@@ -105,5 +106,12 @@ public class UserLoginData {
     public void signOut() {
         setUsername("");
         setPassword("");
+        setUserID("");
+        setFullName("");
+        setCredit("");
+        setPhotoURL("");
+        setRefreshToken("");
+
+        ApiManager.getInstance().getUserAccessTokenTime = 0l;
     }
 }

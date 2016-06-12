@@ -12,6 +12,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.CommunityContentData;
+import com.pitados.neodangdut.util.ApiManager;
 import com.pitados.neodangdut.util.CustomMediaPlayer;
 
 /**
@@ -21,7 +22,7 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
     private Context context;
 
     private ImageView thumbnail;
-    private TextView title, artistName, listenCount, likeCount;
+    private TextView title, artistName, listenCountText, likeCountText;
     private RelativeLayout buttonPlay, buttonLike, buttonShareFB, buttonShareTwitter, buttonComment;
 
     private CommunityContentData commData;
@@ -45,8 +46,8 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
         thumbnail = (ImageView) findViewById(R.id.popup_community_song_thumbnail);
         title = (TextView) findViewById(R.id.popup_community_song_title);
         artistName = (TextView) findViewById(R.id.popup_community_song_artist_name);
-        listenCount = (TextView) findViewById(R.id.popup_community_listen_count);
-        likeCount = (TextView) findViewById(R.id.popup_community_like_count);
+        listenCountText = (TextView) findViewById(R.id.popup_community_listen_count_text);
+        likeCountText = (TextView) findViewById(R.id.popup_community_like_count_text);
 
         // Button
         buttonPlay = (RelativeLayout) findViewById(R.id.popup_community_song_button_play);
@@ -78,8 +79,8 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
         imageLoader.displayImage(data.photoURL, thumbnail, opts);
         title.setText(data.songName);
         artistName.setText(data.userName);
-        listenCount.setText(data.totalViews);
-
+        listenCountText.setText(String.valueOf(data.totalViews));
+        likeCountText.setText(String.valueOf(data.totalLikes));
 
         this.show();
     }
@@ -97,7 +98,19 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
                 CustomMediaPlayer.getInstance().playTrack(commData);
         }
         if(view == buttonLike) {
+            if(commData.category.equalsIgnoreCase("video")) {
+                ApiManager.getInstance().likeItem(ApiManager.LikeType.VIDEO, commData.ID, commData, null);
+            } else {
+                ApiManager.getInstance().likeItem(ApiManager.LikeType.VIDEO, commData.ID, commData, null);
+            }
 
+            int count = 0;
+            if(commData.isLikeable)
+                count = commData.totalLikes + 1;
+            else
+                count = commData.totalLikes - 1;
+
+            likeCountText.setText(String.valueOf(count));
         }
         if(view == buttonComment) {
 

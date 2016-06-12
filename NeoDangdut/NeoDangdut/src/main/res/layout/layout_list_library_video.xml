@@ -3,26 +3,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/main_bg"
     android:descendantFocusability="blocksDescendants">
 
     <ImageView
-        android:id="@+id/list_view_lib_music_thumbnail"
+        android:id="@+id/list_view_lib_video_thumbnail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:src="@drawable/ic_menu_camera" />
 
     <TextView
-        android:id="@+id/list_view_lib_music_album_title"
+        android:id="@+id/list_view_lib_video_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white_font"
+        android:textSize="@dimen/top_list_font_title"
         android:text="Album Title"/>
 
     <TextView
-        android:id="@+id/list_view_lib_music_artist_name"
+        android:id="@+id/list_view_lib_video_artist_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white_font"
+        android:textSize="@dimen/top_list_font_regular"
         android:text="Artist Name"/>
 </LinearLayout>

@@ -3,18 +3,19 @@ package com.pitados.neodangdut.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomLibraryMusicAdapter;
 import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.CustomMediaPlayer;
 import com.pitados.neodangdut.util.DataPool;
 import com.pitados.neodangdut.util.StateManager;
 
@@ -28,6 +29,7 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
 
     // Widgets
     private GridView listViewMusic;
+    private SwipeRefreshLayout swipeRefresh;
 
     // Adapters
     private CustomLibraryMusicAdapter listAdapter;
@@ -68,6 +70,7 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
         // TODO init widgets
         listViewMusic = (GridView) view.findViewById(R.id.list_view_library_music);
 
+        swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.lib_music_swipe_refresh);
 
         loadData();
 
@@ -75,6 +78,13 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
 
         // TODO handle onItemClick
         listViewMusic.setOnItemClickListener(this);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                DataPool.getInstance().listLibraryMusic.clear();
+                ApiManager.getInstance().getLibraryMusic();
+            }
+        });
 
         listViewMusic.setFastScrollEnabled(true);
 
@@ -91,6 +101,7 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
             listAdapter = new CustomLibraryMusicAdapter(context, DataPool.getInstance().listLibraryMusic);
             listViewMusic.setAdapter(listAdapter);
 
+            listAdapter.notifyDataSetChanged();
         }
 
         ApiManager.getInstance().setOnLibraryMusicListener(new ApiManager.OnLibraryMusicReceived() {
@@ -100,6 +111,9 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
                 listViewMusic.setAdapter(listAdapter);
 
                 listAdapter.notifyDataSetChanged();
+
+                if(swipeRefresh != null)
+                    swipeRefresh.setRefreshing(false);
             }
         });
 
@@ -108,8 +122,12 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         if (adapterView == listViewMusic && !StateManager.isTopView) {
-            Toast.makeText(context, "TODO handle lib music item : " + i, Toast.LENGTH_SHORT).show();
+            CustomMediaPlayer.getInstance().playItem(DataPool.getInstance().listLibraryMusic.get(i));
 //            ConnManager.getInstance().downloadFile(Consts.AUDIO_SAMPLE_URL, ConnManager.DataType.AUDIO, "MixTape", "Track-"+i);
         }
+    }
+
+    public void reloadData() {
+        ApiManager.getInstance().getLibraryMusic();
     }
 }

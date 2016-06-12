@@ -38,7 +38,7 @@ public class HttpGetUtil extends AsyncTask<Void, Void, String> {
             HttpRequest request = HttpRequest.get(url, this.params, true).authorization("Bearer "+token);
             String result = "";
 
-            if(request.ok()) {
+            if(request.ok() || request.badRequest()) {
                 result = request.body();
 //                Log.d("Result", result);
             }

@@ -58,7 +58,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
-                        android:text="Uploading"
+                        android:text=""
                         android:textColor="@color/white_font"
                         android:textSize="@dimen/setting_text_small"/>
                 </RelativeLayout>
@@ -113,6 +113,7 @@
                 android:background="@drawable/bg_input"
                 android:hint="Title"
                 android:textSize="@dimen/setting_text_large"
+                android:textColor="@color/white_font"
                 android:paddingLeft="@dimen/upload_input_padding_left"
                 android:textColorHint="@color/purple_font"/>
 
@@ -125,6 +126,7 @@
                 android:hint="Description"
                 android:gravity="left|top"
                 android:textSize="@dimen/setting_text_large"
+                android:textColor="@color/white_font"
                 android:paddingLeft="@dimen/upload_input_padding_left"
                 android:paddingTop="@dimen/upload_content_padding"
                 android:textColorHint="@color/purple_font"/>

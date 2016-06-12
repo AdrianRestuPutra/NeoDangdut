@@ -40,6 +40,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.pitados.neodangdut.Consts;
+import com.pitados.neodangdut.Popup.PopupLoading;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomPagerAdapter;
 import com.pitados.neodangdut.fragments.FragmentHome;
@@ -58,6 +59,7 @@ import com.pitados.neodangdut.fragments.FragmentShopVideoTopVideos;
 import com.pitados.neodangdut.model.FragmentModel;
 import com.pitados.neodangdut.model.SettingPref;
 import com.pitados.neodangdut.model.UserLoginData;
+import com.pitados.neodangdut.model.UserProfileData;
 import com.pitados.neodangdut.util.ApiManager;
 import com.pitados.neodangdut.util.ConnManager;
 import com.pitados.neodangdut.util.CustomMediaPlayer;
@@ -68,6 +70,7 @@ import org.onepf.oms.OpenIabHelper;
 import org.onepf.oms.appstore.googleUtils.IabHelper;
 import org.onepf.oms.appstore.googleUtils.IabResult;
 
+import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +87,8 @@ public class MainActivity extends AppCompatActivity
         PANEL_SHOP_MUSIC,
         PANEL_SHOP_VIDEO,
         PANEL_DOWNLOAD,
-        PANEL_SETTING
+        PANEL_SETTING,
+        PANEL_PROFILE
     }
     private PanelState panelState;
 
@@ -105,6 +109,7 @@ public class MainActivity extends AppCompatActivity
     // VIDEO
     private RelativeLayout panelVideoPlayer;
     private EMVideoView videoView;
+    private ImageView videoPlayerThumbnail;
     // TODO widget video
     private TextView videoDate, videoDescription;
     // NEWS
@@ -124,6 +129,8 @@ public class MainActivity extends AppCompatActivity
     private SeekBar uploadProgress;
     private RelativeLayout uploadButtonPause, uploadButtonCancel, uploadButton;
     private EditText uploadInputTitle, uploadInputDescription;
+    private File tempFile;
+    private boolean isUploadMusic;
 
     // Profile
     private ImageView profilePicture;
@@ -133,6 +140,7 @@ public class MainActivity extends AppCompatActivity
     // TODO content
 
     private boolean notifIsOn, downloadWIFIOnlyOn;
+    private boolean canEditProfile;
 
     // Fragments
     private ViewPager viewPagerNewPost, viewPagerLibrary, viewPagerShopMusic, viewPagerShopVideo;
@@ -144,7 +152,7 @@ public class MainActivity extends AppCompatActivity
     private OpenIabHelper iabHelper;
 
     // Side Menu
-    // TODO profile
+    private ImageView sideMenuProfileButton;
     private ImageView sideMenuUserPic;
     private TextView sideMenuFullName;
     private LinearLayout sideMenuTopup, sideMenuHome, sideMenuLibrary, sideMenuShopMusic, sideMenuShopVideo, sideMenuDownloads, sideMenuSetting, sideMenuSignOut;
@@ -153,6 +161,8 @@ public class MainActivity extends AppCompatActivity
     private ImageLoader imageLoader;
     private DisplayImageOptions opts;
     private UserLoginData userLoginData;
+
+    private PopupLoading popupLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,6 +197,8 @@ public class MainActivity extends AppCompatActivity
         panelSettings = (RelativeLayout) findViewById(R.id.panel_settings);
         panelProfile = (RelativeLayout) findViewById(R.id.panel_profile);
 
+        popupLoading = new PopupLoading(MainActivity.this, R.style.custom_dialog);
+
         initMediaPlayer();
         initSideMenu();
         // Home
@@ -201,11 +213,13 @@ public class MainActivity extends AppCompatActivity
         initUploadForm();
         // TODO init profile
         initPanelProfile();
+        initPanelUpload();
 
         // init state
         panelState = PanelState.PANEL_NEW_POST;
         ConnManager.getInstance().init(getBaseContext());
         isUploadFormShowing = false;
+        ApiManager.getInstance().setContext(MainActivity.this); // TEST
 
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
         ImageLoader.getInstance().init(config);
@@ -228,6 +242,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
 //                showUploadForm();
+                isUploadMusic = true;
                 showFileChooser();
             }
         });
@@ -237,6 +252,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
 //                showUploadForm();
+                isUploadMusic = true;
                 showFileChooser();
             }
         });
@@ -258,10 +274,6 @@ public class MainActivity extends AppCompatActivity
                 ApiManager.getInstance().getHomeTopMusic();
                 ApiManager.getInstance().getHomeTopVideos();
                 ApiManager.getInstance().getHomeLatestNews();
-                // Community
-                ApiManager.getInstance().getCommunityMusic();
-                ApiManager.getInstance().getCommunityVideo();
-                ApiManager.getInstance().getAllNews();
                 // SHOP MUSIC
                 ApiManager.getInstance().getShopMusicTopSongs();
                 ApiManager.getInstance().getFeaturedShopMusic();
@@ -270,6 +282,7 @@ public class MainActivity extends AppCompatActivity
                 ApiManager.getInstance().getShopMusicAllSongs();
                 // SHOP VIDEO
                 ApiManager.getInstance().getShopVideoTopVideos();
+                ApiManager.getInstance().getFeaturedShopVideo();
                 ApiManager.getInstance().getShopVideoNewVideos();
                 ApiManager.getInstance().getShopVideoAllVideos();
             }
@@ -285,7 +298,13 @@ public class MainActivity extends AppCompatActivity
             public void onUserAccessTokenSaved() {
                 setSideMenuData();
 
+                // Community
+                ApiManager.getInstance().getCommunityMusic();
+                ApiManager.getInstance().getCommunityVideo();
+                ApiManager.getInstance().getAllNews();
+
                 ApiManager.getInstance().getLibraryMusic();
+                ApiManager.getInstance().getLibraryVideo();
             }
         });
 
@@ -370,6 +389,7 @@ public class MainActivity extends AppCompatActivity
 
         // TODO insert widget id
         videoView = (EMVideoView) findViewById(R.id.video_player_view);
+        videoPlayerThumbnail = (ImageView) findViewById(R.id.video_player_thumbnail);
         videoDate = (TextView) findViewById(R.id.video_player_detail_date);
         videoDescription = (TextView) findViewById(R.id.video_player_detail_description);
 
@@ -385,7 +405,7 @@ public class MainActivity extends AppCompatActivity
         CustomMediaPlayer.getInstance().setAudioPanel(this, panelMusicPlayer, musicPlayerProgress, musicPlayerDuration,
                 musicPlayerThumbnail, musicPlayerTitle, musicPlayerArtistName, musicPlayerPauseIcon);
 
-        CustomMediaPlayer.getInstance().setVideoPanel(panelVideoPlayer, videoView, videoDate, videoDescription);
+        CustomMediaPlayer.getInstance().setVideoPanel(panelVideoPlayer, videoView, videoDate, videoDescription, videoPlayerThumbnail);
 
         CustomMediaPlayer.getInstance().setNewsPanel(panelNewsDetail, newsDetailThumbnail, newsDetailTitle, newsDetailDate, newsDetailDescription, loadingBar, newsScrollView);
 
@@ -399,6 +419,7 @@ public class MainActivity extends AppCompatActivity
         sideMenuDownloads = (LinearLayout) findViewById(R.id.side_menu_download);
         sideMenuSetting = (LinearLayout) findViewById(R.id.side_menu_setting);
         sideMenuSignOut = (LinearLayout) findViewById(R.id.side_menu_signout);
+        sideMenuProfileButton = (ImageView) findViewById(R.id.side_menu_profile_button);
 
         // Wallet
         sideMenuTopup = (LinearLayout) findViewById(R.id.side_menu_topup);
@@ -408,6 +429,7 @@ public class MainActivity extends AppCompatActivity
         sideMenuFullName = (TextView) findViewById(R.id.nav_header_user_name);
         sideMenuUserPic = (ImageView) findViewById(R.id.nav_header_user_prof_pic);
 
+        sideMenuProfileButton.setOnClickListener(this);
         sideMenuTopup.setOnClickListener(this);
         sideMenuHome.setOnClickListener(this);
         sideMenuLibrary.setOnClickListener(this);
@@ -590,15 +612,39 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initPanelProfile() {
+
         profilePicture = (ImageView) findViewById(R.id.profile_preview_prof_pic);
         profileName = (EditText) findViewById(R.id.profile_preview_name);
         profileCountry = (EditText) findViewById(R.id.profile_preview_country);
         profileCity = (EditText) findViewById(R.id.profile_preview_city);
 
+        profileLikeCount = (TextView) findViewById(R.id.profile_preview_like_count_text);
+        profileMusicCount = (TextView) findViewById(R.id.profile_preview_music_count_text);
+        profileVideoCount = (TextView) findViewById(R.id.profile_preview_video_count_text);
+
         editName = (ImageView) findViewById(R.id.profile_preview_name_edit);
         editCountry = (ImageView) findViewById(R.id.profile_preview_country_edit);
         editCity = (ImageView) findViewById(R.id.profile_preview_city_edit);
+        profileEdit = (ImageView) findViewById(R.id.profile_preview_edit);
 
+        profileEdit.setOnClickListener(this);
+    }
+
+    private void showPanelProfile() {
+        UserProfileData data = DataPool.getInstance().userProfileData;
+
+        imageLoader.displayImage(data.photoURL, profilePicture, opts);
+        profileName.setText(data.fullName);
+        profileCity.setText(data.locationCity);
+        profileCountry.setText(data.locationCountry);
+        profileLikeCount.setText(String.valueOf(data.totalLikes));
+        profileMusicCount.setText(String.valueOf(data.totalMusic));
+        profileVideoCount.setText(String.valueOf(data.totalVideo));
+    }
+
+    private void initPanelUpload() {
+        uploadInputTitle = (EditText) findViewById(R.id.upload_input_title);
+        uploadInputDescription = (EditText) findViewById(R.id.upload_description);
     }
 
     private void showFileChooser() {
@@ -633,18 +679,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("ACTIVITY RESULT", requestCode+" | result : "+resultCode);
         if(requestCode == UPLOAD_FILE_CODE) {
-            if(resultCode == 1) {
+            if(resultCode == RESULT_OK) {
                 Uri uri = data.getData();
-                try {
-                    String path = getPath(this, uri);
 
-//                File file = new File(path);
-                    Toast.makeText(getBaseContext(), "Path : " + path, Toast.LENGTH_SHORT).show();
-                    showUploadForm();
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
+                tempFile = new File(uri.getPath());
+
+                showUploadForm();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -657,7 +699,7 @@ public class MainActivity extends AppCompatActivity
         uploadFileName.setText("");
         uploadProgress.setProgress(0);
         uploadButtonText.setText("SUBMIT");
-        uploadButtonText.setTextColor(getResources().getColor(R.color.dark_purple_font));
+        uploadButtonText.setTextColor(getResources().getColor(R.color.white_font));
     }
 
     private void closeUploadForm() {
@@ -691,6 +733,10 @@ public class MainActivity extends AppCompatActivity
             case PANEL_SETTING:
                 Log.d("CURRENT PANEL", "SETTING");
                 return panelSettings;
+
+            case PANEL_PROFILE:
+                Log.d("CURRENT PANEL", "PROFILE");
+                return panelProfile;
         }
         return null;
     }
@@ -721,8 +767,6 @@ public class MainActivity extends AppCompatActivity
                 panelState = PanelState.PANEL_SHOP_MUSIC;
                 fabMenu.setVisibility(View.INVISIBLE);
 
-//                FragmentShopMusicTopSongs tempFragment = (FragmentShopMusicTopSongs) pagerAdapterShopMusic.getItem(0);
-//                tempFragment.loadData();
                 break;
 
             case PANEL_SHOP_VIDEO:
@@ -743,6 +787,23 @@ public class MainActivity extends AppCompatActivity
                 panelSettings.setVisibility(View.VISIBLE);
                 panelState = PanelState.PANEL_SETTING;
                 fabMenu.setVisibility(View.INVISIBLE);
+                break;
+
+            case PANEL_PROFILE:
+                panelProfile.setVisibility(View.VISIBLE);
+                panelState = PanelState.PANEL_PROFILE;
+                fabMenu.setVisibility(View.INVISIBLE);
+
+                canEditProfile = false;
+                profileName.setEnabled(false);
+                profileCountry.setEnabled(false);
+                profileCity.setEnabled(false);
+
+                editName.setVisibility(View.INVISIBLE);
+                editCountry.setVisibility(View.INVISIBLE);
+                editCity.setVisibility(View.INVISIBLE);
+
+                showPanelProfile();
                 break;
         }
     }
@@ -899,14 +960,63 @@ public class MainActivity extends AppCompatActivity
             MainActivity.this.finish();
         }
 
+        // UPLOAD
+        if(view == uploadButton) {
+            Toast.makeText(getBaseContext(), "Upload File", Toast.LENGTH_SHORT).show();
+
+            String fileName = uploadInputTitle.getText().toString();
+            String fileDescription = uploadInputDescription.getText().toString();
+
+            if(isUploadMusic) {
+                ApiManager.getInstance().uploadContent(tempFile, "music", fileName, fileDescription);
+            } else {
+                ApiManager.getInstance().uploadContent(tempFile, "video", fileName, fileDescription);
+            }
+
+            popupLoading.showPopupLoading("Uploading..");
+            ApiManager.getInstance().setOnUploadListener(new ApiManager.OnUpload() {
+                @Override
+                public void onSucceed() {
+                    popupLoading.closePopupLoading();
+                }
+
+                @Override
+                public void onFailed(String message) {
+                    popupLoading.setMessage("Upload Failed");
+                }
+            });
+        }
+        // UPLOAD END
+
+        // Profile
+        if(view == sideMenuProfileButton) {
+            if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
+                CustomMediaPlayer.getInstance().closeNewsDetail();
+            changePanel(PanelState.PANEL_PROFILE);
+        }
+
+        if(view == profileEdit) {
+            canEditProfile = !canEditProfile;
+            profileName.setEnabled(canEditProfile);
+            profileCountry.setEnabled(canEditProfile);
+            profileCity.setEnabled(canEditProfile);
+
+            if(canEditProfile) {
+                editName.setVisibility(View.VISIBLE);
+                editCountry.setVisibility(View.VISIBLE);
+                editCity.setVisibility(View.VISIBLE);
+            } else {
+                editName.setVisibility(View.INVISIBLE);
+                editCountry.setVisibility(View.INVISIBLE);
+                editCity.setVisibility(View.INVISIBLE);
+            }
+        }
+        // Profile END
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         // SIDE MENU END
 
-        // UPLOAD
-        if(view == uploadButton) {
-            Toast.makeText(getBaseContext(), "Upload File", Toast.LENGTH_SHORT).show();
-        }
-        // UPLOAD END
+
     }
 }

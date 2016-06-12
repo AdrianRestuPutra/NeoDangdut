@@ -7,6 +7,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -30,6 +31,8 @@ public class FragmentShopMusicAllSongs extends Fragment {
 
     private CustomListShopMusicAdapter listAdapter;
     private SwipeRefreshLayout swipeRefresh;
+
+    private boolean isLoadingMore;
 
     public static FragmentShopMusicAllSongs newInstance(int page, String title) {
         FragmentShopMusicAllSongs home = new FragmentShopMusicAllSongs();
@@ -92,6 +95,22 @@ public class FragmentShopMusicAllSongs extends Fragment {
             }
         });
 
+        listAllSong.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                int lastItem = firstVisibleItem + visibleItemCount;
+
+                if (lastItem == totalItemCount && totalItemCount != 0) {
+                    loadMore();
+                }
+            }
+        });
+
         listAllSong.setFastScrollEnabled(true);
 
         return view;
@@ -106,14 +125,26 @@ public class FragmentShopMusicAllSongs extends Fragment {
         ApiManager.getInstance().setOnShopMusicAllSongsListener(new ApiManager.OnShopMusicAllSongsReceived() {
             @Override
             public void onDataLoaded(ApiManager.ApiType type) {
-                listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicAllSongs);
-                listAllSong.setAdapter(listAdapter);
+                if(!isLoadingMore) {
+                    listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicAllSongs);
+                    listAllSong.setAdapter(listAdapter);
+                }
+
+                isLoadingMore = false;
 
                 listAdapter.notifyDataSetChanged();
 
-                if(swipeRefresh != null)
+                if (swipeRefresh != null)
                     swipeRefresh.setRefreshing(false);
             }
         });
+    }
+
+    public void loadMore() {
+        if(!isLoadingMore) {
+            isLoadingMore = true;
+
+            ApiManager.getInstance().getShopMusicAllSongs();
+        }
     }
 }

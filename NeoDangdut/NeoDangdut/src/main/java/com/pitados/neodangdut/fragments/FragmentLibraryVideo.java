@@ -3,17 +3,18 @@ package com.pitados.neodangdut.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomLibraryVideoAdapter;
 import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.CustomMediaPlayer;
 import com.pitados.neodangdut.util.DataPool;
 
 /**
@@ -26,6 +27,7 @@ public class FragmentLibraryVideo extends Fragment implements AdapterView.OnItem
 
     // Widgets
     private GridView listViewVideo;
+    private SwipeRefreshLayout swipeRefresh;
 
     // Adapters
     private CustomLibraryVideoAdapter listAdapter;
@@ -61,9 +63,20 @@ public class FragmentLibraryVideo extends Fragment implements AdapterView.OnItem
         // TODO init widgets
         listViewVideo = (GridView) view.findViewById(R.id.list_view_library_video);
 
+        swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.lib_video_swipe_refresh);
+
+        loadData();
 
         // TODO handle onItemClick
         listViewVideo.setOnItemClickListener(this);
+
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                DataPool.getInstance().listLibraryVideo.clear();
+                ApiManager.getInstance().getLibraryVideo();
+            }
+        });
 
         listViewVideo.setFastScrollEnabled(true);
 
@@ -75,15 +88,19 @@ public class FragmentLibraryVideo extends Fragment implements AdapterView.OnItem
             listAdapter = new CustomLibraryVideoAdapter(context, DataPool.getInstance().listLibraryVideo);
             listViewVideo.setAdapter(listAdapter);
 
+            listAdapter.notifyDataSetChanged();
         }
 
-        ApiManager.getInstance().setOnCommunityMusicListener(new ApiManager.OnCommunityMusicReceived() {
+        ApiManager.getInstance().setOnLibraryVideoListener(new ApiManager.OnLibraryVideoReceived() {
             @Override
             public void onDataLoaded(ApiManager.ApiType type) {
                 listAdapter = new CustomLibraryVideoAdapter(context, DataPool.getInstance().listLibraryVideo);
                 listViewVideo.setAdapter(listAdapter);
 
                 listAdapter.notifyDataSetChanged();
+
+                if(swipeRefresh != null)
+                    swipeRefresh.setRefreshing(false);
             }
         });
 
@@ -91,6 +108,6 @@ public class FragmentLibraryVideo extends Fragment implements AdapterView.OnItem
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Toast.makeText(context, "TODO handle lib video item : " + i, Toast.LENGTH_SHORT).show();
+        CustomMediaPlayer.getInstance().playItem(DataPool.getInstance().listLibraryVideo.get(i));
     }
 }

@@ -7,6 +7,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -30,6 +31,8 @@ public class FragmentShopVideoAllVideos extends Fragment {
     private SwipeRefreshLayout swipeRefresh;
 
     private CustomListShopVideoAdapter listAdapter;
+
+    private boolean isLoadingMore;
 
     public static FragmentShopVideoAllVideos newInstance(int page, String title) {
         FragmentShopVideoAllVideos home = new FragmentShopVideoAllVideos();
@@ -90,6 +93,22 @@ public class FragmentShopVideoAllVideos extends Fragment {
             }
         });
 
+        listAllVideos.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                int lastItem = firstVisibleItem + visibleItemCount;
+
+                if (lastItem == totalItemCount && totalItemCount != 0) {
+                    loadMore();
+                }
+            }
+        });
+
         listAllVideos.setFastScrollEnabled(true);
 
         return view;
@@ -104,8 +123,12 @@ public class FragmentShopVideoAllVideos extends Fragment {
         ApiManager.getInstance().setOnShopVideoAllVideosListener(new ApiManager.OnShopVideoAllVideosReceived() {
             @Override
             public void onDataLoaded(ApiManager.ApiType type) {
-                listAdapter = new CustomListShopVideoAdapter(context, DataPool.getInstance().listShopVideoAllVideos);
-                listAllVideos.setAdapter(listAdapter);
+                if(!isLoadingMore) {
+                    listAdapter = new CustomListShopVideoAdapter(context, DataPool.getInstance().listShopVideoAllVideos);
+                    listAllVideos.setAdapter(listAdapter);
+                }
+
+                isLoadingMore = false;
 
                 listAdapter.notifyDataSetChanged();
 
@@ -115,4 +138,11 @@ public class FragmentShopVideoAllVideos extends Fragment {
         });
     }
 
+    public void loadMore() {
+        if(!isLoadingMore) {
+            isLoadingMore = true;
+
+            ApiManager.getInstance().getShopVideoAllVideos();
+        }
+    }
 }

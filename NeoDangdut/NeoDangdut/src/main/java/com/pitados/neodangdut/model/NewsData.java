@@ -12,7 +12,7 @@ public class NewsData {
     public String slug;
     public int totalLikes;
     public String created;
-    public String isLikeable;
+    public boolean isLikeable;
 
     public NewsData(String ID, String title, String thumbnailURL, String content,
                     String tags, String slug, int totalLikes, String created, String isLikeable) {
@@ -24,7 +24,10 @@ public class NewsData {
         this.slug = slug;
         this.totalLikes = totalLikes;
         this.created = created;
-        this.isLikeable = isLikeable;
+        if(isLikeable.equalsIgnoreCase("true"))
+            this.isLikeable = true;
+        else
+            this.isLikeable = false;
     }
 
     public NewsData() {

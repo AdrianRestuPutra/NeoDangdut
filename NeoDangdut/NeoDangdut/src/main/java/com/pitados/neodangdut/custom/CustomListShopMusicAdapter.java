@@ -2,6 +2,7 @@ package com.pitados.neodangdut.custom;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -10,14 +11,15 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.Popup.PopupArtistSong;
+import com.pitados.neodangdut.Popup.PopupLoading;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.MusicData;
+import com.pitados.neodangdut.util.ApiManager;
 
 import java.util.List;
 
@@ -32,6 +34,7 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
     private DisplayImageOptions opts;
 
     private PopupArtistSong popupArtistSong;
+    private PopupLoading popupLoading;
 
     static class ViewHolder {
         ImageView thumbnail;
@@ -59,6 +62,7 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
                 .build();
 
         popupArtistSong = new PopupArtistSong(context, R.style.custom_dialog);
+        popupLoading = new PopupLoading(context, R.style.custom_dialog);
     }
 
     @Override
@@ -110,16 +114,46 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
         holder.albumName.setText(listTopTrack.get(i).albumName);
 
         // TODO check from file
-        holder.price.setText("Rp "+listTopTrack.get(i).price);
+        holder.price.setText("Rp " + listTopTrack.get(i).price);
 
+        final int index = i;
         holder.buyButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context, "Buy Music", Toast.LENGTH_SHORT).show();
+                popupLoading.showPopupLoading("Purchasing..");
+
+                ApiManager.getInstance().getUserTransactionToken();
+                ApiManager.getInstance().setOnUserTransactionTokenReceived(new ApiManager.OnUserTransactionTokenReceived() {
+                    @Override
+                    public void onUserTransactionTokenSaved() {
+                        ApiManager.getInstance().purchaseItem(ApiManager.PurchaseType.SINGLE, listTopTrack.get(index).ID);
+                        ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
+
+                            @Override
+                            public void onItemPurchased(String result) {
+                                Log.d("Result", result);
+
+                                popupLoading.closePopupLoading();
+                                // TODO notif user
+                            }
+
+                            @Override
+                            public void onError(String message) {
+                                // TODO show popup
+                                popupLoading.setMessage("Purchase Failed");
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        popupLoading.setMessage("Purchase Failed");
+                    }
+                });
+
             }
         });
 
-        final int index = i;
         holder.optButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {

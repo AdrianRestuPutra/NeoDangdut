@@ -22,6 +22,7 @@
         android:layout_marginTop="@dimen/login_button_margin_top"
         android:background="@drawable/bg_input"
         android:hint="Password"
+        android:inputType="textPassword"
         android:paddingLeft="@dimen/signup_padding"
         android:textColor="@color/white_font"
         android:textColorHint="@color/purple_font" />
@@ -33,6 +34,7 @@
         android:layout_marginTop="@dimen/login_button_margin_top"
         android:background="@drawable/bg_input"
         android:hint="Confirm Password"
+        android:inputType="textPassword"
         android:paddingLeft="@dimen/signup_padding"
         android:textColor="@color/white_font"
         android:textColorHint="@color/purple_font" />
@@ -44,6 +46,7 @@
         android:layout_marginTop="@dimen/login_button_margin_top"
         android:background="@drawable/bg_input"
         android:hint="Email"
+        android:inputType="textEmailAddress"
         android:paddingLeft="@dimen/signup_padding"
         android:textColor="@color/white_font"
         android:textColorHint="@color/purple_font" />
@@ -55,6 +58,7 @@
         android:layout_marginTop="@dimen/login_button_margin_top"
         android:background="@drawable/bg_input"
         android:hint="Confirm Email"
+        android:inputType="textEmailAddress"
         android:paddingLeft="@dimen/signup_padding"
         android:textColor="@color/white_font"
         android:textColorHint="@color/purple_font" />

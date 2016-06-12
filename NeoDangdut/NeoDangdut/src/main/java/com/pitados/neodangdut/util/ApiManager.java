@@ -5,12 +5,15 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.pitados.neodangdut.Consts;
+import com.pitados.neodangdut.Popup.PopupLoading;
+import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.AlbumData;
 import com.pitados.neodangdut.model.BannerModel;
 import com.pitados.neodangdut.model.CommunityContentData;
 import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.model.MusicData;
 import com.pitados.neodangdut.model.NewsData;
+import com.pitados.neodangdut.model.RegisterModel;
 import com.pitados.neodangdut.model.UserLoginData;
 import com.pitados.neodangdut.model.VideoData;
 
@@ -18,6 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,6 +68,7 @@ public class ApiManager {
     // Listener
     private OnTokenReceived listener;
     private OnUserAccessTokenReceived userAccessListener;
+    private OnUserTransactionTokenReceived userTransactionListener;
     private OnHomeDataReceived dataListener;
     private OnCommunityMusicReceived commMusicListener;
     private OnCommunityVideoReceived commVideoListener;
@@ -77,6 +82,9 @@ public class ApiManager {
     private OnShopVideoTopVideosReceived shopVideoTopVideosListener;
     private OnShopVideoNewVideosReceived shopVideoNewVideosListener;
     private OnShopVideoAllVideosReceived shopVideoAllVideosListener;
+    private OnPurchase purchaseListener;
+    private OnUpload uploadListener;
+    private OnRegister registerListener;
 
     private static ApiManager instance;
 
@@ -86,12 +94,14 @@ public class ApiManager {
     public String REFRESH_TOKEN = "refresh_token";
 
     public String TOKEN_TYPE = "type";
-    public long getTokenTime, getUserAccessTokenTime;
+    public long getTokenTime, getUserAccessTokenTime, getUserTransactionTokenTime;
 
     private int limitData = 20;
 
     // DATA
     private UserLoginData userLoginData;
+
+    private PopupLoading popupLoading;
 
     public ApiManager() {
 
@@ -108,6 +118,7 @@ public class ApiManager {
         this.context = context;
 
         userLoginData = new UserLoginData(context);
+        popupLoading = new PopupLoading(context, R.style.custom_dialog);
     }
 
     public void getToken() {
@@ -212,6 +223,57 @@ public class ApiManager {
         }
     }
 
+    public void getUserTransactionToken() {
+        if(System.currentTimeMillis() - getUserTransactionTokenTime > 3600000l && userLoginData.getRefreshToken().length() > 0) {
+            Map<String, String> params = new HashMap<>();
+            params.put("client_id", CLIENT_ID);
+            params.put("client_secret", CLIENT_SECRET);
+            params.put("scope", "transaction");
+            params.put("grant_type", "password");
+            params.put("username", userLoginData.getUsername());
+            params.put("password", userLoginData.getPassword());
+            HttpPostUtil request = new HttpPostUtil(Consts.URL_GET_TOKEN, "", params);
+
+            request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
+                @Override
+                public void afterExecute(String result) {
+                    if(result != null) {
+                        Log.d("Result API", result);
+
+                        try {
+                            JSONObject rawData = new JSONObject(result);
+
+
+                            if(!rawData.has("error")) {
+                                USER_ACCESS_TOKEN = rawData.getString("access_token");
+                                REFRESH_TOKEN = rawData.getString("refresh_token");
+                                getUserTransactionTokenTime = System.currentTimeMillis();
+
+                                userTransactionListener.onUserTransactionTokenSaved();
+                            } else {
+                                String errorMessage = rawData.getString("error_description");
+
+                                userTransactionListener.onError(errorMessage);
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void beforeExecute() {
+
+                }
+            });
+            request.execute();
+
+        } else {
+            // TODO refresh
+        }
+    }
+
     public void refreshUserAccessToken() {
         Map<String, String> params = new HashMap<>();
         params.put("client_id", CLIENT_ID);
@@ -276,17 +338,49 @@ public class ApiManager {
                 try {
                         JSONObject rawData = new JSONObject(result);
                         JSONObject profileData = rawData.getJSONObject("profile");
+                        JSONObject locationData = profileData.getJSONObject("location");
 
                         if(!rawData.has("error")) {
                             String userID = profileData.getString("user_id");
                             String fullName = profileData.getString("name");
                             String photoURL = profileData.getString("photo");
+                            String email = profileData.getString("email");
+                            String phone = profileData.getString("phone");
+                            String profile = profileData.getString("profile");
+                            String birthday = profileData.getString("birthday");
+                            String gender = profileData.getString("gender");
+                            String locAddress = locationData.getString("address");
+                            String locPostalCode = locationData.getString("postal_code");
+                            String locCity = locationData.getString("city");
+                            String locCountry = locationData.getString("country");
                             String credit = profileData.getString("credits");
+                            int totalLikes = profileData.getInt("total_likes");
+                            int totalMusic = profileData.getInt("total_music");
+                            int totalVideo = profileData.getInt("total_video");
+                            int unplayed = profileData.getInt("unplayed");
 
                             userLoginData.setUserID(userID);
                             userLoginData.setFullName(fullName);
                             userLoginData.setPhotoURL(photoURL);
                             userLoginData.setCredit(credit);
+
+                            DataPool.getInstance().userProfileData.userID = userID;
+                            DataPool.getInstance().userProfileData.fullName = fullName;
+                            DataPool.getInstance().userProfileData.photoURL = photoURL;
+                            DataPool.getInstance().userProfileData.email = email;
+                            DataPool.getInstance().userProfileData.phone = phone;
+                            DataPool.getInstance().userProfileData.profile = profile;
+                            DataPool.getInstance().userProfileData.birthday = birthday;
+                            DataPool.getInstance().userProfileData.gender = gender;
+                            DataPool.getInstance().userProfileData.locationAddress = locAddress;
+                            DataPool.getInstance().userProfileData.locationPostalCode = locPostalCode;
+                            DataPool.getInstance().userProfileData.locationCity = locCity;
+                            DataPool.getInstance().userProfileData.locationCountry = locCountry;
+                            DataPool.getInstance().userProfileData.credits = credit;
+                            DataPool.getInstance().userProfileData.totalLikes = totalLikes;
+                            DataPool.getInstance().userProfileData.totalMusic = totalMusic;
+                            DataPool.getInstance().userProfileData.totalVideo = totalVideo;
+                            DataPool.getInstance().userProfileData.unplayed = unplayed;
                         } else {
                             String errorMessage = rawData.getString("error_description");
 
@@ -552,7 +646,7 @@ public class ApiManager {
         params.put("sort", "desc");
         params.put("category", "music");
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_COMMUNITY_CONTENT, ApiManager.getInstance().TOKEN, params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_COMMUNITY_CONTENT, ApiManager.getInstance().USER_ACCESS_TOKEN, params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -615,7 +709,7 @@ public class ApiManager {
         params.put("sort", "desc");
         params.put("category", "video");
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_COMMUNITY_CONTENT, ApiManager.getInstance().TOKEN, params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_COMMUNITY_CONTENT, ApiManager.getInstance().USER_ACCESS_TOKEN, params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -676,7 +770,7 @@ public class ApiManager {
         params.put("sort", "desc");
         params.put("offset", String.valueOf(DataPool.getInstance().listAllNews.size()));
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_NEWS, TOKEN, params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_NEWS, USER_ACCESS_TOKEN, params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -790,7 +884,7 @@ public class ApiManager {
 
     public void getLibraryVideo() {
         Map<String, String> params = new HashMap<>();
-        params.put("category", "video");
+        params.put("category", "music video");
 
         HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_LIBRARY, USER_ACCESS_TOKEN, params);
 
@@ -897,11 +991,13 @@ public class ApiManager {
                         String totalPlayed = obj.getString("total_played");
                         String totalPurchased = obj.getString("total_purchased");
 
-                        MusicData tempData = new MusicData(i, ID, cover, songTitle, previewURL, duration,
-                                price, discount, singerID, singerName, albumID, albumName, albumCover,
-                                labelID, labelName,
-                                description, totalPlayed, totalPurchased);
-                        DataPool.getInstance().listShopMusicFeatured.add(tempData);
+                        if(DataPool.getInstance().listShopMusicFeatured.size() < 5) {
+                            MusicData tempData = new MusicData(i, ID, cover, songTitle, previewURL, duration,
+                                    price, discount, singerID, singerName, albumID, albumName, albumCover,
+                                    labelID, labelName,
+                                    description, totalPlayed, totalPurchased);
+                            DataPool.getInstance().listShopMusicFeatured.add(tempData);
+                        }
 
                     }
 
@@ -1181,6 +1277,73 @@ public class ApiManager {
     // SHOP MUSIC END
 
     // SHOP VIDEO
+    public void getFeaturedShopVideo() {
+        Map<String, String> params = new HashMap<>();
+        params.put("order", "total_purchased");
+        params.put("limit", "3");
+        params.put("sort", "desc");
+
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_VIDEO, ApiManager.getInstance().TOKEN ,params);
+
+        request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                Log.d("Result", result);
+
+                try {
+                    JSONObject raw = new JSONObject(result);
+                    JSONArray arrVideo = raw.getJSONArray("video");
+
+                    for (int i = 0; i < arrVideo.length(); i++) {
+                        JSONObject obj = arrVideo.getJSONObject(i);
+                        JSONObject singerObj = obj.getJSONObject("singer");
+                        JSONObject labelObj = obj.getJSONObject("label");
+
+                        String ID = obj.getString("id");
+                        String cover = obj.getString("cover");
+                        String songTitle = obj.getString("name");
+                        String previewURL = obj.getString("preview");
+                        String duration = obj.getString("duration");
+                        String price = obj.getString("price");
+                        String discount = obj.getString("discount");
+                        String singerID = singerObj.getString("id");
+                        String singerName = singerObj.getString("name");
+//                        String labelID = labelObj.getString("id");
+//                        String labelName = labelObj.getString("name");
+                        String labelID = "";
+                        String labelName = "";
+                        String description = obj.getString("description");
+                        String totalPlayed = obj.getString("total_played");
+                        String totalPurchased = obj.getString("total_purchased");
+
+                        if(DataPool.getInstance().listShopVideoFeatured.size() < 3) {
+                            VideoData tempData = new VideoData(ID, cover, songTitle, previewURL, duration,
+                                    price, discount, singerID, singerName,
+                                    labelID, labelName,
+                                    description, totalPlayed, totalPurchased);
+                            DataPool.getInstance().listShopVideoFeatured.add(tempData);
+                        }
+
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if(shopVideoTopVideosListener != null)
+                    shopVideoTopVideosListener.onFeaturedLoaded();
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        request.execute();
+    }
+
     public void getShopVideoTopVideos() {
         Map<String, String> params = new HashMap<>();
         params.put("order", "popularity");
@@ -1300,7 +1463,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(shopVideoNewVideosListener != null)
+                if (shopVideoNewVideosListener != null)
                     shopVideoNewVideosListener.onDataLoaded(ApiType.SHOP_VIDEO_NEW_VIDEO);
             }
 
@@ -1380,7 +1543,7 @@ public class ApiManager {
     // SHOP VIDEO END
 
     // USER ACTION
-    public void likeItem(final LikeType type, final String id) {
+    public void likeItem(final LikeType type, final String id, final CommunityContentData commData, final NewsData newsData) {
         String url = Consts.URL_LIKE;
 
         if(type == LikeType.ARTICLE) {
@@ -1401,15 +1564,23 @@ public class ApiManager {
         request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
             @Override
             public void afterExecute(String result) {
+                popupLoading.closePopupLoading();
                 try {
                     JSONObject rawData = new JSONObject(result);
 
                     if(rawData.has("status")) {
                         String status = rawData.getString("status");
 
+                        if(type == LikeType.VIDEO || type == LikeType.MUSIC) {
+                            commData.totalLikes += 1;
+                            commData.isLikeable = false;
+                        } else {
+                            newsData.totalLikes += 1;
+                            newsData.isLikeable = false;
+                        }
                         Log.d("Status Like", status);
                     } else {
-                        unlikeItem(type, id);
+                        unlikeItem(type, id, commData, newsData);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1418,13 +1589,13 @@ public class ApiManager {
 
             @Override
             public void beforeExecute() {
-
+                popupLoading.showPopupLoading("Processing..");
             }
         });
 
         request.execute();
     }
-    public void unlikeItem(LikeType type, String id) {
+    public void unlikeItem(final LikeType type, String id, final CommunityContentData commData, final NewsData newsData) {
         String url = Consts.URL_UNLIKE;
 
         if(type == LikeType.ARTICLE) {
@@ -1445,13 +1616,21 @@ public class ApiManager {
         request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
             @Override
             public void afterExecute(String result) {
+                popupLoading.closePopupLoading();
                 try {
                     JSONObject rawData = new JSONObject(result);
 
                     if(rawData.has("status")) {
                         String status = rawData.getString("status");
 
-                        Log.d("Status Like", status);
+                        if(type == LikeType.VIDEO || type == LikeType.MUSIC) {
+                            commData.totalLikes -= 1;
+                            commData.isLikeable = true;
+                        } else {
+                            newsData.totalLikes -= 1;
+                            newsData.isLikeable = true;
+                        }
+                        Log.d("Status unlike", status);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1460,7 +1639,7 @@ public class ApiManager {
 
             @Override
             public void beforeExecute() {
-
+                popupLoading.showPopupLoading("Processing..");
             }
         });
 
@@ -1469,7 +1648,7 @@ public class ApiManager {
 
     public void purchaseItem(PurchaseType type, String id) {
         Map<String, String> params = new HashMap<>();
-        params.put("id", id);
+        params.put("unique", id);
 
         if(type == PurchaseType.SINGLE)
             params.put("category", "single");
@@ -1481,6 +1660,19 @@ public class ApiManager {
         request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
             @Override
             public void afterExecute(String result) {
+                try {
+                    JSONObject rawData = new JSONObject(result);
+
+                    if(rawData.has("error")) {
+                        String message = rawData.getString("error");
+
+                        purchaseListener.onError(message);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+
+                    purchaseListener.onItemPurchased(result);
+                }
 
             }
 
@@ -1493,8 +1685,138 @@ public class ApiManager {
         request.execute();
     }
 
+    public void uploadContent(File file, String category, String name, String description) {
+        String url = Consts.URL_GET_TOKEN + "/me/"+category;
+
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("description", description);
+
+        final HttpUploadUtil upload = new HttpUploadUtil(url, USER_ACCESS_TOKEN, file, params);
+        upload.setOnHttpPostUtilListener(new HttpUploadUtil.HttpPostUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                try {
+                    JSONObject rawData = new JSONObject(result);
+
+                    if(rawData.has("status")) {
+                        // succeed
+                        uploadListener.onSucceed();
+                    } else {
+                        String message = rawData.getString("error_description");
+                        // Show popup
+                        uploadListener.onFailed(message);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    uploadListener.onFailed("Upload Failed");
+                }
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        upload.execute();
+    }
+
+    public void getRegisterToken(final RegisterModel data) {
+        Map<String, String> params = new HashMap<>();
+        params.put("client_id", CLIENT_ID);
+        params.put("client_secret", CLIENT_SECRET);
+        params.put("scope", "user_managements");
+        params.put("grant_type", "client_credentials");
+        HttpPostUtil request = new HttpPostUtil(Consts.URL_GET_TOKEN, "", params);
+
+        request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                if(result != null) {
+                    Log.d("Result API", result);
+
+                    try {
+                        JSONObject rawData = new JSONObject(result);
+
+                        if(!rawData.has("error")) {
+                            String registerToken = rawData.getString("access_token");
+
+                            registerNewUser(registerToken, data);
+                        } else {
+                            String errorMessage = rawData.getString("error_description");
+                            popupLoading.setMessage("Register Failed");
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+
+                        popupLoading.setMessage("Register Failed");
+                    }
+                }
+            }
+
+            @Override
+            public void beforeExecute() {
+                popupLoading.showPopupLoading("Register..");
+            }
+        });
+        request.execute();
+    }
+
+    public void registerNewUser(String token, RegisterModel data) {
+        Map<String, String> params = new HashMap<>();
+        params.put("username", data.username);
+        params.put("password", data.password);
+        params.put("email", data.email);
+        params.put("first_name", data.firstName);
+        params.put("last_name", data.lastName);
+        params.put("gender", data.gender);
+        params.put("birthday", data.birthday);
+
+        Log.d("Register data", data.birthday + " | " +data.gender);
+        if(data.city.length() > 0)
+            params.put("city", data.city);
+        if(data.country.length() > 0)
+            params.put("country", data.country);
+
+        HttpPostUtil register = new HttpPostUtil(Consts.URL_SIGNUP, token, params);
+        register.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                try {
+                    JSONObject rawData = new JSONObject(result);
+
+                    if(rawData.has("error")) {
+                        String message = rawData.getString("error_description");
+                        Log.d("Register Failed", message);
+                        popupLoading.setMessage("Register Failed");
+                    } else {
+                        registerListener.onSucceed();
+                        popupLoading.closePopupLoading();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+
+                    popupLoading.setMessage("Register Failed");
+                }
+
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        register.execute();
+
+    }
+
     public void setOnTokenReceived(OnTokenReceived listener) {  this.listener = listener; }
     public void setOnUserAccessTokenReceved(OnUserAccessTokenReceived listener) { this.userAccessListener = listener; }
+    public void setOnUserTransactionTokenReceived(OnUserTransactionTokenReceived listener) { this.userTransactionListener = listener; }
     public void setOnHomeListener(OnHomeDataReceived listener) { this.dataListener =  listener; }
 
     public void setOnCommunityMusicListener(OnCommunityMusicReceived listener) { this.commMusicListener = listener; }
@@ -1513,6 +1835,12 @@ public class ApiManager {
     public void setOnShopVideoNewVideosListener(OnShopVideoNewVideosReceived listener) { this.shopVideoNewVideosListener = listener; }
     public void setOnShopVideoAllVideosListener(OnShopVideoAllVideosReceived listener) { this.shopVideoAllVideosListener = listener; }
 
+    public void setOnPurchasedListener(OnPurchase listener) { this.purchaseListener = listener; }
+
+    public void setOnUploadListener(OnUpload listener) { this.uploadListener = listener; }
+
+    public void setOnRegisterListener(OnRegister listener) { this.registerListener = listener; }
+
     public interface OnTokenReceived {
         void onTokenSaved();
         void onError(String message);
@@ -1520,6 +1848,11 @@ public class ApiManager {
 
     public interface OnUserAccessTokenReceived {
         void onUserAccessTokenSaved();
+    }
+
+    public interface OnUserTransactionTokenReceived {
+        void onUserTransactionTokenSaved();
+        void onError(String message);
     }
 
     public interface OnHomeDataReceived {
@@ -1565,6 +1898,7 @@ public class ApiManager {
 
     public interface OnShopVideoTopVideosReceived {
         void onDataLoaded(ApiType type);
+        void onFeaturedLoaded();
     }
 
     public interface OnShopVideoNewVideosReceived {
@@ -1573,5 +1907,20 @@ public class ApiManager {
 
     public interface OnShopVideoAllVideosReceived {
         void onDataLoaded(ApiType type);
+    }
+
+    public interface OnPurchase {
+        void onItemPurchased(String result);
+        void onError(String message);
+    }
+
+    public interface OnUpload {
+        void onSucceed();
+        void onFailed(String message);
+    }
+
+    public interface OnRegister {
+        void onSucceed();
+        void onFailed(String message);
     }
 }

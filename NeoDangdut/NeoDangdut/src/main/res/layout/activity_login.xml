@@ -52,6 +52,7 @@
                     android:layout_centerInParent="true"
                     android:layout_marginLeft="@dimen/login_button_margin"
                     android:layout_marginRight="@dimen/login_button_margin"
+                    android:visibility="invisible"
                     android:background="@drawable/btn_fb_login"/>
             </RelativeLayout>
             <!-- End FB button -->

@@ -7,6 +7,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -30,6 +31,8 @@ public class FragmentHomeVideo extends Fragment {
     private SwipeRefreshLayout swipeRefresh;
 
     private CustomCommunityVideoAdapter listAdapter;
+
+    private boolean isLoadingMore;
 
     public static FragmentHomeVideo newInstance(int page, String title) {
         FragmentHomeVideo home = new FragmentHomeVideo();
@@ -92,6 +95,22 @@ public class FragmentHomeVideo extends Fragment {
             }
         });
 
+        listViewCommunityVideo.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                int lastItem = firstVisibleItem + visibleItemCount;
+
+                if (lastItem == totalItemCount && totalItemCount != 0) {
+                    loadMore();
+                }
+            }
+        });
+
         listViewCommunityVideo.setFastScrollEnabled(true);
 
         return view;
@@ -108,15 +127,26 @@ public class FragmentHomeVideo extends Fragment {
         ApiManager.getInstance().setOnCommunityVideoListener(new ApiManager.OnCommunityVideoReceived() {
             @Override
             public void onDataLoaded(ApiManager.ApiType type) {
-                listAdapter = new CustomCommunityVideoAdapter(context, DataPool.getInstance().listCommunityVideo);
-                listViewCommunityVideo.setAdapter(listAdapter);
+                if(!isLoadingMore) {
+                    listAdapter = new CustomCommunityVideoAdapter(context, DataPool.getInstance().listCommunityVideo);
+                    listViewCommunityVideo.setAdapter(listAdapter);
+                }
 
+                isLoadingMore = false;
                 listAdapter.notifyDataSetChanged();
 
-                if(swipeRefresh != null)
+                if (swipeRefresh != null)
                     swipeRefresh.setRefreshing(false);
             }
         });
 
+    }
+
+    public void loadMore() {
+        if(!isLoadingMore) {
+            isLoadingMore = true;
+
+            ApiManager.getInstance().getCommunityVideo();
+        }
     }
 }

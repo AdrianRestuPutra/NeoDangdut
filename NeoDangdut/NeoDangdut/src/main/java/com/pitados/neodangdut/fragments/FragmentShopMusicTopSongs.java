@@ -95,6 +95,7 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
         loadData();
 
         listTopSong.setOnItemClickListener(this);
+        listFeatured.setOnItemClickListener(this);
 
         listTopSong.setFastScrollEnabled(true);
 
@@ -140,6 +141,10 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         if(adapterView == listTopSong) {
             CustomMediaPlayer.getInstance().playTrack(DataPool.getInstance().listShopMusicTopSongs.get(i), true);
+        }
+
+        if(adapterView == listFeatured) {
+            CustomMediaPlayer.getInstance().playTrack(DataPool.getInstance().listShopMusicFeatured.get(i), true);
         }
     }
 }

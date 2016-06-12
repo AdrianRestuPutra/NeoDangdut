@@ -4,14 +4,20 @@
     android:layout_height="match_parent"
     android:background="@color/main_bg">
 
-    <GridView
-        android:id="@+id/list_view_library_video"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/lib_video_swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:horizontalSpacing="@dimen/library_horizontal_spacing"
-        android:numColumns="4"
-        android:verticalSpacing="@dimen/library_vertical_spacing">
+        android:layout_height="match_parent">
 
-    </GridView>
+        <GridView
+            android:id="@+id/list_view_library_video"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:horizontalSpacing="@dimen/library_horizontal_spacing"
+            android:numColumns="4"
+            android:verticalSpacing="@dimen/library_vertical_spacing">
+
+        </GridView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

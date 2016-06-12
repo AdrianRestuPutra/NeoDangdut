@@ -3,22 +3,25 @@ package com.pitados.neodangdut.util;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.io.File;
 import java.util.Map;
 
 /**
  * Created by adrianrestuputranto on 5/26/16.
  */
-public class HttpPostUtil extends AsyncTask<Void, Void, String> {
+public class HttpUploadUtil extends AsyncTask<Void, Void, String> {
 
     private String url;
     private String token;
+    private File fileUpload;
     private Map<String, String> params;
 
     private HttpPostUtilListener listener;
 
-    public HttpPostUtil(String url, String token, Map<String, String> params) {
+    public HttpUploadUtil(String url, String token, File fileUpload, Map<String, String> params) {
         this.url = url;
         this.token = token;
+        this.fileUpload = fileUpload;
         this.params = params;
     }
 
@@ -35,13 +38,11 @@ public class HttpPostUtil extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... params) {
         try {
             HttpRequest request = null;
-            if(token.length() > 0)
-                request = HttpRequest.post(url).authorization("Bearer "+token).form(this.params);
-            else
-                request = HttpRequest.post(url).form(this.params);
+            request = HttpRequest.post(url).authorization("Bearer "+token).form(this.params);
+            request.form("upload", fileUpload);
             String result = "";
 
-            if(request.ok() || request.badRequest()) {
+            if(request.ok()) {
                 result = request.body();
 //                Log.d("BODY", result);
             }
