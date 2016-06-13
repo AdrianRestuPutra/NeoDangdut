@@ -34,6 +34,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.anjlab.android.iab.v3.BillingProcessor;
+import com.anjlab.android.iab.v3.TransactionDetails;
 import com.devbrackets.android.exomedia.EMVideoView;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -66,20 +68,17 @@ import com.pitados.neodangdut.util.CustomMediaPlayer;
 import com.pitados.neodangdut.util.DataPool;
 import com.pitados.neodangdut.util.StateManager;
 
-import org.onepf.oms.OpenIabHelper;
-import org.onepf.oms.appstore.googleUtils.IabHelper;
-import org.onepf.oms.appstore.googleUtils.IabResult;
-
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements View.OnClickListener {
+        implements View.OnClickListener, BillingProcessor.IBillingHandler {
 
     private int REQUEST_STORAGE_PERMISSION_CODE = 100;
     private int UPLOAD_FILE_CODE = 250;
+
 
     private enum PanelState {
         PANEL_NEW_POST,
@@ -149,7 +148,7 @@ public class MainActivity extends AppCompatActivity
 
     // In App Purchase
     private String storeKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApFO+8ygQlDoMB1bp7EtAYHjVpvAc2T+x054MAQCimjwT4yZD0QVW7GpYXVgELhEZtLDWpiREPYgIe6UX8ZxHwaU50sYy7Q8GtIx2zRR2ZMSW0TGhGZCYsdTuVpTUDBPnZ21lxXRCkDYyEAbZ2NhoOma6QoVcjdMkbGh8K0NHksBFjg6ngFxtTFJ8N7RNFKgGtcUKPJdQSbI1rXjHLAoae4GhSiffi/vkZp60yFEjCqsbN6lF1hdGvgOiC+kd3wLIApR+UWAYE46jMS4giP+5kt6vwV3wXR1aWXmpQIehq8p3sS99/2Qv7R1kYKRHT0uPHZTKSXnDhfs8aWTSt4QntwIDAQAB";
-    private OpenIabHelper iabHelper;
+    private BillingProcessor billingProc;
 
     // Side Menu
     private ImageView sideMenuProfileButton;
@@ -173,7 +172,7 @@ public class MainActivity extends AppCompatActivity
 
         isStoragePermissionGranted();
 
-        initOpenIAB();
+        initIAB();
 
         userLoginData = new UserLoginData(getBaseContext());
 
@@ -310,27 +309,14 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void initOpenIAB() {
-        OpenIabHelper.Options opts = new OpenIabHelper.Options.Builder()
-                .addStoreKey(OpenIabHelper.NAME_GOOGLE, storeKey)
-                .addAvailableStoreNames(OpenIabHelper.NAME_GOOGLE)
-                .addPreferredStoreName(OpenIabHelper.NAME_GOOGLE)
-                .setVerifyMode(OpenIabHelper.Options.VERIFY_SKIP)
-                .setStoreSearchStrategy(OpenIabHelper.Options.SEARCH_STRATEGY_INSTALLER_THEN_BEST_FIT)
-                .build();
+    private void initIAB() {
+        billingProc = new BillingProcessor(this, storeKey, this);
 
-        iabHelper = new OpenIabHelper(getBaseContext(), opts);
-        iabHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
-            @Override
-            public void onIabSetupFinished(IabResult result) {
-                if (result.isSuccess()) {
-                    // TODO query inventory
-                    Log.d("Open IAB", "Open IAB ready!");
-                } else {
-                    Log.e("Open IAB", result.getMessage());
-                }
-            }
-        });
+        boolean isAvailable = BillingProcessor.isIabServiceAvailable(this);
+        if(isAvailable)
+            Log.d("AVAILABLE", "Store OK");
+        else
+            Log.d("AVAILABLE", "No STore");
     }
 
     // Method init
@@ -679,7 +665,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("ACTIVITY RESULT", requestCode+" | result : "+resultCode);
+        Log.d("ACTIVITY RESULT", requestCode + " | result : " + resultCode);
         if(requestCode == UPLOAD_FILE_CODE) {
             if(resultCode == RESULT_OK) {
                 Uri uri = data.getData();
@@ -1017,6 +1003,26 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         // SIDE MENU END
 
+
+    }
+
+    @Override
+    public void onProductPurchased(String productId, TransactionDetails details) {
+
+    }
+
+    @Override
+    public void onPurchaseHistoryRestored() {
+
+    }
+
+    @Override
+    public void onBillingError(int errorCode, Throwable error) {
+
+    }
+
+    @Override
+    public void onBillingInitialized() {
 
     }
 }
