@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity
     private BillingProcessor billingProc;
 
     // Side Menu
-    private ImageView sideMenuProfileButton;
+    private RelativeLayout sideMenuProfileButton;
     private ImageView sideMenuUserPic;
     private TextView sideMenuFullName;
     private LinearLayout sideMenuTopup, sideMenuHome, sideMenuLibrary, sideMenuShopMusic, sideMenuShopVideo, sideMenuDownloads, sideMenuSetting, sideMenuSignOut;
@@ -265,7 +265,10 @@ public class MainActivity extends AppCompatActivity
 
         // Load All data
         ApiManager.getInstance().getToken();
-        ApiManager.getInstance().getUserAccessToken();
+        if(userLoginData.getLoginWithFB() == true)
+            ApiManager.getInstance().getUserAccessTokenWithFB();
+        else
+            ApiManager.getInstance().getUserAccessToken();
         ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
             @Override
             public void onTokenSaved() {
@@ -304,6 +307,11 @@ public class MainActivity extends AppCompatActivity
 
                 ApiManager.getInstance().getLibraryMusic();
                 ApiManager.getInstance().getLibraryVideo();
+            }
+
+            @Override
+            public void onError(String message) {
+
             }
         });
 
@@ -405,7 +413,7 @@ public class MainActivity extends AppCompatActivity
         sideMenuDownloads = (LinearLayout) findViewById(R.id.side_menu_download);
         sideMenuSetting = (LinearLayout) findViewById(R.id.side_menu_setting);
         sideMenuSignOut = (LinearLayout) findViewById(R.id.side_menu_signout);
-        sideMenuProfileButton = (ImageView) findViewById(R.id.side_menu_profile_button);
+        sideMenuProfileButton = (RelativeLayout) findViewById(R.id.side_menu_profile_button);
 
         // Wallet
         sideMenuTopup = (LinearLayout) findViewById(R.id.side_menu_topup);
@@ -429,7 +437,7 @@ public class MainActivity extends AppCompatActivity
     private void setSideMenuData() {
         imageLoader.displayImage(userLoginData.getPhotoURL(), sideMenuUserPic, opts);
         sideMenuFullName.setText(userLoginData.getFullname());
-        sideMenuWallet.setText(userLoginData.getCredit());
+        sideMenuWallet.setText("Rp "+ userLoginData.getCredit());
     }
 
     private void initPanelNewPost() {
@@ -920,12 +928,18 @@ public class MainActivity extends AppCompatActivity
             if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
                 CustomMediaPlayer.getInstance().closeNewsDetail();
             changePanel(PanelState.PANEL_SHOP_MUSIC);
+
+            FragmentShopMusicTopSongs temp = (FragmentShopMusicTopSongs)pagerAdapterShopMusic.getItem(0);
+            temp.refreshListview();
         }
 
         if(view == sideMenuShopVideo) {
             if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
                 CustomMediaPlayer.getInstance().closeNewsDetail();
             changePanel(PanelState.PANEL_SHOP_VIDEO);
+
+            FragmentShopVideoTopVideos temp = (FragmentShopVideoTopVideos)pagerAdapterShopVideo.getItem(0);
+            temp.refreshListview();
         }
 
         if(view == sideMenuDownloads) {
@@ -1024,5 +1038,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBillingInitialized() {
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(billingProc != null)
+            billingProc.release();
+
+        super.onDestroy();
     }
 }

@@ -18,8 +18,10 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.Popup.PopupArtistSong;
 import com.pitados.neodangdut.Popup.PopupLoading;
 import com.pitados.neodangdut.R;
+import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.model.MusicData;
 import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.DataPool;
 
 import java.util.List;
 
@@ -28,7 +30,7 @@ import java.util.List;
  */
 public class CustomListShopMusicAdapter extends BaseAdapter {
     private Context context;
-    private List<MusicData> listTopTrack; // TODO change to shop data
+    private List<MusicData> listTrack; // TODO change to shop data
 
     private ImageLoader imageLoader;
     private DisplayImageOptions opts;
@@ -48,7 +50,7 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
 
     public CustomListShopMusicAdapter(Context context, List<MusicData> listTopTrack) {
         this.context = context;
-        this.listTopTrack = listTopTrack;
+        this.listTrack = listTopTrack;
 
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()
@@ -67,18 +69,27 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return listTopTrack.size();
+        return listTrack.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return listTopTrack.get(i);
+        return listTrack.get(i);
     }
 
     @Override
     public long getItemId(int i) {
         // TODO change to item id
         return i;
+    }
+
+    private boolean isInLibrary(String ID) {
+        for(LibraryData data : DataPool.getInstance().listLibraryMusic) {
+            if(ID.equalsIgnoreCase(data.ID))
+                return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -108,57 +119,65 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
         }
 
         // TODO set data using holder.wiget
-        imageLoader.displayImage(listTopTrack.get(i).albumCover, holder.thumbnail, opts);
-        holder.musicTitle.setText(listTopTrack.get(i).songTitle);
-        holder.artistName.setText(listTopTrack.get(i).singerName);
-        holder.albumName.setText(listTopTrack.get(i).albumName);
-
-        // TODO check from file
-        holder.price.setText("Rp " + listTopTrack.get(i).price);
+        imageLoader.displayImage(listTrack.get(i).albumCover, holder.thumbnail, opts);
+        holder.musicTitle.setText(listTrack.get(i).songTitle);
+        holder.artistName.setText(listTrack.get(i).singerName);
+        holder.albumName.setText(listTrack.get(i).albumName);
 
         final int index = i;
-        holder.buyButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                popupLoading.showPopupLoading("Purchasing..");
 
-                ApiManager.getInstance().getUserTransactionToken();
-                ApiManager.getInstance().setOnUserTransactionTokenReceived(new ApiManager.OnUserTransactionTokenReceived() {
-                    @Override
-                    public void onUserTransactionTokenSaved() {
-                        ApiManager.getInstance().purchaseItem(ApiManager.PurchaseType.SINGLE, listTopTrack.get(index).ID);
-                        ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
+        if(isInLibrary(listTrack.get(index).ID)) {
+            listTrack.get(index).inLibrary = true;
+            holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
+            holder.price.setText("");
+        } else {
+            listTrack.get(index).inLibrary = false;
+            holder.buyButton.setBackgroundResource(R.drawable.btn_price_artist_song);
+            holder.price.setText("Rp " + listTrack.get(i).price);
 
-                            @Override
-                            public void onItemPurchased(String result) {
-                                Log.d("Result", result);
+            holder.buyButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    popupLoading.showPopupLoading("Purchasing..");
 
-                                popupLoading.closePopupLoading();
-                                // TODO notif user
-                            }
+                    ApiManager.getInstance().getUserTransactionToken();
+                    ApiManager.getInstance().setOnUserTransactionTokenReceived(new ApiManager.OnUserTransactionTokenReceived() {
+                        @Override
+                        public void onUserTransactionTokenSaved() {
+                            ApiManager.getInstance().purchaseItem(ApiManager.PurchaseType.SINGLE, listTrack.get(index).ID);
+                            ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
 
-                            @Override
-                            public void onError(String message) {
-                                // TODO show popup
-                                popupLoading.setMessage("Purchase Failed");
-                            }
-                        });
-                    }
+                                @Override
+                                public void onItemPurchased(String result) {
+                                    Log.d("Result", result);
 
-                    @Override
-                    public void onError(String message) {
-                        popupLoading.setMessage("Purchase Failed");
-                    }
-                });
+                                    popupLoading.closePopupLoading();
+                                    // TODO notif user
+                                }
 
-            }
-        });
+                                @Override
+                                public void onError(String message) {
+                                    // TODO show popup
+                                    popupLoading.setMessage("Purchase Failed");
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                            popupLoading.setMessage("Purchase Failed");
+                        }
+                    });
+
+                }
+            });
+        }
 
         holder.optButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                popupArtistSong.showPopupArtistSong(listTopTrack.get(index));
+                popupArtistSong.showPopupArtistSong(listTrack.get(index));
             }
         });
 

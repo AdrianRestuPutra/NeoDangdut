@@ -24,6 +24,8 @@ public class MusicData {
 
     public int index;
 
+    public boolean inLibrary;
+
     public MusicData(int index, String ID, String cover, String songTitle,
                      String previewURL, String duration,
                      String price, String discount,

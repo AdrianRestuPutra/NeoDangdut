@@ -3,6 +3,7 @@ package com.pitados.neodangdut.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -10,11 +11,24 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.pitados.neodangdut.Popup.PopupLoading;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.RegisterModel;
 import com.pitados.neodangdut.model.UserLoginData;
 import com.pitados.neodangdut.util.ApiManager;
+
+import org.json.JSONObject;
+
+import java.util.Arrays;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
     private enum PagePosition {
@@ -32,7 +46,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     // WIDGETS
     // LOGIN
     private EditText loginUsername, loginPassword;
-    private Button loginbutton, goToSignupButton, facebookButton;
+    private Button loginbutton, goToSignupButton;
+    private LoginButton facebookButton;
     // TODO signup page 1
     private EditText signupUsername, signupPassword, signupConfirmPassword,
                     signupEmail, signupConfirmEmail;
@@ -50,16 +65,25 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private PopupLoading popupLoading;
 
+    // Facebook
+    private CallbackManager callbackManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Init FB
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        FacebookSdk.setApplicationId(getResources().getString(R.string.facebook_app_id));
         setContentView(R.layout.activity_login);
 
         userLoginData = new UserLoginData(getBaseContext());
         ApiManager.getInstance().setContext(getBaseContext());
         position = PagePosition.LOGIN;
 
-        if(userLoginData.getUsername().length() > 0) {
+        // Init FB
+        initFB();
+
+        if(userLoginData.getUsername().length() > 0 || userLoginData.getLoginWithFB() == true) { // TODO and FB
             // TODO intent to main activity
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             LoginActivity.this.finish();
@@ -72,6 +96,71 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             ApiManager.getInstance().setContext(LoginActivity.this);
         }
+    }
+
+    private void initFB() {
+        callbackManager = CallbackManager.Factory.create();
+
+        facebookButton = (LoginButton) findViewById(R.id.login_facebook_button);
+        facebookButton.setReadPermissions(Arrays.asList("public_profile", "email"));
+
+        facebookButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                AccessToken accToken = loginResult.getAccessToken();
+
+                GraphRequest request = GraphRequest.newMeRequest(accToken, new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+                        Log.d("DATA", object.toString());
+
+                        Log.d("FACEBOOK email", object.optString("email"));
+                        Log.d("FACEBOOK ID", object.optString("id"));
+
+                        String fbID = object.optString("id");
+                        String fbEmail = object.optString("email");
+
+                        userLoginData.setLoginWithFB(true);
+                        userLoginData.setUserFBID(fbID);
+                        userLoginData.setUserFBEmail(fbEmail);
+
+                        ApiManager.getInstance().getUserAccessTokenWithFB();
+                        ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
+                            @Override
+                            public void onUserAccessTokenSaved() {
+                                String refreshToken = ApiManager.getInstance().REFRESH_TOKEN;
+
+                                userLoginData.setRefreshToken(refreshToken);
+
+                                popupLoading.closePopupLoading();
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                LoginActivity.this.finish();
+                            }
+
+                            @Override
+                            public void onError(String message) {
+
+                            }
+                        });
+                    }
+                });
+
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id, first_name, last_name, email,gender, birthday, location"); // Parámetros que pedimos a facebook
+                request.setParameters(parameters);
+                request.executeAsync();
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+
+            }
+        });
     }
 
     private void initPanel() {
@@ -91,11 +180,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         loginUsername = (EditText) findViewById(R.id.login_form_username);
         loginPassword = (EditText) findViewById(R.id.login_form_password);
         loginbutton = (Button) findViewById(R.id.login_button_login);
-        facebookButton = (Button) findViewById(R.id.login_facebook_button);
+
         goToSignupButton = (Button) findViewById(R.id.login_signup);
 
         loginbutton.setOnClickListener(this);
-        facebookButton.setOnClickListener(this);
         goToSignupButton.setOnClickListener(this);
     }
 
@@ -152,6 +240,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     popupLoading.closePopupLoading();
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     LoginActivity.this.finish();
+                }
+
+                @Override
+                public void onError(String message) {
+
                 }
             });
 
@@ -222,6 +315,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         genderMale.setChecked(false);
         genderFemale.setChecked(false);
         signupAgree.setChecked(false);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

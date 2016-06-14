@@ -8,8 +8,8 @@ android {
         applicationId "com.pitados.neodangdut"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 5
-        versionName "0.8.2"
+        versionCode 6
+        versionName "0.8.3"
     }
     buildTypes {
         release {

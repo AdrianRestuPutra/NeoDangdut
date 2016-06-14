@@ -10,8 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <!-- Billing -->
-    <uses-permission android:name="com.android.vending.billing" />
-    <uses-permission android:name="org.onepf.openiab.permission.BILLING" />
+    <uses-permission android:name="com.android.vending.BILLING" />
 
     <application
         android:name=".app.AppController"

@@ -112,6 +112,13 @@ public class FragmentShopVideoTopVideos extends Fragment {
         return view;
     }
 
+    public void refreshListview() {
+        listAdapter = new CustomListShopVideoAdapter(context, DataPool.getInstance().listShopVideoTopVideos);
+        listTopVideos.setAdapter(listAdapter);
+
+        listAdapter.notifyDataSetChanged();
+    }
+
     public void loadData() {
         if(DataPool.getInstance().listShopVideoTopVideos.size() > 0) {
             listAdapter = new CustomListShopVideoAdapter(context, DataPool.getInstance().listShopVideoTopVideos);

@@ -61,7 +61,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
     // Data
     // Audio
-    private ImageView audioPlayerThumbnail, audioPauseIcon;
+    private ImageView audioPlayerThumbnail, audioPauseIcon, audioShuffleIcon, audioRepeatIcon, audioInfoIcon;
     private TextView audioPlayerSongTitle, audioPlayerArtistName, audioPlayerDuration;
     // Video
     private EMVideoView videoPlayer;
@@ -99,7 +99,8 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
     }
 
     public void setAudioPanel(Context context, final View panelMusicPlayer, SeekBar audioProgress, TextView duration,
-                              ImageView thumbnailContainer, TextView songTitleContainer, TextView artistNameContainer, ImageView audioPauseIcon) {
+                              ImageView thumbnailContainer, TextView songTitleContainer, TextView artistNameContainer,
+                              ImageView audioPauseIcon) {
         this.panelMusicPlayer = panelMusicPlayer;
         this.context = context;
 
@@ -132,6 +133,11 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
     }
 
     public void playTrack(final MusicData data, boolean isPreview) {
+        if(isVideoPlayerShowing) {
+            isVideoPlayerShowing = false;
+            closeVideoPlayer();
+        }
+
         if (panelMusicPlayer.getVisibility() != View.VISIBLE) {
                     showMusicPlayer();
 
@@ -204,6 +210,11 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
     }
 
     public void playTrack(final CommunityContentData data) {
+        if(isVideoPlayerShowing) {
+            isVideoPlayerShowing = false;
+            closeVideoPlayer();
+        }
+
         if (panelMusicPlayer.getVisibility() != View.VISIBLE) {
             showMusicPlayer();
 
@@ -274,8 +285,12 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
     public void playItem(final LibraryData data) {
         if(data.category.equalsIgnoreCase("music")) {
-            // Music
+            if(isVideoPlayerShowing) {
+                isVideoPlayerShowing = false;
+                closeVideoPlayer();
+            }
 
+            // Music
             if (panelMusicPlayer.getVisibility() != View.VISIBLE) {
                 showMusicPlayer();
 
@@ -344,8 +359,12 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 }
             });
         } else {
-            // Video
+            if(isAudioPlayerShowing) {
+                isAudioPlayerShowing = false;
+                stopTrack();
+            }
 
+            // Video
             showVideoPlayer();
             videoPlayer.setVideoURI(Uri.parse(data.fileURL)); // TODO change url
             videoPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -374,6 +393,11 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
     }
 
     public void playVideo(VideoData videoData) {
+        if(isAudioPlayerShowing) {
+            isAudioPlayerShowing = false;
+            stopTrack();
+        }
+
         showVideoPlayer();
         videoPlayer.setVideoURI(Uri.parse(videoData.previewURL)); // TODO change url
         videoPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -391,6 +415,11 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
     }
 
     public void playVideo(CommunityContentData videoData) {
+        if(isAudioPlayerShowing) {
+            isAudioPlayerShowing = false;
+            stopTrack();
+        }
+
         showVideoPlayer();
         videoPlayer.setVideoURI(Uri.parse(videoData.fileURL));
         videoPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.facebook.login.LoginManager;
 import com.pitados.neodangdut.util.ApiManager;
 
 /**
@@ -24,6 +25,11 @@ public class UserLoginData {
     private String LAST_NAME = "Last";
     private String PHOTO_URL = "URL";
     private String CREDIT = "COINS";
+
+    private String FACEBOOK_ID = "Facebook";
+    private String EMAIL = "Email";
+
+    private String LOGIN_WITH_FB = "LOGIN_FB";
 
     public UserLoginData(Context context) {
         preferences = context.getSharedPreferences(USER_DATA, Activity.MODE_PRIVATE);
@@ -67,6 +73,12 @@ public class UserLoginData {
         return preferences.getString(CREDIT, "0");
     }
 
+    public String getUserFBID() { return preferences.getString(FACEBOOK_ID, ""); }
+
+    public String getUserFBEmail() { return preferences.getString(EMAIL, ""); }
+
+    public boolean getLoginWithFB() { return preferences.getBoolean(LOGIN_WITH_FB, false); }
+
     public void setUsername(String username) {
         preferencesEditor.putString(USERNAME, username).commit();
     }
@@ -82,6 +94,12 @@ public class UserLoginData {
     public void setUserID(String id) {
         preferencesEditor.putString(USER_ID, id).commit();
     }
+
+    public void setUserFBID(String fbID) { preferencesEditor.putString(FACEBOOK_ID, fbID).commit(); }
+
+    public void setUserFBEmail(String email) { preferencesEditor.putString(EMAIL, email).commit(); }
+
+    public void setLoginWithFB(boolean loginWithFB) { preferencesEditor.putBoolean(LOGIN_WITH_FB, loginWithFB); }
 
     public void setFullName(String fullName) {
         preferencesEditor.putString(FULLNAME, fullName).commit();
@@ -111,6 +129,12 @@ public class UserLoginData {
         setCredit("");
         setPhotoURL("");
         setRefreshToken("");
+
+        setLoginWithFB(false);
+        setUserFBID("");
+        setUserFBEmail("");
+
+        LoginManager.getInstance().logOut();
 
         ApiManager.getInstance().getUserAccessTokenTime = 0l;
     }

@@ -202,7 +202,62 @@ public class ApiManager {
                             } else {
                                 String errorMessage = rawData.getString("error_description");
 
-                                listener.onError(errorMessage);
+                                userAccessListener.onError(errorMessage);
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void beforeExecute() {
+
+                }
+            });
+            request.execute();
+
+        } else {
+            refreshUserAccessToken();
+        }
+    }
+
+    public void getUserAccessTokenWithFB() {
+        if(System.currentTimeMillis() - getUserAccessTokenTime > 3600000l) {
+            Map<String, String> params = new HashMap<>();
+            params.put("client_id", CLIENT_ID);
+            params.put("client_secret", CLIENT_SECRET);
+            params.put("scope", "user_actions");
+            params.put("grant_type", "facebook");
+            params.put("facebook_id", userLoginData.getUserFBID());
+            params.put("email", userLoginData.getUserFBEmail());
+            HttpPostUtil request = new HttpPostUtil(Consts.URL_GET_TOKEN, "", params);
+
+            request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
+                @Override
+                public void afterExecute(String result) {
+                    if(result != null) {
+                        Log.d("Result API", result);
+
+                        try {
+                            JSONObject rawData = new JSONObject(result);
+
+
+                            if(!rawData.has("error")) {
+                                USER_ACCESS_TOKEN = rawData.getString("access_token");
+                                REFRESH_TOKEN = rawData.getString("refresh_token");
+                                getUserAccessTokenTime = System.currentTimeMillis();
+
+                                userLoginData.setRefreshToken(REFRESH_TOKEN);
+
+                                getUserData();
+
+                                userAccessListener.onUserAccessTokenSaved();
+                            } else {
+                                String errorMessage = rawData.getString("error_description");
+
+                                userAccessListener.onError(errorMessage);
                             }
 
                         } catch (JSONException e) {
@@ -334,7 +389,7 @@ public class ApiManager {
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
             public void afterExecute(String result) {
-
+                Log.d("Result", result);
                 try {
                         JSONObject rawData = new JSONObject(result);
                         JSONObject profileData = rawData.getJSONObject("profile");
@@ -1244,8 +1299,8 @@ public class ApiManager {
                         String albumID = albumObj.getString("id");
                         String albumName = albumObj.getString("name");
                         String albumCover = albumObj.getString("cover");
-                        String labelID = labelObj.getString("id");
-                        String labelName = labelObj.getString("name");
+                        String labelID = labelObj.optString("id");
+                        String labelName = labelObj.optString("name");
                         String description = obj.getString("description");
                         String totalPlayed = obj.getString("total_played");
                         String totalPurchased = obj.getString("total_purchased");
@@ -1497,7 +1552,6 @@ public class ApiManager {
                     for (int i = 0; i < arrVideo.length(); i++) {
                         JSONObject obj = arrVideo.getJSONObject(i);
                         JSONObject singerObj = obj.getJSONObject("singer");
-                        JSONObject albumObj = obj.getJSONObject("album");
                         JSONObject labelObj = obj.getJSONObject("label");
 
                         String ID = obj.getString("id");
@@ -1509,8 +1563,8 @@ public class ApiManager {
                         String discount = obj.getString("discount");
                         String singerID = singerObj.getString("id");
                         String singerName = singerObj.getString("name");
-                        String labelID = labelObj.getString("id");
-                        String labelName = labelObj.getString("name");
+                        String labelID = labelObj.optString("id");
+                        String labelName = labelObj.optString("name");
                         String description = obj.getString("description");
                         String totalPlayed = obj.getString("total_played");
                         String totalPurchased = obj.getString("total_purchased");
@@ -1848,6 +1902,7 @@ public class ApiManager {
 
     public interface OnUserAccessTokenReceived {
         void onUserAccessTokenSaved();
+        void onError(String message);
     }
 
     public interface OnUserTransactionTokenReceived {

@@ -23,6 +23,8 @@ public class VideoData {
     public String totalPlayed;
     public String totalPurchased;
 
+    public boolean inLibrary;
+
     public VideoData(String ID, String cover, String songTitle,
                      String previewURL, String duration,
                      String price, String discount,

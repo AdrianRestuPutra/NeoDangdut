@@ -136,6 +136,12 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
         }
     }
 
+    public void refreshListview() {
+        listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicTopSongs);
+        listTopSong.setAdapter(listAdapter);
+
+        listAdapter.notifyDataSetChanged();
+    }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
