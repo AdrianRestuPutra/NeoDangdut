@@ -270,65 +270,6 @@
                         android:textSize="@dimen/tab_text_size" />
                 </RelativeLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/divider_height"
-                    android:background="@color/tab_divider" />
-
-                <!-- Share FB -->
-                <RelativeLayout
-                    android:id="@+id/popup_artist_song_button_share_fb"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1">
-
-                    <ImageView
-                        android:layout_width="@dimen/dialog_artist_price_button_icon"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:adjustViewBounds="true"
-                        android:src="@drawable/icon_popup_fb" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="@dimen/dialog_artist_button_text_margin"
-                        android:text="Share to Facebook"
-                        android:textColor="@color/white_font"
-                        android:textSize="@dimen/tab_text_size" />
-                </RelativeLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/divider_height"
-                    android:background="@color/tab_divider" />
-
-                <!-- Share Twitter -->
-                <RelativeLayout
-                    android:id="@+id/popup_artist_song_button_share_twitter"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1">
-
-                    <ImageView
-                        android:layout_width="@dimen/dialog_artist_price_button_icon"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:adjustViewBounds="true"
-                        android:src="@drawable/icon_popup_tweeter" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="@dimen/dialog_artist_button_text_margin"
-                        android:text="Share to Twitter"
-                        android:textColor="@color/white_font"
-                        android:textSize="@dimen/tab_text_size" />
-                </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
         <!-- Right Panel End -->

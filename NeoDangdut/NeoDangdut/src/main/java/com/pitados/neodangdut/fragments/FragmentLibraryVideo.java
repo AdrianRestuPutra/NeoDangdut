@@ -99,11 +99,15 @@ public class FragmentLibraryVideo extends Fragment implements AdapterView.OnItem
 
                 listAdapter.notifyDataSetChanged();
 
-                if(swipeRefresh != null)
+                if (swipeRefresh != null)
                     swipeRefresh.setRefreshing(false);
             }
         });
 
+    }
+
+    public void reloadData() {
+        ApiManager.getInstance().getLibraryVideo();
     }
 
     @Override

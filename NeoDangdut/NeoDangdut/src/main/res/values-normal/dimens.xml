@@ -84,6 +84,7 @@
     <dimen name="video_player_detail_height">70dp</dimen>
     <dimen name="video_player_detail_padding">10dp</dimen>
     <dimen name="video_player_description_margin_top">20dp</dimen>
+    <dimen name="video_player_icon_width">20dp</dimen>
 
     <!-- Community Music -->
     <dimen name="home_music_list_thumbnail_width">100dp</dimen>
@@ -153,7 +154,7 @@
     <!-- Dialog -->
     <dimen name="dialog_artist_song_upper_panel_height">100dp</dimen>
     <dimen name="dialog_artist_song_width">200dp</dimen>
-    <dimen name="dialog_artist_song_height">300dp</dimen>
+    <dimen name="dialog_artist_song_height">200dp</dimen>
     <dimen name="dialog_artist_song_price_height">20dp</dimen>
     <dimen name="dialog_artist_song_thumbnail_size">60dp</dimen>
     <dimen name="dialog_artist_left_panel_margin">2dp</dimen>
@@ -164,6 +165,10 @@
     <dimen name="dialog_artist_text">7pt</dimen>
     <dimen name="dialog_artist_text_margin">2dp</dimen>
     <dimen name="dialog_artist_icon_margin">10dp</dimen>
+    <!-- Video -->
+    <dimen name="dialog_artist_video_height">150dp</dimen>
+    <!-- Community -->
+    <dimen name="dialog_community_height">300dp</dimen>
     <!-- Loading -->
     <dimen name="dialog_loading_width">150dp</dimen>
     <dimen name="dialog_loading_height">100dp</dimen>
@@ -192,5 +197,14 @@
     <dimen name="profile_preview_city_margin">15dp</dimen>
     <dimen name="profile_preview_description_margin">20dp</dimen>
     <dimen name="profile_preview_description_text">6pt</dimen>
+
+    <!-- Popup webview -->
+    <dimen name="dialog_webview_width">300dp</dimen>
+    <dimen name="dialog_webview_height">400dp</dimen>
+
+    <!-- Album View -->
+    <dimen name="album_item_button_width">100dp</dimen>
+    <dimen name="album_item_button_height">20dp</dimen>
+    <dimen name="album_item_thumbnail_width">80dp</dimen>
     
 </resources>

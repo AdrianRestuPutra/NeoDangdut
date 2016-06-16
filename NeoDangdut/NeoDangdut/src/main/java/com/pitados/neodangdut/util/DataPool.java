@@ -45,6 +45,8 @@ public class DataPool {
     public List<VideoData> listShopVideoNewVideos;
     public List<VideoData> listShopVideoAllVideos;
 
+    public AlbumData selectedAlbum;
+
     public DataPool() {
         userProfileData = new UserProfileData();
 

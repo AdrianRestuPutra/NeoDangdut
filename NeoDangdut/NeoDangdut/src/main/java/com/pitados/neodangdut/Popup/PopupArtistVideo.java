@@ -49,9 +49,6 @@ public class PopupArtistVideo extends Dialog implements View.OnClickListener{
 
         // Button
         buttonPlay = (RelativeLayout) findViewById(R.id.popup_artist_video_button_play);
-//        buttonLike = (RelativeLayout) findViewById(R.id.popup_artist_video_button_like);
-        buttonShareFB = (RelativeLayout) findViewById(R.id.popup_artist_video_button_share_fb);
-        buttonShareTwitter = (RelativeLayout) findViewById(R.id.popup_artist_video_button_share_twitter);
 
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()
@@ -64,9 +61,6 @@ public class PopupArtistVideo extends Dialog implements View.OnClickListener{
                 .build();
 
         buttonPlay.setOnClickListener(this);
-//        buttonLike.setOnClickListener(this);
-        buttonShareFB.setOnClickListener(this);
-        buttonShareTwitter.setOnClickListener(this);
     }
 
     public void showPopupArtistVideo(VideoData data) {

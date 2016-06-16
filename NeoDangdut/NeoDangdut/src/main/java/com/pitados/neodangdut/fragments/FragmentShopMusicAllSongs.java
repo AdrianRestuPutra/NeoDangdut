@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.pitados.neodangdut.Consts;
+import com.pitados.neodangdut.Popup.PopupAlbumView;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomListShopMusicAdapter;
 import com.pitados.neodangdut.util.ApiManager;
@@ -33,6 +34,8 @@ public class FragmentShopMusicAllSongs extends Fragment {
     private SwipeRefreshLayout swipeRefresh;
 
     private boolean isLoadingMore;
+
+    private PopupAlbumView popupAlbum;
 
     public static FragmentShopMusicAllSongs newInstance(int page, String title) {
         FragmentShopMusicAllSongs home = new FragmentShopMusicAllSongs();
@@ -86,6 +89,8 @@ public class FragmentShopMusicAllSongs extends Fragment {
             }
         });
 
+        popupAlbum = new PopupAlbumView(context, R.style.custom_dialog);
+
         loadData();
 
         listAllSong.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -118,7 +123,7 @@ public class FragmentShopMusicAllSongs extends Fragment {
 
     public void loadData() {
         if(DataPool.getInstance().listShopMusicAllSongs.size() > 0) {
-            listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicAllSongs);
+            listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicAllSongs, popupAlbum);
             listAllSong.setAdapter(listAdapter);
         }
 
@@ -126,7 +131,7 @@ public class FragmentShopMusicAllSongs extends Fragment {
             @Override
             public void onDataLoaded(ApiManager.ApiType type) {
                 if(!isLoadingMore) {
-                    listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicAllSongs);
+                    listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicAllSongs, popupAlbum);
                     listAllSong.setAdapter(listAdapter);
                 }
 

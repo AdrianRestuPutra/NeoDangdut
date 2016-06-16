@@ -11,6 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.pitados.neodangdut.Consts;
+import com.pitados.neodangdut.Popup.PopupAlbumView;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomListShopMusicAdapter;
 import com.pitados.neodangdut.util.ApiManager;
@@ -30,6 +31,8 @@ public class FragmentShopMusicNewSongs extends Fragment {
     private ListView listNewSongs;
 
     private CustomListShopMusicAdapter listAdapter;
+
+    private PopupAlbumView popupAlbum;
 
     public static FragmentShopMusicNewSongs newInstance(int page, String title) {
         FragmentShopMusicNewSongs home = new FragmentShopMusicNewSongs();
@@ -66,6 +69,8 @@ public class FragmentShopMusicNewSongs extends Fragment {
         listNewSongs = (ListView) view.findViewById(R.id.shop_music_top_50_listview);
         listNewSongs.setFocusable(false);
 
+        popupAlbum = new PopupAlbumView(context, R.style.custom_dialog);
+
         loadData();
 
         listNewSongs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -82,14 +87,14 @@ public class FragmentShopMusicNewSongs extends Fragment {
 
     public void loadData() {
         if(DataPool.getInstance().listShopMusicNewSongs.size() > 0) {
-            listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicNewSongs);
+            listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicNewSongs, popupAlbum);
             listNewSongs.setAdapter(listAdapter);
         }
 
         ApiManager.getInstance().setOnShopMusicNewSongsListener(new ApiManager.OnShopMusicNewSongsReceived() {
             @Override
             public void onDataLoaded(ApiManager.ApiType type) {
-                listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicNewSongs);
+                listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicNewSongs, popupAlbum);
                 listNewSongs.setAdapter(listAdapter);
 
                 listAdapter.notifyDataSetChanged();

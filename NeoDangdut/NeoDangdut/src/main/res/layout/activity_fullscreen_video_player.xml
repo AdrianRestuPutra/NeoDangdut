@@ -1,0 +1,15 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:EMVideoView="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_bg"
+    tools:context="com.pitados.neodangdut.activities.FullscreenVideoPlayer">
+
+    <com.devbrackets.android.exomedia.EMVideoView
+        android:id="@+id/fullscreen_video_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        EMVideoView:defaultControlsEnabled="true"></com.devbrackets.android.exomedia.EMVideoView>
+
+</RelativeLayout>

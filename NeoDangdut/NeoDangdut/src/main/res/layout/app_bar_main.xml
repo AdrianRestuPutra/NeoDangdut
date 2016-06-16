@@ -136,10 +136,12 @@
                         android:layout_height="match_parent">
 
                         <ImageView
+                            android:id="@+id/music_player_opt_button"
                             android:layout_width="@dimen/music_player_button_icon_width"
                             android:layout_height="wrap_content"
                             android:layout_alignParentBottom="true"
                             android:layout_alignParentRight="true"
+                            android:layout_marginRight="@dimen/dialog_artist_price_margin"
                             android:adjustViewBounds="true"
                             android:src="@drawable/icon_more_white" />
                     </RelativeLayout>
@@ -203,6 +205,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:adjustViewBounds="true"
+                            android:visibility="invisible"
                             android:src="@drawable/icon_random" />
                     </RelativeLayout>
 
@@ -218,6 +221,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:adjustViewBounds="true"
+                            android:visibility="invisible"
                             android:src="@drawable/icon_loop" />
                     </RelativeLayout>
 
@@ -228,11 +232,11 @@
                         android:layout_weight="1">
 
                         <ImageView
-
                             android:layout_width="@dimen/music_player_button_icon_width"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:adjustViewBounds="true"
+                            android:visibility="invisible"
                             android:src="@drawable/icon_info" />
                     </RelativeLayout>
                 </LinearLayout>

@@ -11,6 +11,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.facebook.share.widget.ShareDialog;
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomCommunityVideoAdapter;
@@ -31,6 +32,7 @@ public class FragmentHomeVideo extends Fragment {
     private SwipeRefreshLayout swipeRefresh;
 
     private CustomCommunityVideoAdapter listAdapter;
+    private ShareDialog shareDialog;
 
     private boolean isLoadingMore;
 
@@ -66,6 +68,8 @@ public class FragmentHomeVideo extends Fragment {
 
         listViewCommunityVideo = (ListView) view.findViewById(R.id.community_video_listview);
         listViewCommunityVideo.setFocusable(false);
+
+        shareDialog = new ShareDialog(this);
 
         loadData();
 
@@ -118,7 +122,7 @@ public class FragmentHomeVideo extends Fragment {
 
     public void loadData() {
         if(DataPool.getInstance().listCommunityVideo.size() > 0) {
-            listAdapter = new CustomCommunityVideoAdapter(context, DataPool.getInstance().listCommunityVideo);
+            listAdapter = new CustomCommunityVideoAdapter(context, DataPool.getInstance().listCommunityVideo, shareDialog);
             listViewCommunityVideo.setAdapter(listAdapter);
 
             listAdapter.notifyDataSetChanged();
@@ -128,7 +132,7 @@ public class FragmentHomeVideo extends Fragment {
             @Override
             public void onDataLoaded(ApiManager.ApiType type) {
                 if(!isLoadingMore) {
-                    listAdapter = new CustomCommunityVideoAdapter(context, DataPool.getInstance().listCommunityVideo);
+                    listAdapter = new CustomCommunityVideoAdapter(context, DataPool.getInstance().listCommunityVideo, shareDialog);
                     listViewCommunityVideo.setAdapter(listAdapter);
                 }
 

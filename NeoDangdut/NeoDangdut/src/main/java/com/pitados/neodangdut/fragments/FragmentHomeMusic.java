@@ -11,6 +11,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.facebook.share.widget.ShareDialog;
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomCommunityMusicAdapter;
@@ -33,6 +34,7 @@ public class FragmentHomeMusic extends Fragment {
     private boolean isLoadingMore;
 
     private SwipeRefreshLayout swipeRefresh;
+    private ShareDialog shareDialog;
 
     public static FragmentHomeMusic newInstance(int page, String title) {
         FragmentHomeMusic home = new FragmentHomeMusic();
@@ -69,6 +71,24 @@ public class FragmentHomeMusic extends Fragment {
 
         loadData();
 
+        shareDialog = new ShareDialog(this);
+
+        swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.community_music_swipe_refresh);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+//                ApiManager.getInstance().getUserAccessToken();
+//                ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
+//                    @Override
+//                    public void onUserAccessTokenSaved() {
+//                        ApiManager.getInstance().getCommunityMusic();
+//                    }
+//                });
+
+                ApiManager.getInstance().getCommunityMusic();
+            }
+        });
+
         listViewCommunityMusic.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -92,22 +112,6 @@ public class FragmentHomeMusic extends Fragment {
             }
         });
 
-        swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.community_music_swipe_refresh);
-        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-//                ApiManager.getInstance().getUserAccessToken();
-//                ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
-//                    @Override
-//                    public void onUserAccessTokenSaved() {
-//                        ApiManager.getInstance().getCommunityMusic();
-//                    }
-//                });
-
-                ApiManager.getInstance().getCommunityMusic();
-            }
-        });
-
         listViewCommunityMusic.setFastScrollEnabled(true);
 
         return view;
@@ -115,7 +119,7 @@ public class FragmentHomeMusic extends Fragment {
 
     public void loadData() {
         if(DataPool.getInstance().listCommunityMusic.size() > 0) {
-            listAdapter = new CustomCommunityMusicAdapter(context, DataPool.getInstance().listCommunityMusic);
+            listAdapter = new CustomCommunityMusicAdapter(context, DataPool.getInstance().listCommunityMusic, shareDialog);
             listViewCommunityMusic.setAdapter(listAdapter);
 
             listAdapter.notifyDataSetChanged();
@@ -125,7 +129,7 @@ public class FragmentHomeMusic extends Fragment {
             @Override
             public void onDataLoaded(ApiManager.ApiType type) {
                 if(!isLoadingMore) {
-                    listAdapter = new CustomCommunityMusicAdapter(context, DataPool.getInstance().listCommunityMusic);
+                    listAdapter = new CustomCommunityMusicAdapter(context, DataPool.getInstance().listCommunityMusic, shareDialog);
                     listViewCommunityMusic.setAdapter(listAdapter);
                 }
 

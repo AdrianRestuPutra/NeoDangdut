@@ -292,6 +292,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 return false;
         }
 
+        if(day.length() == 1)
+            day = "0"+day;
+        if(month.length() == 1)
+            month = "0"+month;
+
         birthday = year + "-" + month + "-" + day;
         gender = (genderMale.isChecked()) ? "male" : "female";
 

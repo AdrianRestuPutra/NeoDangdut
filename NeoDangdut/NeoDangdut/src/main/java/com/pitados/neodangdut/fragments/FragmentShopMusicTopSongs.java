@@ -13,6 +13,7 @@ import android.widget.Gallery;
 import android.widget.ListView;
 
 import com.pitados.neodangdut.Consts;
+import com.pitados.neodangdut.Popup.PopupAlbumView;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomListShopMusicAdapter;
 import com.pitados.neodangdut.custom.ShopMusicFeaturedAdapter;
@@ -35,6 +36,8 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
 
     private CustomListShopMusicAdapter listAdapter;
     private ShopMusicFeaturedAdapter featuredAdapter;
+
+    private PopupAlbumView popupAlbum;
 
     public static FragmentShopMusicTopSongs newInstance(int page, String title) {
         FragmentShopMusicTopSongs home = new FragmentShopMusicTopSongs();
@@ -92,6 +95,8 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
 
         listFeatured = (Gallery) view.findViewById(R.id.shop_music_featured);
 
+        popupAlbum = new PopupAlbumView(context, R.style.custom_dialog);
+
         loadData();
 
         listTopSong.setOnItemClickListener(this);
@@ -104,7 +109,7 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
 
     public void loadData() {
         if(DataPool.getInstance().listShopMusicTopSongs.size() > 0) {
-            listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicTopSongs);
+            listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicTopSongs, popupAlbum);
             listTopSong.setAdapter(listAdapter);
 
             featuredAdapter = new ShopMusicFeaturedAdapter(context, DataPool.getInstance().listShopMusicFeatured);
@@ -114,7 +119,7 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
             ApiManager.getInstance().setOnShopMusicTopSongListener(new ApiManager.OnShopMusicTopSongReceived() {
                 @Override
                 public void onDataLoaded(ApiManager.ApiType type) {
-                    listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicTopSongs);
+                    listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicTopSongs, popupAlbum);
                     listTopSong.setAdapter(listAdapter);
 
                     listAdapter.notifyDataSetChanged();
@@ -137,7 +142,7 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
     }
 
     public void refreshListview() {
-        listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicTopSongs);
+        listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicTopSongs, popupAlbum);
         listTopSong.setAdapter(listAdapter);
 
         listAdapter.notifyDataSetChanged();

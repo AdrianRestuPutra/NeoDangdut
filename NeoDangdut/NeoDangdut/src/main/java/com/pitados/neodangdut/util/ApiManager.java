@@ -6,8 +6,10 @@ import android.widget.Toast;
 
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.Popup.PopupLoading;
+import com.pitados.neodangdut.Popup.PopupWebview;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.AlbumData;
+import com.pitados.neodangdut.model.AlbumItem;
 import com.pitados.neodangdut.model.BannerModel;
 import com.pitados.neodangdut.model.CommunityContentData;
 import com.pitados.neodangdut.model.LibraryData;
@@ -22,7 +24,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -82,6 +86,7 @@ public class ApiManager {
     private OnShopVideoTopVideosReceived shopVideoTopVideosListener;
     private OnShopVideoNewVideosReceived shopVideoNewVideosListener;
     private OnShopVideoAllVideosReceived shopVideoAllVideosListener;
+    private OnAlbumDetailReceived albumDetailListener;
     private OnPurchase purchaseListener;
     private OnUpload uploadListener;
     private OnRegister registerListener;
@@ -102,6 +107,7 @@ public class ApiManager {
     private UserLoginData userLoginData;
 
     private PopupLoading popupLoading;
+    private PopupWebview popupWebview;
 
     public ApiManager() {
 
@@ -119,6 +125,7 @@ public class ApiManager {
 
         userLoginData = new UserLoginData(context);
         popupLoading = new PopupLoading(context, R.style.custom_dialog);
+        popupWebview = new PopupWebview(context, R.style.custom_dialog);
     }
 
     public void getToken() {
@@ -706,10 +713,13 @@ public class ApiManager {
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
             public void afterExecute(String result) {
+                int totalData = 0;
 
                 try {
                     JSONObject rawData = new JSONObject(result);
                     JSONArray arrCommunityMusic = rawData.getJSONArray("contents");
+                    totalData = rawData.getInt("total");
+                    Log.d("MUSIC TOTAL", totalData+"");
 
                     for (int i = 0; i < arrCommunityMusic.length(); i++) {
                         JSONObject obj = arrCommunityMusic.getJSONObject(i);
@@ -743,7 +753,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(commMusicListener != null)
+                if(commMusicListener != null && DataPool.getInstance().listCommunityMusic.size() != totalData)
                     commMusicListener.onDataLoaded(ApiType.COMMUNITY_MUSIC);
             }
 
@@ -762,17 +772,20 @@ public class ApiManager {
         params.put("offset", String.valueOf(DataPool.getInstance().listCommunityVideo.size()));
         params.put("order", "id");
         params.put("sort", "desc");
-        params.put("category", "video");
+        params.put("category", "music video");
 
         HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_COMMUNITY_CONTENT, ApiManager.getInstance().USER_ACCESS_TOKEN, params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
             public void afterExecute(String result) {
+                int totalData = 0;
 
                 try {
                     JSONObject rawData = new JSONObject(result);
                     JSONArray arrCommunityMusic = rawData.getJSONArray("contents");
+                    totalData = rawData.getInt("total");
+                    Log.d("VIDEO TOTAL", totalData+"");
 
                     for (int i = 0; i < arrCommunityMusic.length(); i++) {
                         JSONObject obj = arrCommunityMusic.getJSONObject(i);
@@ -805,7 +818,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(commVideoListener != null)
+                if(commVideoListener != null && DataPool.getInstance().listCommunityVideo.size() != totalData)
                     commVideoListener.onDataLoaded(ApiType.COMMUNITY_VIDEO);
             }
 
@@ -830,9 +843,12 @@ public class ApiManager {
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
             public void afterExecute(String result) {
+                int totalData = 0;
+
                 try {
                     JSONObject rawData = new JSONObject(result);
                     JSONArray arrData = rawData.getJSONArray("article");
+                    totalData = rawData.getInt("total");
 
                     for(int i = 0; i < arrData.length(); i++) {
                         JSONObject obj = arrData.getJSONObject(i);
@@ -856,7 +872,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(commNewsListener != null)
+                if(commNewsListener != null && DataPool.getInstance().listAllNews.size() != totalData)
                     commNewsListener.onDataLoaded(ApiType.COMMUNITY_NEWS);
             }
 
@@ -1151,10 +1167,12 @@ public class ApiManager {
             @Override
             public void afterExecute(String result) {
                 Log.d("Result", result);
+                int totalData = 0;
                 try {
 
                     JSONObject raw = new JSONObject(result);
                     JSONArray arrAlbum = raw.getJSONArray("album");
+                    totalData = raw.getInt("total");
 
                     for (int i = 0; i < arrAlbum.length(); i++) {
                         JSONObject obj = arrAlbum.getJSONObject(i);
@@ -1181,7 +1199,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(shopTopAlbumListener != null)
+                if(shopTopAlbumListener != null && DataPool.getInstance().listShopMusicTopAlbums.size() != totalData)
                     shopTopAlbumListener.onDataLoaded(ApiType.SHOP_MUSIC_TOP_ALBUM);
             }
 
@@ -1452,7 +1470,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(shopVideoTopVideosListener != null)
+                if (shopVideoTopVideosListener != null)
                     shopVideoTopVideosListener.onDataLoaded(ApiType.SHOP_VIDEO_TOP_VIDEO);
             }
 
@@ -1596,6 +1614,81 @@ public class ApiManager {
     }
     // SHOP VIDEO END
 
+    // ALBUM
+    public void getAlbumDetail(String albumID) {
+
+        String url = Consts.URL_GET_ALBUM + "/" + albumID;
+
+        Map<String, String> params = new HashMap<>();
+
+        HttpGetUtil request = new HttpGetUtil(url, ApiManager.getInstance().TOKEN, params);
+
+        request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                Log.d("Result", result);
+                try {
+
+                    JSONObject raw = new JSONObject(result);
+                    JSONObject dataAlbum = raw.getJSONObject("album");
+                    JSONObject dataSinger = dataAlbum.getJSONObject("singer");
+                    JSONObject dataLabel = dataAlbum.getJSONObject("label");
+                    JSONArray dataMusic = dataAlbum.getJSONArray("music");
+
+                    List<AlbumItem> tempList = new ArrayList<AlbumItem>();
+
+                    String albumID = dataAlbum.getString("id");
+                    String albumName = dataAlbum.getString("name");
+                    String coverURL = dataAlbum.getString("cover");
+                    String albumSingerID = dataSinger.getString("id");
+                    String albumSingerName = dataSinger.getString("name");
+                    String price = dataAlbum.getString("price");
+
+
+                    for (int i = 0; i < dataMusic.length(); i++) {
+                        JSONObject obj = dataMusic.getJSONObject(i);
+                        JSONObject singerObj = obj.getJSONObject("singer");
+
+                        String category = obj.getString("category");
+                        String ID = obj.getString("id");
+                        String trackNum = obj.getString("track");
+                        String songName = obj.getString("name");
+                        String songPrice = obj.getString("price");
+                        String discount = obj.getString("discount");
+                        String singerID = dataSinger.getString("id");
+                        String singerName = dataSinger.getString("name");
+                        String duration = obj.getString("duration");
+                        String previewURL = obj.getString("preview");
+
+                        AlbumItem tempData = new AlbumItem(category, ID, trackNum, songName, songPrice, discount,
+                                singerID, singerName, duration, previewURL);
+                        tempList.add(tempData);
+
+                    }
+
+                    DataPool.getInstance().selectedAlbum = new AlbumData(albumID, albumName, coverURL, albumSingerID, albumSingerName, price, tempList);
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    if(albumDetailListener != null)
+                        albumDetailListener.onError();
+                }
+
+                if(albumDetailListener != null)
+                    albumDetailListener.onDataLoaded();
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        request.execute();
+    }
+    // ALBUM END
+
     // USER ACTION
     public void likeItem(final LikeType type, final String id, final CommunityContentData commData, final NewsData newsData) {
         String url = Consts.URL_LIKE;
@@ -1714,25 +1807,38 @@ public class ApiManager {
         request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
             @Override
             public void afterExecute(String result) {
-                try {
-                    JSONObject rawData = new JSONObject(result);
+                if(result != null) {
 
-                    if(rawData.has("error")) {
-                        String message = rawData.getString("error");
+                    try {
+                        JSONObject rawData = new JSONObject(result);
 
-                        purchaseListener.onError(message);
+                        if(rawData.has("error")) {
+                            String message = rawData.getString("error");
+
+                            popupLoading.setMessage("Purchase Failed");
+                            purchaseListener.onError(message);
+                        } else {
+                            String status = rawData.getString("status");
+                            if(status.equalsIgnoreCase("true")) {
+                                // Success
+                                popupLoading.setMessage("Item Purchased");
+                                purchaseListener.onItemPurchased(result);
+                            } else {
+                                popupLoading.setMessage("Purchase Failed");
+                                purchaseListener.onError("Purchased Failed");
+                            }
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-
-                    purchaseListener.onItemPurchased(result);
                 }
 
             }
 
             @Override
             public void beforeExecute() {
-
+                popupLoading.showPopupLoading("Purchasing..");
             }
         });
 
@@ -1889,6 +1995,8 @@ public class ApiManager {
     public void setOnShopVideoNewVideosListener(OnShopVideoNewVideosReceived listener) { this.shopVideoNewVideosListener = listener; }
     public void setOnShopVideoAllVideosListener(OnShopVideoAllVideosReceived listener) { this.shopVideoAllVideosListener = listener; }
 
+    public void setOnAlbumDetailListener(OnAlbumDetailReceived listener) { this.albumDetailListener = listener; }
+
     public void setOnPurchasedListener(OnPurchase listener) { this.purchaseListener = listener; }
 
     public void setOnUploadListener(OnUpload listener) { this.uploadListener = listener; }
@@ -1962,6 +2070,11 @@ public class ApiManager {
 
     public interface OnShopVideoAllVideosReceived {
         void onDataLoaded(ApiType type);
+    }
+
+    public interface OnAlbumDetailReceived {
+        void onDataLoaded();
+        void onError();
     }
 
     public interface OnPurchase {

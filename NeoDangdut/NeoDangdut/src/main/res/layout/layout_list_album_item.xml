@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="blocksDescendants">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/top_track_item_height"
+        android:background="@color/main_bg"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/top_list_padding_small"
+            android:layout_weight="1.5">
+
+            <TextView
+                android:id="@+id/list_view_album_item_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white_font"
+                android:textSize="@dimen/top_list_font_title"
+                android:text="Song Title" />
+            <TextView
+                android:id="@+id/list_view_album_item_artist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white_font"
+                android:textSize="@dimen/top_list_font_regular"
+                android:text="Song Title" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <!-- Buy Button -->
+            <RelativeLayout
+                android:id="@+id/list_view_album_item_buy_button"
+                android:layout_width="@dimen/album_item_button_width"
+                android:layout_height="@dimen/album_item_button_height"
+                android:layout_margin="@dimen/dialog_artist_left_panel_margin"
+                android:background="@drawable/btn_price_artist_song"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true">
+
+                <TextView
+                    android:id="@+id/list_view_album_item_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/shop_featured_price_margin_left"
+                    android:layout_centerVertical="true"
+                    android:text="Rp 1000"
+                    android:textSize="@dimen/shop_featured_price_text"
+                    android:textColor="@color/purple_font" />
+
+            </RelativeLayout>
+
+
+            <ImageView
+                android:id="@+id/list_view_album_item_opt_button"
+                android:layout_width="@dimen/top_list_opt_icon_width"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/dialog_artist_price_margin"
+                android:layout_alignParentRight="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/icon_more_white"/>
+
+        </RelativeLayout>
+
+
+
+    </LinearLayout>
+
+</RelativeLayout>

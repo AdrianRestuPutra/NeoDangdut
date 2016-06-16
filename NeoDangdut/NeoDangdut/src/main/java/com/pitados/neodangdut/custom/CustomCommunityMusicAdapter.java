@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.facebook.share.widget.ShareDialog;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
@@ -30,6 +31,7 @@ public class CustomCommunityMusicAdapter extends BaseAdapter {
     private DisplayImageOptions opts;
 
     private PopupCommunity popupCommunity;
+    private ShareDialog shareDialog;
 
     static class ViewHolder {
         ImageView thumbnail;
@@ -38,14 +40,14 @@ public class CustomCommunityMusicAdapter extends BaseAdapter {
         RelativeLayout optButton;
     }
 
-    public CustomCommunityMusicAdapter(Context context, List<CommunityContentData> listMusic) {
+    public CustomCommunityMusicAdapter(Context context, List<CommunityContentData> listMusic, ShareDialog shareDialog) {
         this.context = context;
         this.listMusic = listMusic;
 
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.ic_menu_gallery)
-                .showImageForEmptyUri(R.drawable.ic_menu_gallery)
+                .showImageOnLoading(R.drawable.icon_user)
+                .showImageForEmptyUri(R.drawable.icon_user)
                 .cacheInMemory(false)
                 .cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
@@ -53,7 +55,10 @@ public class CustomCommunityMusicAdapter extends BaseAdapter {
                 .resetViewBeforeLoading(true)
                 .build();
 
+        this.shareDialog = shareDialog;
         popupCommunity = new PopupCommunity(context, R.style.custom_dialog);
+        popupCommunity.setShareDialog(shareDialog);
+
     }
 
     @Override

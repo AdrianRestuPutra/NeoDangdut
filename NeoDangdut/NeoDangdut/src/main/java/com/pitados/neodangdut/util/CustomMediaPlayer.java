@@ -29,6 +29,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
+import com.pitados.neodangdut.model.AlbumItem;
 import com.pitados.neodangdut.model.CommunityContentData;
 import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.model.MusicData;
@@ -45,6 +46,17 @@ import java.util.Map;
  * Created by adrianrestuputranto on 4/16/16.
  */
 public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressCallback {
+    public enum MusicType {
+        SHOP,
+        COMMUNITY,
+        LIBRARY,
+        ALBUM_ITEM
+    }
+    private MusicType trackType;
+    private MusicData selectedMusicData;
+    private CommunityContentData selectedCommunityData;
+    private LibraryData selectedLibraryData;
+    private AlbumItem selectedAlbumItemData;
 
     public static CustomMediaPlayer instance;
 
@@ -87,8 +99,8 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
     public CustomMediaPlayer() {
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.ic_menu_gallery)
-                .showImageForEmptyUri(R.drawable.ic_menu_gallery)
+                .showImageOnLoading(R.drawable.icon_user)
+                .showImageForEmptyUri(R.drawable.icon_user)
                 .cacheInMemory(false)
                 .cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
@@ -142,6 +154,9 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                     showMusicPlayer();
 
         }
+
+        trackType = MusicType.SHOP;
+        selectedMusicData = data;
         // TODO set panel music player default / loading
         panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
         audioPauseIcon.setImageResource(R.drawable.icon_play);
@@ -219,6 +234,9 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
             showMusicPlayer();
 
         }
+
+        trackType = MusicType.COMMUNITY;
+        selectedCommunityData = data;
         // TODO set panel music player default / loading
         panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
         audioPauseIcon.setImageResource(R.drawable.icon_play);
@@ -283,6 +301,83 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         });
     }
 
+    public void playTrack(final AlbumItem data) {
+        if(isVideoPlayerShowing) {
+            isVideoPlayerShowing = false;
+            closeVideoPlayer();
+        }
+
+        if (panelMusicPlayer.getVisibility() != View.VISIBLE) {
+            showMusicPlayer();
+
+        }
+
+        trackType = MusicType.ALBUM_ITEM;
+        selectedAlbumItemData = data;
+        // TODO set panel music player default / loading
+        panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
+        audioPauseIcon.setImageResource(R.drawable.icon_play);
+
+        if(audioPlayer.isPlaying())
+            audioPlayer.stopPlayback();
+
+        audioPlayer.setDataSource(context, Uri.parse(data.previewURL));
+        audioPlayer.prepareAsync();
+        audioPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                audioPlayer.start();
+                panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
+                audioPauseIcon.setImageResource(R.drawable.icon_pause);
+
+                // TODO change audio data
+                imageLoader.displayImage("", audioPlayerThumbnail, opts);
+                audioPlayerSongTitle.setText(data.songName);
+                audioPlayerArtistName.setText(data.singerName);
+                audioPlayerDuration.setText("");
+
+                int duration = (int)audioPlayer.getDuration() / 1000;
+                audioProgress.setMax(duration);
+            }
+        });
+
+        final Handler mHandler = new Handler();
+        Activity currentActivity =  (Activity) context;
+        currentActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(audioPlayer != null) {
+                    int mCurrentPos = (int)audioPlayer.getCurrentPosition() / 1000;
+                    audioProgress.setProgress(mCurrentPos);
+                }
+
+                mHandler.postDelayed(this, 1000);
+            }
+        });
+
+        audioProgress.setThumb(ContextCompat.getDrawable(context, R.color.transparent));
+        audioProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int pos, boolean fromUser) {
+                if(audioPlayer != null && fromUser) {
+                    audioPlayer.seekTo(pos * 1000);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO set seek thumb
+//                seekBar.setThumb(ContextCompat.getDrawable(context, R.color.colorPrimary));
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // TODO set seek thumb transparent
+//                seekBar.setThumb(ContextCompat.getDrawable(context, R.color.colorPrimary));
+            }
+        });
+    }
+
     public void playItem(final LibraryData data) {
         if(data.category.equalsIgnoreCase("music")) {
             if(isVideoPlayerShowing) {
@@ -295,6 +390,9 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 showMusicPlayer();
 
             }
+
+            trackType = MusicType.LIBRARY;
+            selectedLibraryData = data;
             // TODO set panel music player default / loading
             panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
             audioPauseIcon.setImageResource(R.drawable.icon_play);
@@ -383,9 +481,39 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
     }
 
+    public void pauseTrack() {
+        audioPauseIcon.setImageResource(R.drawable.icon_play);
+        audioPlayer.pause();
+    }
+
+    public void resumeTrack() {
+        audioPauseIcon.setImageResource(R.drawable.icon_pause);
+        audioPlayer.start();
+    }
+
+    public boolean isTrackPaused() {
+        return !audioPlayer.isPlaying();
+    }
+
     public void stopTrack() {
         closeMusicPlayer();
         audioPlayer.stopPlayback();
+    }
+
+    public MusicType trackType() {
+        return trackType;
+    }
+
+    public MusicData getSelectedMusicData() {
+        return selectedMusicData;
+    }
+
+    public CommunityContentData getSelectedCommunityData() {
+        return selectedCommunityData;
+    }
+
+    public LibraryData getSelectedLibraryData() {
+        return selectedLibraryData;
     }
 
     public long getCurrentPos() {
@@ -436,6 +564,18 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
             videoDescription.setText(videoData.description);
     }
 
+    public void pauseVideoPlayer() {
+        videoPlayer.pause();
+    }
+
+    public String getVideoPlayerURL() {
+        return videoPlayer.getVideoUri().toString();
+    }
+
+    public long getVideoPlayerCurrentPosition() {
+        return videoPlayer.getCurrentPosition();
+    }
+
     // Animate panel
     private void showMusicPlayer() {
         TranslateAnimation translate = new TranslateAnimation(TranslateAnimation.RELATIVE_TO_SELF, 0f, TranslateAnimation.RELATIVE_TO_SELF, 0f, TranslateAnimation.RELATIVE_TO_SELF, 1f, TranslateAnimation.RELATIVE_TO_SELF, 0f);
@@ -461,7 +601,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         panelMusicPlayer.startAnimation(translate);
     }
 
-    private void closeMusicPlayer() {
+    public void closeMusicPlayer() {
         TranslateAnimation translate = new TranslateAnimation(TranslateAnimation.RELATIVE_TO_SELF, 0f, TranslateAnimation.RELATIVE_TO_SELF, 0f, TranslateAnimation.RELATIVE_TO_SELF, 0f, TranslateAnimation.RELATIVE_TO_SELF, 1f);
         translate.setAnimationListener(new Animation.AnimationListener() {
             @Override

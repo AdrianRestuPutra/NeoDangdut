@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.facebook.share.widget.ShareDialog;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
@@ -37,15 +38,16 @@ public class CustomCommunityVideoAdapter extends BaseAdapter {
     private DisplayImageOptions opts;
 
     private PopupCommunity popupCommunity;
+    private ShareDialog shareDialog;
 
-    public CustomCommunityVideoAdapter(Context context, List<CommunityContentData> listVideo) {
+    public CustomCommunityVideoAdapter(Context context, List<CommunityContentData> listVideo, ShareDialog shareDialog) {
         this.context = context;
         this.listVideo = listVideo;
 
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.ic_menu_gallery)
-                .showImageForEmptyUri(R.drawable.ic_menu_gallery)
+                .showImageOnLoading(R.drawable.icon_user)
+                .showImageForEmptyUri(R.drawable.icon_user)
                 .cacheInMemory(false)
                 .cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
@@ -53,7 +55,9 @@ public class CustomCommunityVideoAdapter extends BaseAdapter {
                 .imageScaleType(ImageScaleType.EXACTLY)
                 .build();
 
+        this.shareDialog = shareDialog;
         popupCommunity = new PopupCommunity(context, R.style.custom_dialog);
+        popupCommunity.setShareDialog(shareDialog);
     }
 
     @Override

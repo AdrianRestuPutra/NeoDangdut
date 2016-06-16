@@ -6,7 +6,7 @@
 
     <LinearLayout
         android:layout_width="@dimen/dialog_artist_song_width"
-        android:layout_height="@dimen/dialog_artist_song_height"
+        android:layout_height="@dimen/dialog_community_height"
         android:layout_centerInParent="true"
         android:background="@drawable/popup_artistsong_bg"
         android:orientation="horizontal"
@@ -276,6 +276,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/divider_height"
+                    android:visibility="gone"
                     android:background="@color/tab_divider"/>
 
                 <!-- Comment -->
@@ -283,6 +284,7 @@
                     android:id="@+id/popup_community_song_button_comment"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:visibility="gone"
                     android:layout_weight="1">
 
                     <ImageView

@@ -17,6 +17,13 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/video_player_height">
 
+            <ImageView
+                android:id="@+id/video_player_fullscreen_button"
+                android:layout_width="@dimen/video_player_icon_width"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:src="@drawable/icon_fullscreen"/>
         </com.devbrackets.android.exomedia.EMVideoView>
 
         <!-- Detail video -->

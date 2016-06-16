@@ -2,18 +2,26 @@ package com.pitados.neodangdut.Popup;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.CommunityContentData;
 import com.pitados.neodangdut.util.ApiManager;
 import com.pitados.neodangdut.util.CustomMediaPlayer;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * Created by adrianrestuputranto on 5/31/16.
@@ -32,6 +40,8 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
 
     private boolean isMusic;
 
+    private ShareDialog shareDialog;
+
     public PopupCommunity(Context context, int themeResId) {
         super(context, themeResId);
         this.context = context;
@@ -40,6 +50,10 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
         this.setCanceledOnTouchOutside(true);
 
         initialize();
+    }
+
+    public void setShareDialog(ShareDialog shareDialog) {
+        this.shareDialog = shareDialog;
     }
 
     private void initialize() {
@@ -89,6 +103,18 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
         this.dismiss();
     }
 
+
+    // TWITTER
+    public static String urlEncode(String s) {
+        try {
+            return URLEncoder.encode(s, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e) {
+            Log.wtf("TAG", "UTF-8 should always be supported", e);
+            throw new RuntimeException("URLEncoder.encode() failed for " + s);
+        }
+    }
+
     @Override
     public void onClick(View view) {
         if(view == buttonPlay) {
@@ -116,10 +142,38 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
 
         }
         if(view == buttonShareFB) {
+            String url = "neodangdut.com";
 
+            if(commData.category.equalsIgnoreCase("music")) {
+                url = url + "/music/detail/" + commData.ID;
+            } else {
+                url = url + "/video/detail/" + commData.ID;
+            }
+            Log.d("Share", url);
+
+            ShareLinkContent shareLink = new ShareLinkContent.Builder()
+                    .setContentUrl(Uri.parse(url))
+                    .build();
+
+            shareDialog.show(shareLink);
         }
         if(view == buttonShareTwitter) {
+            String url = "neodangdut.com";
 
+            if(commData.category.equalsIgnoreCase("music")) {
+                url = url + "/music/detail/" + commData.ID;
+            } else {
+                url = url + "/video/detail/" + commData.ID;
+            }
+            Log.d("Share", url);
+
+            String toShare = "Mau tahu banyak ttg NeoDangdut? Klik disini. http://neodangdut.com/music #neo #dangdut #neodangdut";
+
+            String tweetUrl = String.format("https://twitter.com/intent/tweet?text=%s",
+                    urlEncode(toShare));
+
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(tweetUrl));
+            context.startActivity(intent);
         }
     }
 }

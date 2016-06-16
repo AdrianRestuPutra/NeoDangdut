@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.pitados.neodangdut.Popup.PopupAlbumView;
 import com.pitados.neodangdut.Popup.PopupArtistSong;
 import com.pitados.neodangdut.Popup.PopupLoading;
 import com.pitados.neodangdut.R;
@@ -48,14 +49,14 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
         RelativeLayout optButton;
     }
 
-    public CustomListShopMusicAdapter(Context context, List<MusicData> listTopTrack) {
+    public CustomListShopMusicAdapter(Context context, List<MusicData> listTopTrack, PopupAlbumView popupAlbum) {
         this.context = context;
         this.listTrack = listTopTrack;
 
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.ic_menu_gallery)
-                .showImageForEmptyUri(R.drawable.ic_menu_gallery)
+                .showImageOnLoading(R.drawable.icon_user)
+                .showImageForEmptyUri(R.drawable.icon_user)
                 .cacheInMemory(false)
                 .cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
@@ -64,6 +65,7 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
                 .build();
 
         popupArtistSong = new PopupArtistSong(context, R.style.custom_dialog);
+        popupArtistSong.setPopupAlbum(popupAlbum);
         popupLoading = new PopupLoading(context, R.style.custom_dialog);
     }
 
@@ -95,7 +97,7 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        ViewHolder holder;
+        final ViewHolder holder;
         if(view == null) {
             view = inflater.inflate(R.layout.layout_list_shop_music, null); // TODO change to shop top track
 
@@ -138,7 +140,6 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
             holder.buyButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    popupLoading.showPopupLoading("Purchasing..");
 
                     ApiManager.getInstance().getUserTransactionToken();
                     ApiManager.getInstance().setOnUserTransactionTokenReceived(new ApiManager.OnUserTransactionTokenReceived() {
@@ -151,21 +152,22 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
                                 public void onItemPurchased(String result) {
                                     Log.d("Result", result);
 
-                                    popupLoading.closePopupLoading();
+                                    listTrack.get(index).inLibrary = true;
+                                    holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
                                     // TODO notif user
                                 }
 
                                 @Override
                                 public void onError(String message) {
                                     // TODO show popup
-                                    popupLoading.setMessage("Purchase Failed");
+
                                 }
                             });
                         }
 
                         @Override
                         public void onError(String message) {
-                            popupLoading.setMessage("Purchase Failed");
+
                         }
                     });
 

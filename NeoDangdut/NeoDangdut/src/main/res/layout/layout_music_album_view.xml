@@ -8,13 +8,13 @@
         android:id="@+id/library_music_album_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/blue_semi_transparent"
         android:orientation="vertical">
 
         <!-- Thumbnail -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/lib_music_album_view_thumbnail_container_height"
+            android:background="@drawable/bg_profile_preview"
             android:orientation="horizontal">
 
             <RelativeLayout
@@ -23,11 +23,12 @@
                 android:layout_weight="1">
 
                 <ImageView
-                    android:id="@+id/lib_music_thumbnail"
-                    android:layout_width="match_parent"
+                    android:id="@+id/album_item_thumbnail"
+                    android:layout_width="@dimen/album_item_thumbnail_width"
                     android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/ic_menu_camera" />
+                    android:src="@drawable/icon_user" />
             </RelativeLayout>
 
             <!-- Album Title -->
@@ -39,7 +40,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/lib_music_album_title"
+                    android:id="@+id/album_item_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Album Title"
@@ -47,7 +48,7 @@
                     android:textSize="@dimen/lib_music_album_view_title" />
 
                 <TextView
-                    android:id="@+id/lib_music_album_artist"
+                    android:id="@+id/album_item_artist"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Artist Name"
@@ -69,7 +70,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/lib_music_album_view_title_container_height"
-            android:background="@color/black_semi_transparent"
+            android:background="@color/main_bg"
             android:orientation="horizontal">
 
             <RelativeLayout
@@ -126,7 +127,7 @@
             android:layout_height="match_parent">
 
             <ListView
-                android:id="@+id/lib_music_album_listview"
+                android:id="@+id/album_item_listview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"></ListView>
         </RelativeLayout>

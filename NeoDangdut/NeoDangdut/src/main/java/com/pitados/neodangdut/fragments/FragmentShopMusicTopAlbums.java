@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.pitados.neodangdut.Consts;
+import com.pitados.neodangdut.Popup.PopupAlbumView;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomListShopAlbumAdapter;
 import com.pitados.neodangdut.util.ApiManager;
@@ -30,6 +30,8 @@ public class FragmentShopMusicTopAlbums extends Fragment {
     private ListView listTopAlbums;
 
     private CustomListShopAlbumAdapter listAdapter;
+
+    private PopupAlbumView popupAlbum;
 
     public static FragmentShopMusicTopAlbums newInstance(int page, String title) {
         FragmentShopMusicTopAlbums home = new FragmentShopMusicTopAlbums();
@@ -73,11 +75,13 @@ public class FragmentShopMusicTopAlbums extends Fragment {
         listTopAlbums.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(context, "TODO click item "+i, Toast.LENGTH_SHORT).show();
+                popupAlbum.showPopupLoading(DataPool.getInstance().listShopMusicTopAlbums.get(i).ID);
             }
         });
 
         listTopAlbums.setFastScrollEnabled(true);
+
+        popupAlbum = new PopupAlbumView(context, R.style.custom_dialog);
 
         return view;
     }

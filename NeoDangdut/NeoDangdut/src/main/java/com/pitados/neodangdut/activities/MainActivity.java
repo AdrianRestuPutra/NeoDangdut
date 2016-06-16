@@ -42,6 +42,8 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.pitados.neodangdut.Consts;
+import com.pitados.neodangdut.Popup.PopupArtistSong;
+import com.pitados.neodangdut.Popup.PopupCommunity;
 import com.pitados.neodangdut.Popup.PopupLoading;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomPagerAdapter;
@@ -101,7 +103,7 @@ public class MainActivity extends AppCompatActivity
     // Media Panel
     private LinearLayout panelMusicPlayer;
     private RelativeLayout musicPlayerPauseButton, musicPlayerShuffleButton, musicPlayerLoopbutton;
-    private ImageView musicPlayerPauseIcon;
+    private ImageView musicPlayerPauseIcon, musicPlayerOptButton;
     private ImageView musicPlayerThumbnail;
     private TextView musicPlayerTitle, musicPlayerArtistName, musicPlayerDuration;
     private SeekBar musicPlayerProgress;
@@ -109,6 +111,7 @@ public class MainActivity extends AppCompatActivity
     private RelativeLayout panelVideoPlayer;
     private EMVideoView videoView;
     private ImageView videoPlayerThumbnail;
+    private ImageView videoPlayerFullscreenButton;
     // TODO widget video
     private TextView videoDate, videoDescription;
     // NEWS
@@ -162,6 +165,8 @@ public class MainActivity extends AppCompatActivity
     private UserLoginData userLoginData;
 
     private PopupLoading popupLoading;
+    private PopupArtistSong popupArtistSong;
+    private PopupCommunity popupCommunitySong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,8 +183,8 @@ public class MainActivity extends AppCompatActivity
 
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.nd_local_512)
-                .showImageForEmptyUri(R.drawable.nd_local_512)
+                .showImageOnLoading(R.drawable.icon_user)
+                .showImageForEmptyUri(R.drawable.icon_user)
                 .cacheInMemory(false)
                 .cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
@@ -352,12 +357,27 @@ public class MainActivity extends AppCompatActivity
 
         musicPlayerPauseIcon = (ImageView) findViewById(R.id.music_player_pause_icon);
         musicPlayerPauseButton = (RelativeLayout) findViewById(R.id.music_player_pause);
+        musicPlayerOptButton = (ImageView) findViewById(R.id.music_player_opt_button);
+
         musicPlayerPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CustomMediaPlayer.getInstance().stopTrack();
+//                CustomMediaPlayer.getInstance().stopTrack();
+                if(CustomMediaPlayer.getInstance().isTrackPaused())
+                    CustomMediaPlayer.getInstance().resumeTrack();
+                else
+                    CustomMediaPlayer.getInstance().pauseTrack();
             }
         });
+
+        musicPlayerOptButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showMusicDetail();
+            }
+        });
+
+
         musicPlayerProgress = (SeekBar) findViewById(R.id.music_player_progress);
         musicPlayerThumbnail = (ImageView) findViewById(R.id.music_player_thumbnail);
         musicPlayerShuffleButton = (RelativeLayout) findViewById(R.id.music_player_random);
@@ -382,11 +402,27 @@ public class MainActivity extends AppCompatActivity
         });
 
         // TODO insert widget id
+        videoPlayerFullscreenButton = (ImageView) findViewById(R.id.video_player_fullscreen_button);
         videoView = (EMVideoView) findViewById(R.id.video_player_view);
         videoPlayerThumbnail = (ImageView) findViewById(R.id.video_player_thumbnail);
         videoDate = (TextView) findViewById(R.id.video_player_detail_date);
         videoDescription = (TextView) findViewById(R.id.video_player_detail_description);
 
+
+        videoPlayerFullscreenButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CustomMediaPlayer.getInstance().pauseVideoPlayer();
+                String url = CustomMediaPlayer.getInstance().getVideoPlayerURL();
+                int currentPos = (int)CustomMediaPlayer.getInstance().getCurrentPos();
+
+                Intent intent = new Intent(MainActivity.this, FullscreenVideoPlayer.class);
+                intent.putExtra("VideoURI",url);
+                intent.putExtra("CurrentPosition", currentPos);
+
+                startActivity(intent);
+            }
+        });
 
         newsScrollView = (ScrollView) findViewById(R.id.news_scroll_view);
         panelNewsDetail = (RelativeLayout) findViewById(R.id.news_detail);
@@ -402,6 +438,9 @@ public class MainActivity extends AppCompatActivity
         CustomMediaPlayer.getInstance().setVideoPanel(panelVideoPlayer, videoView, videoDate, videoDescription, videoPlayerThumbnail);
 
         CustomMediaPlayer.getInstance().setNewsPanel(panelNewsDetail, newsDetailThumbnail, newsDetailTitle, newsDetailDate, newsDetailDescription, loadingBar, newsScrollView);
+
+        popupArtistSong = new PopupArtistSong(MainActivity.this, R.style.custom_dialog);
+        popupCommunitySong = new PopupCommunity(MainActivity.this, R.style.custom_dialog);
 
     }
 
@@ -641,6 +680,19 @@ public class MainActivity extends AppCompatActivity
         uploadInputDescription = (EditText) findViewById(R.id.upload_description);
     }
 
+    private void showMusicDetail() {
+        if(CustomMediaPlayer.getInstance().trackType() == CustomMediaPlayer.MusicType.SHOP) {
+            // SHOP
+            popupArtistSong.showPopupArtistSong(CustomMediaPlayer.getInstance().getSelectedMusicData());
+        } else if(CustomMediaPlayer.getInstance().trackType() == CustomMediaPlayer.MusicType.COMMUNITY) {
+            // COMMUNITY
+            popupCommunitySong.showPopupCommunity(CustomMediaPlayer.getInstance().getSelectedCommunityData());
+        } else {
+            // LIBRARY
+            popupArtistSong.showPopupArtistSong(CustomMediaPlayer.getInstance().getSelectedLibraryData());
+        }
+    }
+
     private void showFileChooser() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");
@@ -680,17 +732,17 @@ public class MainActivity extends AppCompatActivity
 
                 tempFile = new File(uri.getPath());
 
-                showUploadForm();
+                showUploadForm(uri.getPath());
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void showUploadForm() {
+    private void showUploadForm(String fileName) {
         panelUpload.setVisibility(View.VISIBLE);
         isUploadFormShowing = true;
 
-        uploadFileName.setText("");
+        uploadFileName.setText(fileName);
         uploadProgress.setProgress(0);
         uploadButtonText.setText("SUBMIT");
         uploadButtonText.setTextColor(getResources().getColor(R.color.white_font));
@@ -855,6 +907,11 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
+        if(CustomMediaPlayer.getInstance().isAudioPlayerShowing) {
+            if(CustomMediaPlayer.getInstance().isTrackPaused())
+                CustomMediaPlayer.getInstance().closeMusicPlayer();
+        }
+
         if(CustomMediaPlayer.getInstance().isVideoPlayerShowing) {
             CustomMediaPlayer.getInstance().closeVideoPlayer();
         } else if(CustomMediaPlayer.getInstance().isNewsDetailShowing) {
@@ -869,12 +926,13 @@ public class MainActivity extends AppCompatActivity
                 drawer.closeDrawer(GravityCompat.START);
             }
         } else {
+            if(!CustomMediaPlayer.getInstance().isAudioPlayerShowing) {
+                DataPool.getInstance().listHomeBanner.clear();
+                DataPool.getInstance().listHomeTopVideos.clear();
+                DataPool.getInstance().listHomeTopMusic.clear();
 
-            DataPool.getInstance().listHomeBanner.clear();
-            DataPool.getInstance().listHomeTopVideos.clear();
-            DataPool.getInstance().listHomeTopMusic.clear();
-
-            MainActivity.this.finish();
+                MainActivity.this.finish();
+            }
 //                super.onBackPressed();
         }
 
@@ -915,18 +973,30 @@ public class MainActivity extends AppCompatActivity
         if(view == sideMenuHome) {
             if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
                 CustomMediaPlayer.getInstance().closeNewsDetail();
+            if(CustomMediaPlayer.getInstance().isVideoPlayerShowing)
+                CustomMediaPlayer.getInstance().closeVideoPlayer();
             changePanel(PanelState.PANEL_NEW_POST);
         }
 
         if(view == sideMenuLibrary) {
             if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
                 CustomMediaPlayer.getInstance().closeNewsDetail();
+            if(CustomMediaPlayer.getInstance().isVideoPlayerShowing)
+                CustomMediaPlayer.getInstance().closeVideoPlayer();
             changePanel(PanelState.PANEL_LIBRARY);
+
+            FragmentLibraryMusic fragLibMusic = (FragmentLibraryMusic) pagerAdapterLibrary.getItem(0);
+            fragLibMusic.reloadData();
+
+            FragmentLibraryVideo fragLibVideo = (FragmentLibraryVideo) pagerAdapterLibrary.getItem(1);
+            fragLibVideo.reloadData();
         }
 
         if(view == sideMenuShopMusic) {
             if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
                 CustomMediaPlayer.getInstance().closeNewsDetail();
+            if(CustomMediaPlayer.getInstance().isVideoPlayerShowing)
+                CustomMediaPlayer.getInstance().closeVideoPlayer();
             changePanel(PanelState.PANEL_SHOP_MUSIC);
 
             FragmentShopMusicTopSongs temp = (FragmentShopMusicTopSongs)pagerAdapterShopMusic.getItem(0);
@@ -936,6 +1006,8 @@ public class MainActivity extends AppCompatActivity
         if(view == sideMenuShopVideo) {
             if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
                 CustomMediaPlayer.getInstance().closeNewsDetail();
+            if(CustomMediaPlayer.getInstance().isVideoPlayerShowing)
+                CustomMediaPlayer.getInstance().closeVideoPlayer();
             changePanel(PanelState.PANEL_SHOP_VIDEO);
 
             FragmentShopVideoTopVideos temp = (FragmentShopVideoTopVideos)pagerAdapterShopVideo.getItem(0);
@@ -945,16 +1017,25 @@ public class MainActivity extends AppCompatActivity
         if(view == sideMenuDownloads) {
             if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
                 CustomMediaPlayer.getInstance().closeNewsDetail();
+            if(CustomMediaPlayer.getInstance().isVideoPlayerShowing)
+                CustomMediaPlayer.getInstance().closeVideoPlayer();
             changePanel(PanelState.PANEL_DOWNLOAD);
         }
 
         if(view == sideMenuSetting) {
             if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
                 CustomMediaPlayer.getInstance().closeNewsDetail();
+            if(CustomMediaPlayer.getInstance().isVideoPlayerShowing)
+                CustomMediaPlayer.getInstance().closeVideoPlayer();
             changePanel(PanelState.PANEL_SETTING);
         }
 
         if(view == sideMenuSignOut) {
+            if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
+                CustomMediaPlayer.getInstance().closeNewsDetail();
+            if(CustomMediaPlayer.getInstance().isVideoPlayerShowing)
+                CustomMediaPlayer.getInstance().closeVideoPlayer();
+
             userLoginData.signOut();
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             MainActivity.this.finish();
@@ -992,6 +1073,8 @@ public class MainActivity extends AppCompatActivity
         if(view == sideMenuProfileButton) {
             if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
                 CustomMediaPlayer.getInstance().closeNewsDetail();
+            if(CustomMediaPlayer.getInstance().isVideoPlayerShowing)
+                CustomMediaPlayer.getInstance().closeVideoPlayer();
             changePanel(PanelState.PANEL_PROFILE);
         }
 
