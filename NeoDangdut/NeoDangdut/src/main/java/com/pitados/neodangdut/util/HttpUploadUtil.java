@@ -14,11 +14,11 @@ public class HttpUploadUtil extends AsyncTask<Void, Void, String> {
     private String url;
     private String token;
     private File fileUpload;
-    private Map<String, String> params;
+    private Map<String, Object> params;
 
     private HttpPostUtilListener listener;
 
-    public HttpUploadUtil(String url, String token, File fileUpload, Map<String, String> params) {
+    public HttpUploadUtil(String url, String token, File fileUpload, Map<String, Object> params) {
         this.url = url;
         this.token = token;
         this.fileUpload = fileUpload;
@@ -37,9 +37,9 @@ public class HttpUploadUtil extends AsyncTask<Void, Void, String> {
     @Override
     protected String doInBackground(Void... params) {
         try {
+
             HttpRequest request = null;
             request = HttpRequest.post(url).authorization("Bearer "+token).form(this.params);
-            request.form("upload", fileUpload);
             String result = "";
 
             if(request.ok()) {

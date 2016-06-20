@@ -78,6 +78,7 @@ public class ApiManager {
 //    private OnTokenReceived listener;
     private OnUserAccessTokenReceived userAccessListener;
 //    private OnUserTransactionTokenReceived userTransactionListener;
+    private OnUserDataReceived userDataListener;
     private OnHomeDataReceived dataListener;
     private OnUploadedMusicReceived uploadedMusicListener;
     private OnUploadedVideoReceived uploadedVideoListener;
@@ -99,6 +100,7 @@ public class ApiManager {
     private OnRegister registerListener;
     private OnSearchReceived searchShopMusicListener, searchShopAlbumListener, searchShopVideoListener,
                                 searchCommunityMusicListener, searchCommunityVideoListener;
+    private OnConfirmIAP confirmIAPListener;
 
     private static ApiManager instance;
 
@@ -326,6 +328,9 @@ public class ApiManager {
                             DataPool.getInstance().userProfileData.totalMusic = totalMusic;
                             DataPool.getInstance().userProfileData.totalVideo = totalVideo;
                             DataPool.getInstance().userProfileData.unplayed = unplayed;
+
+                            userDataListener.onUserDataLoaded();
+
                         } else {
                             String errorMessage = rawData.getString("error_description");
 
@@ -2032,6 +2037,7 @@ public class ApiManager {
 
                         AlbumItem tempData = new AlbumItem(category, ID, trackNum, songName, songPrice, discount,
                                 singerID, singerName, duration, previewURL);
+                        tempData.albumName = albumName;
                         tempList.add(tempData);
 
                     }
@@ -2218,9 +2224,11 @@ public class ApiManager {
     public void uploadContent(File file, String category, String name, String description) {
         String url = Consts.URL_GET_TOKEN + "/me/"+category;
 
-        Map<String, String> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("description", description);
+        params.put("file", file);
+        Log.d("FILE", file.length() + "");
 
         final HttpUploadUtil upload = new HttpUploadUtil(url, USER_ACCESS_TOKEN, file, params);
         upload.setOnHttpPostUtilListener(new HttpUploadUtil.HttpPostUtilListener() {
@@ -2347,6 +2355,39 @@ public class ApiManager {
 
     }
 
+    public void confirmIAP(String originalJSON, String purchaseSignature) {
+        Map<String, String> params = new HashMap<>();
+        params.put("purchase", originalJSON);
+        params.put("signature", purchaseSignature);
+
+        HttpPostUtil request = new HttpPostUtil(Consts.URL_CONFIRM, USER_ACCESS_TOKEN, params);
+
+        request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                Log.d("Result IAP", result);
+                try {
+                    JSONObject rawData = new JSONObject(result);
+
+                    if (rawData.has("verified")) {
+                        confirmIAPListener.onConfirm();
+                    } else {
+                        // Error
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+
+//                    popupLoading.setMessage("Register Failed");
+                }
+            }
+
+            @Override
+            public void beforeExecute() {
+            }
+        });
+    }
+
     // IAP COMMAND
     public void topUpCredit(String productID) {
         Log.d("TOP UP", "TEST");
@@ -2357,6 +2398,8 @@ public class ApiManager {
     public void setOnUserAccessTokenReceved(OnUserAccessTokenReceived listener) { this.userAccessListener = listener; }
 //    public void setOnUserTransactionTokenReceived(OnUserTransactionTokenReceived listener) { this.userTransactionListener = listener; }
     public void setOnHomeListener(OnHomeDataReceived listener) { this.dataListener =  listener; }
+
+    public void setOnUserDataListener(OnUserDataReceived listener) { this.userDataListener = listener; }
 
     public void setOnUploadedMusicListener(OnUploadedMusicReceived listener) { this.uploadedMusicListener = listener; }
     public void setOnUploadedVideoListener(OnUploadedVideoReceived listener) { this.uploadedVideoListener = listener; }
@@ -2391,9 +2434,15 @@ public class ApiManager {
     public void setOnSearchCommunityMusicListener(OnSearchReceived listener) { this.searchCommunityMusicListener = listener; }
     public void setOnSearchCommunityVideoListener(OnSearchReceived listener) { this.searchCommunityVideoListener = listener; }
 
+    public void setOnConfirmIAP(OnConfirmIAP listener) { confirmIAPListener = listener; }
+
     public interface OnUserAccessTokenReceived {
         void onUserAccessTokenSaved();
         void onError(String message);
+    }
+
+    public interface OnUserDataReceived {
+        void onUserDataLoaded();
     }
 
     public interface OnHomeDataReceived {
@@ -2481,5 +2530,9 @@ public class ApiManager {
     public interface OnSearchReceived {
         void onDataLoaded();
         void onError();
+    }
+
+    public interface OnConfirmIAP {
+        void onConfirm();
     }
 }

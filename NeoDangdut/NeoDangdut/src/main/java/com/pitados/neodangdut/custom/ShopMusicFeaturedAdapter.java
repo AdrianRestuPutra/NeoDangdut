@@ -17,8 +17,11 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.Popup.PopupLoading;
 import com.pitados.neodangdut.Popup.PopupPurchase;
 import com.pitados.neodangdut.R;
+import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.model.MusicData;
 import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.ConnManager;
+import com.pitados.neodangdut.util.DataPool;
 import com.pitados.neodangdut.util.FontLoader;
 
 import java.util.List;
@@ -79,10 +82,31 @@ public class ShopMusicFeaturedAdapter extends BaseAdapter {
         return i;
     }
 
+    private boolean isInLibrary(String ID) {
+        for(LibraryData data : DataPool.getInstance().listLibraryMusic) {
+            if(ID.equalsIgnoreCase(data.ID))
+                return true;
+        }
+
+        return false;
+    }
+
+    private LibraryData getLibraryItem(String songID) {
+        Log.d("LIBRARY SIZE", DataPool.getInstance().listLibraryMusic.size()+"");
+        for(int i = 0; i < DataPool.getInstance().listLibraryMusic.size(); i++) {
+            LibraryData data = DataPool.getInstance().listLibraryMusic.get(i);
+            Log.d("COMPARE", data.ID + " | "+songID);
+            if(data.ID.equalsIgnoreCase(songID))
+                return data;
+        }
+
+        return null;
+    }
+
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        ViewHolder holder;
+        final ViewHolder holder;
         if(view == null) {
             view = inflater.inflate(R.layout.featured_shop_music, null); // TODO change to shop top track
 
@@ -117,30 +141,66 @@ public class ShopMusicFeaturedAdapter extends BaseAdapter {
         holder.price.setText("Rp " + listData.get(i).price);
 
         final int index = i;
+        listData.get(index).inLibrary = false;
+        listData.get(index).purchased = false;
+
+        if(isInLibrary(listData.get(index).ID)) {
+            if(ConnManager.getInstance().fileExist(ConnManager.DataType.AUDIO, listData.get(index).albumName, listData.get(index).songTitle)) {
+                Log.d("SONG", "IN LIBRARY");
+                holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
+                holder.price.setText("");
+                listData.get(index).inLibrary = true;
+            } else {
+                Log.d("SONG", "DOWNLOAD");
+                holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_blank);
+                holder.price.setText("Download");
+                holder.price.setTextColor(context.getResources().getColor(R.color.white_font));
+                listData.get(index).purchased = true;
+            }
+
+        } else {
+            holder.buyButton.setBackgroundResource(R.drawable.btn_price_artist_song);
+            holder.price.setText("Rp " + listData.get(i).price);
+        }
+
         holder.buyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("FEATURED", index+"");
 
-                ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
+                if(listData.get(index).inLibrary) {
+                    // DO NOTHING
+                } else if(listData.get(index).purchased) {
+                    // Download
+                    LibraryData temp = getLibraryItem(listData.get(index).ID);
+                    if(temp != null) {
+                        Log.d("DOWNLOAD", temp.fileURL);
+                        ConnManager.getInstance().downloadFile(temp.fileURL, ConnManager.DataType.AUDIO, listData.get(index).albumName, listData.get(index).songTitle);
 
-                    @Override
-                    public void onItemPurchased(String result) {
-                        Log.d("Result", result);
+                        holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
+                        holder.price.setText("");
+                        listData.get(index).inLibrary = true;
+                    } else
+                        Log.d("DOWNLOAD", "null");
+                }else {
+                    ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
 
-                        popupLoading.closePopupLoading();
-                        // TODO notif user
-                    }
+                        @Override
+                        public void onItemPurchased(String result) {
+                            Log.d("Result", result);
 
-                    @Override
-                    public void onError(String message) {
-                        // TODO show popup
-                        popupLoading.setMessage("Purchase Failed");
-                    }
-                });
+                            popupLoading.closePopupLoading();
+                            // TODO notif user
+                        }
 
-                popupPurchase.showPopupPurchase(listData.get(index));
+                        @Override
+                        public void onError(String message) {
+                            // TODO show popup
+                            popupLoading.setMessage("Purchase Failed");
+                        }
+                    });
 
+                    popupPurchase.showPopupPurchase(listData.get(index));
+                }
             }
         });
 

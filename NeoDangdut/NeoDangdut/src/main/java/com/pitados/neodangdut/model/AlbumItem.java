@@ -15,6 +15,11 @@ public class AlbumItem {
     public String duration;
     public String previewURL;
 
+    public String albumName;
+
+    public boolean purchased;
+    public boolean inLibrary;
+
     public AlbumItem(String category, String ID, String trackNum, String albumName, String price, String discount, String singerID, String singerName,
                      String duration , String previewURL) {
         this.category = category;

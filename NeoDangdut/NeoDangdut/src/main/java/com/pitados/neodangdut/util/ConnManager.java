@@ -3,9 +3,10 @@ package com.pitados.neodangdut.util;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.net.Uri;
-import android.os.Environment;
+import android.util.Log;
 
 import com.pitados.neodangdut.Consts;
+import com.pitados.neodangdut.model.SettingPref;
 
 import java.io.File;
 
@@ -21,8 +22,11 @@ public class ConnManager {
     private Context context;
     private static ConnManager instance;
 
+    private SettingPref settingData;
+
     public void init(Context context) {
         this.context = context;
+        settingData = new SettingPref(context);
     }
 
     public static ConnManager getInstance() {
@@ -35,10 +39,14 @@ public class ConnManager {
         DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
 
         DownloadManager.Request downloadRequest = new DownloadManager.Request(Uri.parse(url));
-        downloadRequest.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+        if(settingData.getDowloadWifiOnlyState()) {
+            downloadRequest.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
+        } else {
+            downloadRequest.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+        }
+
         downloadRequest.setTitle(Consts.NOTIF_DOWNLOAD_TITLE);
         downloadRequest.setDescription(Consts.NOTIF_DOWNLOAD_DESCRIPTION);
-        String savePath = Environment.getExternalStorageDirectory().getAbsolutePath();
         String filePath = "";
         if(type == DataType.AUDIO) {
             // TODO savePath audio
@@ -57,6 +65,9 @@ public class ConnManager {
         // TODO add download item to download list
 
         downloadRequest.setDestinationInExternalPublicDir(Consts.APP_BASE_DIR, filePath);
+        if(settingData.getNotifState() == true)
+            downloadRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+
         dm.enqueue(downloadRequest);
     }
 
@@ -64,17 +75,21 @@ public class ConnManager {
         String path = "";
 
         if(type == DataType.AUDIO) {
-            path = Consts.APP_BASE_DIR+"/Music/"+album+"/"+song+".mp3";
+            path = "/sdcard/"+Consts.APP_BASE_DIR+"/Music/"+album+"/"+song+".mp3";
             File file = new File(path);
 
-            if(file.exists())
-                return  true;
+            Log.d("PATH", path + " | " +file.getAbsolutePath());
+            if(file.exists()) {
+                Log.d("PATH", "File Exists");
+                return true;
+            }
         } else {
-            path = Consts.APP_BASE_DIR+"/Video/"+song+".mp4";
+            path = "/sdcard/"+Consts.APP_BASE_DIR+"/Video/"+song+".mp4";
             File file = new File(path);
 
+            Log.d("PATH", path);
             if(file.exists())
-                return  true;
+                return true;
         }
 
         return false;

@@ -43,6 +43,8 @@ public class Consts {
     public static String URL_UNLIKE = URL_GET_TOKEN+"/me/unlike/";
     public static String URL_PURCHASE = URL_GET_TOKEN+"/me/purchase";
 
+    public static String URL_CONFIRM = URL_GET_TOKEN+"/IAP/android";
+
     // TAG TOKEN
     public static String TAG_TOKEN = "access_token";
     public static String TAG_TOKEN_TYPE = "token_type";

@@ -1,6 +1,10 @@
 package com.pitados.neodangdut.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -77,15 +81,26 @@ public class FragmentHomeMusic extends Fragment {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-//                ApiManager.getInstance().getUserAccessToken();
-//                ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
-//                    @Override
-//                    public void onUserAccessTokenSaved() {
-//                        ApiManager.getInstance().getCommunityMusic();
-//                    }
-//                });
+                if(isNetworkAvailable()) {
+                    ApiManager.getInstance().getCommunityMusic();
+                } else {
+                    swipeRefresh.setRefreshing(false);
+                    new AlertDialog.Builder(context)
+                            .setTitle("Connection Error")
+                            .setMessage("No Internet Connection")
+                            .setPositiveButton("Retry", new DialogInterface.OnClickListener() {
 
-                ApiManager.getInstance().getCommunityMusic();
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if(isNetworkAvailable())
+                                        ApiManager.getInstance().getCommunityMusic();
+                                }
+
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
+                }
+
             }
         });
 
@@ -128,7 +143,7 @@ public class FragmentHomeMusic extends Fragment {
         ApiManager.getInstance().setOnCommunityMusicListener(new ApiManager.OnCommunityMusicReceived() {
             @Override
             public void onDataLoaded(ApiManager.ApiType type) {
-                if(!isLoadingMore) {
+                if (!isLoadingMore) {
                     listAdapter = new CustomCommunityMusicAdapter(context, DataPool.getInstance().listCommunityMusic, shareDialog);
                     listViewCommunityMusic.setAdapter(listAdapter);
                 }
@@ -137,7 +152,7 @@ public class FragmentHomeMusic extends Fragment {
 
                 listAdapter.notifyDataSetChanged();
 
-                if(swipeRefresh != null)
+                if (swipeRefresh != null)
                     swipeRefresh.setRefreshing(false);
             }
         });
@@ -150,6 +165,13 @@ public class FragmentHomeMusic extends Fragment {
 
             ApiManager.getInstance().getCommunityMusic();
         }
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
 }

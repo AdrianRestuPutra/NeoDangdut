@@ -295,6 +295,7 @@
             android:id="@+id/side_menu_download"
             android:layout_width="match_parent"
             android:layout_height="@dimen/side_menu_item_height"
+            android:visibility="invisible"
             android:orientation="horizontal">
 
             <RelativeLayout
@@ -333,6 +334,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/divider_height"
+            android:visibility="invisible"
             android:background="@color/tab_divider"/>
 
         <!-- App Setting -->

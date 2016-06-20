@@ -20,7 +20,9 @@ import com.pitados.neodangdut.Popup.PopupLoading;
 import com.pitados.neodangdut.Popup.PopupPurchase;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.AlbumData;
+import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.DataPool;
 import com.pitados.neodangdut.util.FontLoader;
 
 import java.util.List;
@@ -84,6 +86,27 @@ public class CustomListShopAlbumAdapter extends BaseAdapter {
         return i;
     }
 
+    private boolean isInLibrary(String ID) {
+        for(LibraryData data : DataPool.getInstance().listLibraryMusic) {
+            if(ID.equalsIgnoreCase(data.ID))
+                return true;
+        }
+
+        return false;
+    }
+
+    private LibraryData getLibraryItem(String songID) {
+        Log.d("LIBRARY SIZE", DataPool.getInstance().listLibraryMusic.size()+"");
+        for(int i = 0; i < DataPool.getInstance().listLibraryMusic.size(); i++) {
+            LibraryData data = DataPool.getInstance().listLibraryMusic.get(i);
+            Log.d("COMPARE", data.ID + " | "+songID);
+            if(data.ID.equalsIgnoreCase(songID))
+                return data;
+        }
+
+        return null;
+    }
+
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -109,6 +132,8 @@ public class CustomListShopAlbumAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) view.getTag();
         }
+
+
 
         // TODO set data using holder.wiget
         imageLoader.displayImage(listTopAlbum.get(i).coverURL, holder.thumbnail, opts);

@@ -73,7 +73,6 @@ public class FragmentShopVideoTopVideos extends Fragment {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                ApiManager.getInstance().getUserAccessToken();
                 ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
                     @Override
                     public void onUserAccessTokenSaved() {
@@ -86,6 +85,8 @@ public class FragmentShopVideoTopVideos extends Fragment {
 
                     }
                 });
+                ApiManager.getInstance().getUserAccessToken();
+
 
             }
         });

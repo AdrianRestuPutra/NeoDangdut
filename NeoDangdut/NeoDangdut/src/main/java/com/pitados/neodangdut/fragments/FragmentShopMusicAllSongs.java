@@ -71,7 +71,6 @@ public class FragmentShopMusicAllSongs extends Fragment {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                ApiManager.getInstance().getUserAccessToken();
                 ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
 
                     @Override
@@ -87,6 +86,8 @@ public class FragmentShopMusicAllSongs extends Fragment {
 
                     }
                 });
+                ApiManager.getInstance().getUserAccessToken();
+
             }
         });
 

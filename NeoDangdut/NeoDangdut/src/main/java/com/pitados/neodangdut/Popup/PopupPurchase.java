@@ -197,7 +197,6 @@ public class PopupPurchase extends Dialog implements View.OnClickListener{
     @Override
     public void onClick(View view) {
         if(view == buttonBuy) {
-            ApiManager.getInstance().getUserAccessToken();
             ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
 
                 @Override
@@ -214,6 +213,8 @@ public class PopupPurchase extends Dialog implements View.OnClickListener{
 
                 }
             });
+
+            ApiManager.getInstance().getUserAccessToken();
 
             closePopupPurchase();
         }

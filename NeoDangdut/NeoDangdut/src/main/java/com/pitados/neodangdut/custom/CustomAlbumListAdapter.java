@@ -19,7 +19,10 @@ import com.pitados.neodangdut.Popup.PopupArtistSong;
 import com.pitados.neodangdut.Popup.PopupPurchase;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.AlbumItem;
+import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.ConnManager;
+import com.pitados.neodangdut.util.DataPool;
 import com.pitados.neodangdut.util.FontLoader;
 
 import java.util.List;
@@ -84,14 +87,26 @@ public class CustomAlbumListAdapter extends BaseAdapter {
         return i;
     }
 
-//    private boolean isInLibrary(String ID) {
-//        for(LibraryData data : DataPool.getInstance().listLibraryMusic) {
-//            if(ID.equalsIgnoreCase(data.ID))
-//                return true;
-//        }
-//
-//        return false;
-//    }
+    private boolean isInLibrary(String ID) {
+        for(LibraryData data : DataPool.getInstance().listLibraryMusic) {
+            if(ID.equalsIgnoreCase(data.ID))
+                return true;
+        }
+
+        return false;
+    }
+
+    private LibraryData getLibraryItem(String songID) {
+        Log.d("LIBRARY SIZE", DataPool.getInstance().listLibraryMusic.size()+"");
+        for(int i = 0; i < DataPool.getInstance().listLibraryMusic.size(); i++) {
+            LibraryData data = DataPool.getInstance().listLibraryMusic.get(i);
+            Log.d("COMPARE", data.ID + " | "+songID);
+            if(data.ID.equalsIgnoreCase(songID))
+                return data;
+        }
+
+        return null;
+    }
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
@@ -125,28 +140,58 @@ public class CustomAlbumListAdapter extends BaseAdapter {
         holder.artistName.setText(listTrack.get(i).singerName);
 
         final int index = i;
+        listTrack.get(index).inLibrary = false;
+        listTrack.get(index).purchased = false;
 
-//        if(isInLibrary(listTrack.get(index).ID)) {
-//            listTrack.get(index).inLibrary = true;
-//            holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
-//            holder.price.setText("");
-//        } else {
-//            listTrack.get(index).inLibrary = false;
+        if(isInLibrary(listTrack.get(index).ID)) {
+            if(ConnManager.getInstance().fileExist(ConnManager.DataType.AUDIO, listTrack.get(index).albumName, listTrack.get(index).songName)) {
+                Log.d("SONG", "IN LIBRARY");
+                holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
+                holder.price.setText("");
+                listTrack.get(index).inLibrary = true;
+            } else {
+                Log.d("SONG", "DOWNLOAD");
+                holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_blank);
+                holder.price.setText("Download");
+                holder.price.setTextColor(context.getResources().getColor(R.color.white_font));
+                listTrack.get(index).purchased = true;
+            }
+
+        } else {
             holder.buyButton.setBackgroundResource(R.drawable.btn_price_artist_song);
             holder.price.setText("Rp " + listTrack.get(i).price);
+        }
 
-            holder.buyButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
+        holder.buyButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(listTrack.get(index).inLibrary) {
+                    // DO NOTHING
+                } else if(listTrack.get(index).purchased) {
+                    // Download
+                    LibraryData temp = getLibraryItem(listTrack.get(index).ID);
+                    if(temp != null) {
+                        Log.d("DOWNLOAD", temp.fileURL);
+                        ConnManager.getInstance().downloadFile(temp.fileURL, ConnManager.DataType.AUDIO, listTrack.get(index).albumName, listTrack.get(index).songName);
+
+                        holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
+                        holder.price.setText("");
+                        listTrack.get(index).inLibrary = true;
+                    } else
+                        Log.d("DOWNLOAD", "null");
+                } else {
+
                     ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
 
                         @Override
                         public void onItemPurchased(String result) {
                             Log.d("Result", result);
 
-//                                    listTrack.get(index).inLibrary = true;
+                            holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_blank);
+                            holder.price.setText("Download");
+                            holder.price.setTextColor(context.getResources().getColor(R.color.white_font));
+                            listTrack.get(index).inLibrary = true;
                             holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
-                            // TODO notif user
                         }
 
                         @Override
@@ -157,10 +202,10 @@ public class CustomAlbumListAdapter extends BaseAdapter {
                     });
 
                     popupPurchase.showPopupPurchase(listTrack.get(index));
-
                 }
-            });
-//        }
+
+            }
+        });
 
         holder.optButton.setOnClickListener(new OnClickListener() {
             @Override

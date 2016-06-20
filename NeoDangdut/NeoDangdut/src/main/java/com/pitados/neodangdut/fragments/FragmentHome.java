@@ -1,6 +1,10 @@
 package com.pitados.neodangdut.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -47,7 +51,6 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
 
     private SwipeRefreshLayout swipeRefresh;
 
-
     public static FragmentHome newInstance(int page, String title) {
         FragmentHome home = new FragmentHome();
         Bundle args = new Bundle();
@@ -77,6 +80,7 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
 
         View view = inflater.inflate(R.layout.layout_fragment_home, container, false);
 
+
         // TODO init widgets
         homeBanner = (SliderLayout) view.findViewById(R.id.home_slider);
         homeBannerIndicator = (PagerIndicator) view.findViewById(R.id.home_slider_indicator);
@@ -95,24 +99,48 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                homeBanner.removeAllSliders();
 
-                ApiManager.getInstance().getUserAccessToken();
-                ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
+                if(isNetworkAvailable()) {
+                    homeBanner.removeAllSliders();
 
-                    @Override
-                    public void onUserAccessTokenSaved() {
-                        ApiManager.getInstance().getHomeBanner();
-                        ApiManager.getInstance().getHomeTopMusic();
-                        ApiManager.getInstance().getHomeTopVideos();
-                        ApiManager.getInstance().getHomeLatestNews();
-                    }
+                    ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
 
-                    @Override
-                    public void onError(String message) {
+                        @Override
+                        public void onUserAccessTokenSaved() {
+                            ApiManager.getInstance().getHomeBanner();
+                            ApiManager.getInstance().getHomeTopMusic();
+                            ApiManager.getInstance().getHomeTopVideos();
+                            ApiManager.getInstance().getHomeLatestNews();
+                        }
 
-                    }
-                });
+                        @Override
+                        public void onError(String message) {
+
+                        }
+                    });
+                    ApiManager.getInstance().getUserAccessToken();
+
+                } else {
+                    swipeRefresh.setRefreshing(false);
+                    new AlertDialog.Builder(context)
+                            .setTitle("Connection Error")
+                            .setMessage("No Internet Connection")
+                            .setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if(isNetworkAvailable()) {
+                                        ApiManager.getInstance().getHomeBanner();
+                                        ApiManager.getInstance().getHomeTopMusic();
+                                        ApiManager.getInstance().getHomeTopVideos();
+                                        ApiManager.getInstance().getHomeLatestNews();
+                                    }
+                                }
+
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
+                }
             }
         });
 
@@ -241,5 +269,12 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
         myListView.setLayoutParams(params);
         // print height of adapter on log
         Log.i("height of listItem:", String.valueOf(totalHeight));
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

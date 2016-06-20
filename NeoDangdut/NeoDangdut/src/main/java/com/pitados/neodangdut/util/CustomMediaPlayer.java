@@ -39,6 +39,7 @@ import com.pitados.neodangdut.model.VideoData;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -163,10 +164,14 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
         if(audioPlayer.isPlaying())
             audioPlayer.stopPlayback();
-        if(isPreview) {
-            audioPlayer.setDataSource(context, Uri.parse(data.previewURL));
+        if(ConnManager.getInstance().fileExist(ConnManager.DataType.AUDIO, data.albumName, data.songTitle)) {
+            Log.d("MEDIA", "Local");
+            String path = "/sdcard/"+Consts.APP_BASE_DIR+"/Music/"+data.albumName+"/"+data.songTitle+".mp3";
+
+            audioPlayer.setDataSource(context, Uri.parse(new File(path).toString()));
         } else {
-            // TODO
+            Log.d("MEDIA", "URL");
+            audioPlayer.setDataSource(context, Uri.parse(data.previewURL));
         }
         audioPlayer.prepareAsync();
         audioPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -321,7 +326,15 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         if(audioPlayer.isPlaying())
             audioPlayer.stopPlayback();
 
-        audioPlayer.setDataSource(context, Uri.parse(data.previewURL));
+        if(ConnManager.getInstance().fileExist(ConnManager.DataType.AUDIO, data.albumName, data.songName)) {
+            Log.d("MEDIA", "Local");
+            String path = "/sdcard/"+Consts.APP_BASE_DIR+"/Music/"+data.albumName+"/"+data.songName+".mp3";
+
+            audioPlayer.setDataSource(context, Uri.parse(new File(path).toString()));
+        } else {
+            Log.d("MEDIA", "URL");
+            audioPlayer.setDataSource(context, Uri.parse(data.previewURL));
+        }
         audioPlayer.prepareAsync();
         audioPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -401,7 +414,15 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 audioPlayer.stopPlayback();
 
             // TODO from local
-            audioPlayer.setDataSource(context, Uri.parse(data.fileURL));
+            if(ConnManager.getInstance().fileExist(ConnManager.DataType.AUDIO, data.albumName, data.songTitle)) {
+                Log.d("MEDIA", "Local");
+                String path = "/sdcard/"+Consts.APP_BASE_DIR+"/Music/"+data.albumName+"/"+data.songTitle+".mp3";
+
+                audioPlayer.setDataSource(context, Uri.parse(new File(path).toString()));
+            } else {
+                Log.d("MEDIA", "URL");
+                audioPlayer.setDataSource(context, Uri.parse(data.fileURL));
+            }
             audioPlayer.prepareAsync();
             audioPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
@@ -464,7 +485,15 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
             // Video
             showVideoPlayer();
-            videoPlayer.setVideoURI(Uri.parse(data.fileURL)); // TODO change url
+            if(ConnManager.getInstance().fileExist(ConnManager.DataType.VIDEO, "", data.songTitle)) {
+                Log.d("MEDIA", "Local");
+                String path = "/sdcard/"+Consts.APP_BASE_DIR+"/Video/"+data.songTitle+".mp4";
+
+                videoPlayer.setVideoPath(path);
+            } else {
+                Log.d("MEDIA", "URL");
+                videoPlayer.setVideoURI(Uri.parse(data.fileURL));
+            }
             videoPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mediaPlayer) {
@@ -529,7 +558,15 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         }
 
         showVideoPlayer();
-        videoPlayer.setVideoURI(Uri.parse(videoData.previewURL)); // TODO change url
+        if(ConnManager.getInstance().fileExist(ConnManager.DataType.VIDEO, "", videoData.videoTitle)) {
+            Log.d("MEDIA", "Local");
+            String path = "/sdcard/"+Consts.APP_BASE_DIR+"/Video/"+videoData.videoTitle+".mp4";
+
+            videoPlayer.setVideoPath(path);
+        } else {
+            Log.d("MEDIA", "URL");
+            videoPlayer.setVideoURI(Uri.parse(videoData.previewURL));
+        }
         videoPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
