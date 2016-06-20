@@ -150,8 +150,6 @@ public class FragmentHomeMusic extends Fragment {
 
             ApiManager.getInstance().getCommunityMusic();
         }
-
-
     }
 
 }

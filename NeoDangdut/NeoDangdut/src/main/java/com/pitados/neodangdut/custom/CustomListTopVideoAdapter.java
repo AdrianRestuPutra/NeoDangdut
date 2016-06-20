@@ -17,6 +17,7 @@ import com.pitados.neodangdut.Popup.PopupArtistVideo;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.VideoData;
 import com.pitados.neodangdut.util.DataPool;
+import com.pitados.neodangdut.util.FontLoader;
 
 import java.util.List;
 
@@ -84,6 +85,12 @@ public class CustomListTopVideoAdapter extends BaseAdapter {
             holder.thumbnail = (ImageView) view.findViewById(R.id.list_view_top_video_thumbnail);
             holder.videoTitle = (TextView) view.findViewById(R.id.list_view_top_video_title);
             holder.artistName = (TextView) view.findViewById(R.id.list_view_top_video_artist);
+
+            holder.videoTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+            holder.artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+
+            holder.videoTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+            holder.artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
 
             // TODO init all id
             final int index = i;

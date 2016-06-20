@@ -84,10 +84,11 @@ public class FragmentHomeVideo extends Fragment {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                ApiManager.getInstance().getToken();
-                ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
+                ApiManager.getInstance().getUserAccessToken();
+                ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
+
                     @Override
-                    public void onTokenSaved() {
+                    public void onUserAccessTokenSaved() {
                         ApiManager.getInstance().getCommunityVideo();
                     }
 

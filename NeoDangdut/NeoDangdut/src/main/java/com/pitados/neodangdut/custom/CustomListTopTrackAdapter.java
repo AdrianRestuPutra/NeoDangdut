@@ -16,6 +16,7 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.Popup.PopupArtistSong;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.MusicData;
+import com.pitados.neodangdut.util.FontLoader;
 
 import java.util.List;
 
@@ -87,6 +88,9 @@ public class CustomListTopTrackAdapter extends BaseAdapter {
             holder.musicTitle = (TextView) view.findViewById(R.id.list_view_top_track_title);
             holder.artistName = (TextView) view.findViewById(R.id.list_view_top_track_artist);
 
+            holder.musicTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+            holder.artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+
             final int index = i;
             holder.optButton = (ImageView) view.findViewById(R.id.list_view_top_track_opt_button);
             holder.optButton.setOnClickListener(new OnClickListener() {
@@ -95,6 +99,9 @@ public class CustomListTopTrackAdapter extends BaseAdapter {
                     popupArtisSong.showPopupArtistSong(listTopTrack.get(index));
                 }
             });
+
+            holder.musicTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+            holder.artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
 
             view.setTag(holder);
         } else {
@@ -105,6 +112,8 @@ public class CustomListTopTrackAdapter extends BaseAdapter {
         imageLoader.displayImage(listTopTrack.get(i).albumCover, holder.thumbnail, opts);
         holder.musicTitle.setText(listTopTrack.get(i).songTitle);
         holder.artistName.setText(listTopTrack.get(i).singerName);
+
+
         return view;
     }
 }

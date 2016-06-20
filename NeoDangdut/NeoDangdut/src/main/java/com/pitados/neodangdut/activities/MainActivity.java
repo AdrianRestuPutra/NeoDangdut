@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -53,6 +54,8 @@ import com.pitados.neodangdut.fragments.FragmentHomeNews;
 import com.pitados.neodangdut.fragments.FragmentHomeVideo;
 import com.pitados.neodangdut.fragments.FragmentLibraryMusic;
 import com.pitados.neodangdut.fragments.FragmentLibraryVideo;
+import com.pitados.neodangdut.fragments.FragmentSearchCommunity;
+import com.pitados.neodangdut.fragments.FragmentSearchShop;
 import com.pitados.neodangdut.fragments.FragmentShopMusicAllSongs;
 import com.pitados.neodangdut.fragments.FragmentShopMusicNewSongs;
 import com.pitados.neodangdut.fragments.FragmentShopMusicTopAlbums;
@@ -60,6 +63,8 @@ import com.pitados.neodangdut.fragments.FragmentShopMusicTopSongs;
 import com.pitados.neodangdut.fragments.FragmentShopVideoAllVideos;
 import com.pitados.neodangdut.fragments.FragmentShopVideoNewVideos;
 import com.pitados.neodangdut.fragments.FragmentShopVideoTopVideos;
+import com.pitados.neodangdut.fragments.FragmentUploadedMusic;
+import com.pitados.neodangdut.fragments.FragmentUploadedVideo;
 import com.pitados.neodangdut.model.FragmentModel;
 import com.pitados.neodangdut.model.SettingPref;
 import com.pitados.neodangdut.model.UserLoginData;
@@ -68,6 +73,7 @@ import com.pitados.neodangdut.util.ApiManager;
 import com.pitados.neodangdut.util.ConnManager;
 import com.pitados.neodangdut.util.CustomMediaPlayer;
 import com.pitados.neodangdut.util.DataPool;
+import com.pitados.neodangdut.util.FontLoader;
 import com.pitados.neodangdut.util.StateManager;
 
 import java.io.File;
@@ -89,7 +95,9 @@ public class MainActivity extends AppCompatActivity
         PANEL_SHOP_VIDEO,
         PANEL_DOWNLOAD,
         PANEL_SETTING,
-        PANEL_PROFILE
+        PANEL_PROFILE,
+        PANEL_TOPUP,
+        PANEL_SEARCH
     }
     private PanelState panelState;
 
@@ -99,7 +107,7 @@ public class MainActivity extends AppCompatActivity
     private FloatingActionsMenu fabMenu;
     private com.getbase.floatingactionbutton.FloatingActionButton fabMusic, fabVideo;
     // Panel
-    private RelativeLayout panelNewPost, panelLibrary, panelShopMusic, panelShopVideo, panelDownloads, panelSettings, panelUpload, panelProfile;
+    private RelativeLayout panelNewPost, panelLibrary, panelShopMusic, panelShopVideo, panelDownloads, panelSettings, panelUpload, panelProfile, panelTopup, panelSearch;
     // Media Panel
     private LinearLayout panelMusicPlayer;
     private RelativeLayout musicPlayerPauseButton, musicPlayerShuffleButton, musicPlayerLoopbutton;
@@ -134,20 +142,31 @@ public class MainActivity extends AppCompatActivity
     private File tempFile;
     private boolean isUploadMusic;
 
+    // TOPUP
+    private RelativeLayout topupButton3k, topupButton5k, topupButton10k, topupButton20k, topupButton50k;
+
     // Profile
     private ImageView profilePicture;
     private EditText profileName, profileCountry, profileCity;
     private ImageView profileEdit, editName, editCountry, editCity;
     private TextView profileLikeCount, profileMusicCount, profileVideoCount, profileDescription;
-    // TODO content
 
     private boolean notifIsOn, downloadWIFIOnlyOn;
     private boolean canEditProfile;
 
+    // SEARCH
+    private EditText searchInput;
+    private RelativeLayout searchPanelButton;
+    private String searchKey;
+
     // Fragments
-    private ViewPager viewPagerNewPost, viewPagerLibrary, viewPagerShopMusic, viewPagerShopVideo;
-    private TabLayout slidingTabNewPost, slidingTabLibrary, slidingTabShopMusic, slidingTabShopVideo;
-    private CustomPagerAdapter pagerAdapterHome, pagerAdapterLibrary, pagerAdapterShopMusic, pagerAdapterShopVideo;
+    private ViewPager viewPagerNewPost, viewPagerLibrary, viewPagerShopMusic, viewPagerShopVideo, viewPagerSearch;
+    private TabLayout slidingTabNewPost, slidingTabLibrary, slidingTabShopMusic, slidingTabShopVideo, slidingTabSearch;
+    private CustomPagerAdapter pagerAdapterHome, pagerAdapterLibrary, pagerAdapterShopMusic, pagerAdapterShopVideo, pagerAdapterSearch;
+    // Upload
+    private ViewPager viewPagerUploaded;
+    private TabLayout slidingTabUploaded;
+    private CustomPagerAdapter pagerAdapterUploaded;
 
     // In App Purchase
     private String storeKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApFO+8ygQlDoMB1bp7EtAYHjVpvAc2T+x054MAQCimjwT4yZD0QVW7GpYXVgELhEZtLDWpiREPYgIe6UX8ZxHwaU50sYy7Q8GtIx2zRR2ZMSW0TGhGZCYsdTuVpTUDBPnZ21lxXRCkDYyEAbZ2NhoOma6QoVcjdMkbGh8K0NHksBFjg6ngFxtTFJ8N7RNFKgGtcUKPJdQSbI1rXjHLAoae4GhSiffi/vkZp60yFEjCqsbN6lF1hdGvgOiC+kd3wLIApR+UWAYE46jMS4giP+5kt6vwV3wXR1aWXmpQIehq8p3sS99/2Qv7R1kYKRHT0uPHZTKSXnDhfs8aWTSt4QntwIDAQAB";
@@ -167,6 +186,11 @@ public class MainActivity extends AppCompatActivity
     private PopupLoading popupLoading;
     private PopupArtistSong popupArtistSong;
     private PopupCommunity popupCommunitySong;
+    // EXIT
+
+    // MENU
+    private TextView actionBarTitle;
+    private MenuItem searchButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,6 +224,8 @@ public class MainActivity extends AppCompatActivity
         panelDownloads = (RelativeLayout) findViewById(R.id.panel_downloads);
         panelSettings = (RelativeLayout) findViewById(R.id.panel_settings);
         panelProfile = (RelativeLayout) findViewById(R.id.panel_profile);
+        panelTopup = (RelativeLayout) findViewById(R.id.panel_topup);
+        panelSearch = (RelativeLayout) findViewById(R.id.panel_search);
 
         popupLoading = new PopupLoading(MainActivity.this, R.style.custom_dialog);
 
@@ -215,9 +241,11 @@ public class MainActivity extends AppCompatActivity
         // TODO init download
         initPanelSetting();
         initUploadForm();
-        // TODO init profile
         initPanelProfile();
         initPanelUpload();
+        initPanelTopup();
+        initPanelSearch();
+
 
         // init state
         panelState = PanelState.PANEL_NEW_POST;
@@ -268,50 +296,49 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        // Load All data
-        ApiManager.getInstance().getToken();
-        if(userLoginData.getLoginWithFB() == true)
-            ApiManager.getInstance().getUserAccessTokenWithFB();
-        else
-            ApiManager.getInstance().getUserAccessToken();
-        ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
-            @Override
-            public void onTokenSaved() {
-                ApiManager.getInstance().getHomeBanner();
-                ApiManager.getInstance().getHomeTopMusic();
-                ApiManager.getInstance().getHomeTopVideos();
-                ApiManager.getInstance().getHomeLatestNews();
-                // SHOP MUSIC
-                ApiManager.getInstance().getShopMusicTopSongs();
-                ApiManager.getInstance().getFeaturedShopMusic();
-                ApiManager.getInstance().getShopMusicTopAlbums();
-                ApiManager.getInstance().getShopMusicNewSongs();
-                ApiManager.getInstance().getShopMusicAllSongs();
-                // SHOP VIDEO
-                ApiManager.getInstance().getShopVideoTopVideos();
-                ApiManager.getInstance().getFeaturedShopVideo();
-                ApiManager.getInstance().getShopVideoNewVideos();
-                ApiManager.getInstance().getShopVideoAllVideos();
-            }
-
-            @Override
-            public void onError(String message) {
-
-            }
-        });
+        // Action Bar
+        getSupportActionBar().setTitle("Neo Dangdut");
 
         ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
             @Override
             public void onUserAccessTokenSaved() {
-                setSideMenuData();
+                if(panelState != PanelState.PANEL_SEARCH) {
+                    setSideMenuData();
 
-                // Community
-                ApiManager.getInstance().getCommunityMusic();
-                ApiManager.getInstance().getCommunityVideo();
-                ApiManager.getInstance().getAllNews();
+                    ApiManager.getInstance().getHomeBanner();
+                    ApiManager.getInstance().getHomeTopMusic();
+                    ApiManager.getInstance().getHomeTopVideos();
+                    ApiManager.getInstance().getHomeLatestNews();
+                    // SHOP MUSIC
+                    ApiManager.getInstance().getShopMusicTopSongs();
+                    ApiManager.getInstance().getFeaturedShopMusic();
+                    ApiManager.getInstance().getShopMusicTopAlbums();
+                    ApiManager.getInstance().getShopMusicNewSongs();
+                    ApiManager.getInstance().getShopMusicAllSongs();
+                    // SHOP VIDEO
+                    ApiManager.getInstance().getShopVideoTopVideos();
+                    ApiManager.getInstance().getFeaturedShopVideo();
+                    ApiManager.getInstance().getShopVideoNewVideos();
+                    ApiManager.getInstance().getShopVideoAllVideos();
 
-                ApiManager.getInstance().getLibraryMusic();
-                ApiManager.getInstance().getLibraryVideo();
+                    // Community
+                    ApiManager.getInstance().getCommunityMusic();
+                    ApiManager.getInstance().getCommunityVideo();
+                    ApiManager.getInstance().getAllNews();
+
+                    ApiManager.getInstance().getLibraryMusic();
+                    ApiManager.getInstance().getLibraryVideo();
+
+                    ApiManager.getInstance().getUploadedMusic();
+                    ApiManager.getInstance().getUploadedVideo();
+                } else {
+                    // Search
+                    ApiManager.getInstance().getSearchShopMusic(searchKey);
+                    ApiManager.getInstance().getSearchShopVideos(searchKey);
+                    ApiManager.getInstance().getSearchShopMusicAlbums(searchKey);
+                    ApiManager.getInstance().getSearchCommunityMusic(searchKey);
+                    ApiManager.getInstance().getSearchCommunityVideo(searchKey);
+                }
             }
 
             @Override
@@ -320,10 +347,12 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        ApiManager.getInstance().getUserAccessToken();
     }
 
     private void initIAB() {
         billingProc = new BillingProcessor(this, storeKey, this);
+        ApiManager.getInstance().setBillingProc(MainActivity.this, billingProc);
 
         boolean isAvailable = BillingProcessor.isIabServiceAvailable(this);
         if(isAvailable)
@@ -355,6 +384,9 @@ public class MainActivity extends AppCompatActivity
         musicPlayerTitle = (TextView) findViewById(R.id.music_player_title);
         musicPlayerArtistName = (TextView) findViewById(R.id.music_player_artist);
 
+        musicPlayerTitle.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_REGULAR));
+        musicPlayerArtistName.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_LIGHT));
+
         musicPlayerPauseIcon = (ImageView) findViewById(R.id.music_player_pause_icon);
         musicPlayerPauseButton = (RelativeLayout) findViewById(R.id.music_player_pause);
         musicPlayerOptButton = (ImageView) findViewById(R.id.music_player_opt_button);
@@ -384,6 +416,8 @@ public class MainActivity extends AppCompatActivity
         musicPlayerLoopbutton = (RelativeLayout) findViewById(R.id.music_player_loop);
         musicPlayerDuration = (TextView) findViewById(R.id.music_player_duration);
 
+        musicPlayerDuration.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_LIGHT));
+
         panelVideoPlayer = (RelativeLayout) findViewById(R.id.video_player_panel);
         panelVideoPlayer.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -408,16 +442,18 @@ public class MainActivity extends AppCompatActivity
         videoDate = (TextView) findViewById(R.id.video_player_detail_date);
         videoDescription = (TextView) findViewById(R.id.video_player_detail_description);
 
+        videoDate.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_LIGHT));
+        videoDescription.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_REGULAR));
 
         videoPlayerFullscreenButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 CustomMediaPlayer.getInstance().pauseVideoPlayer();
                 String url = CustomMediaPlayer.getInstance().getVideoPlayerURL();
-                int currentPos = (int)CustomMediaPlayer.getInstance().getCurrentPos();
+                int currentPos = (int) CustomMediaPlayer.getInstance().getCurrentPos();
 
                 Intent intent = new Intent(MainActivity.this, FullscreenVideoPlayer.class);
-                intent.putExtra("VideoURI",url);
+                intent.putExtra("VideoURI", url);
                 intent.putExtra("CurrentPosition", currentPos);
 
                 startActivity(intent);
@@ -431,6 +467,10 @@ public class MainActivity extends AppCompatActivity
         newsDetailDate = (TextView) findViewById(R.id.news_detail_date);
         newsDetailDescription = (TextView) findViewById(R.id.news_detail_description);
         loadingBar = (RelativeLayout) findViewById(R.id.news_detail_loading);
+
+        newsDetailTitle.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_REGULAR));
+        newsDetailDate.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_LIGHT));
+        newsDetailDescription.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_REGULAR));
 
         CustomMediaPlayer.getInstance().setAudioPanel(this, panelMusicPlayer, musicPlayerProgress, musicPlayerDuration,
                 musicPlayerThumbnail, musicPlayerTitle, musicPlayerArtistName, musicPlayerPauseIcon);
@@ -476,7 +516,7 @@ public class MainActivity extends AppCompatActivity
     private void setSideMenuData() {
         imageLoader.displayImage(userLoginData.getPhotoURL(), sideMenuUserPic, opts);
         sideMenuFullName.setText(userLoginData.getFullname());
-        sideMenuWallet.setText("Rp "+ userLoginData.getCredit());
+        sideMenuWallet.setText("Rp " + userLoginData.getCredit());
     }
 
     private void initPanelNewPost() {
@@ -661,6 +701,19 @@ public class MainActivity extends AppCompatActivity
         profileEdit = (ImageView) findViewById(R.id.profile_preview_edit);
 
         profileEdit.setOnClickListener(this);
+
+        // pool fragment TEST
+        List<FragmentModel> list = new ArrayList<>();
+        list.add(new FragmentModel(0, "Music", FragmentUploadedMusic.newInstance(0, "Music")));
+        list.add(new FragmentModel(1, "Video", FragmentUploadedVideo.newInstance(1, "Video")));
+
+        viewPagerUploaded = (ViewPager) findViewById(R.id.pager_uploaded);
+        pagerAdapterUploaded = new CustomPagerAdapter(getSupportFragmentManager(), list);
+        viewPagerUploaded.setAdapter(pagerAdapterUploaded);
+
+        slidingTabUploaded = (TabLayout) findViewById(R.id.sliding_tab_uploaded);
+        slidingTabUploaded.setupWithViewPager(viewPagerUploaded);
+
     }
 
     private void showPanelProfile() {
@@ -680,6 +733,39 @@ public class MainActivity extends AppCompatActivity
         uploadInputDescription = (EditText) findViewById(R.id.upload_description);
     }
 
+    private void initPanelTopup() {
+        topupButton3k = (RelativeLayout) findViewById(R.id.topup_btn_3k);
+        topupButton5k = (RelativeLayout) findViewById(R.id.topup_btn_5k);
+        topupButton10k = (RelativeLayout) findViewById(R.id.topup_btn_10k);
+        topupButton20k = (RelativeLayout) findViewById(R.id.topup_btn_20k);
+        topupButton50k = (RelativeLayout) findViewById(R.id.topup_btn_50k);
+
+        topupButton3k.setOnClickListener(this);
+        topupButton5k.setOnClickListener(this);
+        topupButton10k.setOnClickListener(this);
+        topupButton20k.setOnClickListener(this);
+        topupButton50k.setOnClickListener(this);
+    }
+
+    private void initPanelSearch() {
+        // pool fragment
+        List<FragmentModel> list = new ArrayList<>();
+        list.add(new FragmentModel(0, "SHOP", FragmentSearchShop.newInstance(0, "Shop")));
+        list.add(new FragmentModel(1, "COMMUNITY", FragmentSearchCommunity.newInstance(1, "Community")));
+
+        viewPagerSearch = (ViewPager) findViewById(R.id.pager_search);
+        pagerAdapterSearch = new CustomPagerAdapter(getSupportFragmentManager(), list);
+        viewPagerSearch.setAdapter(pagerAdapterSearch);
+
+        slidingTabSearch = (TabLayout) findViewById(R.id.sliding_tab_search);
+        slidingTabSearch.setupWithViewPager(viewPagerSearch);
+
+        searchInput = (EditText) findViewById(R.id.search_input);
+        searchPanelButton = (RelativeLayout) findViewById(R.id.search_panel_button);
+
+        searchPanelButton.setOnClickListener(this);
+    }
+
     private void showMusicDetail() {
         if(CustomMediaPlayer.getInstance().trackType() == CustomMediaPlayer.MusicType.SHOP) {
             // SHOP
@@ -687,6 +773,8 @@ public class MainActivity extends AppCompatActivity
         } else if(CustomMediaPlayer.getInstance().trackType() == CustomMediaPlayer.MusicType.COMMUNITY) {
             // COMMUNITY
             popupCommunitySong.showPopupCommunity(CustomMediaPlayer.getInstance().getSelectedCommunityData());
+        } else if(CustomMediaPlayer.getInstance().trackType() == CustomMediaPlayer.MusicType.ALBUM_ITEM) {
+            popupArtistSong.showPopupArtistSong(CustomMediaPlayer.getInstance().getSelectedAlbumItemData(), null);
         } else {
             // LIBRARY
             popupArtistSong.showPopupArtistSong(CustomMediaPlayer.getInstance().getSelectedLibraryData());
@@ -725,6 +813,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(!billingProc.handleActivityResult(requestCode, resultCode, data))
+            super.onActivityResult(requestCode, resultCode, data);
         Log.d("ACTIVITY RESULT", requestCode + " | result : " + resultCode);
         if(requestCode == UPLOAD_FILE_CODE) {
             if(resultCode == RESULT_OK) {
@@ -735,7 +825,7 @@ public class MainActivity extends AppCompatActivity
                 showUploadForm(uri.getPath());
             }
         }
-        super.onActivityResult(requestCode, resultCode, data);
+
     }
 
     private void showUploadForm(String fileName) {
@@ -783,6 +873,14 @@ public class MainActivity extends AppCompatActivity
             case PANEL_PROFILE:
                 Log.d("CURRENT PANEL", "PROFILE");
                 return panelProfile;
+
+            case PANEL_TOPUP:
+                Log.d("CURRENT PANEL", "TOPUP");
+                return panelTopup;
+
+            case PANEL_SEARCH:
+                Log.d("CURRENT PANEL", "SEARCH");
+                return panelSearch;
         }
         return null;
     }
@@ -797,7 +895,8 @@ public class MainActivity extends AppCompatActivity
                 panelState = PanelState.PANEL_NEW_POST;
                 fabMenu.setVisibility(View.VISIBLE);
 
-                // TODO load data
+                getSupportActionBar().setTitle("NEO DANGDUT");
+                searchButton.setVisible(true);
                 break;
 
             case PANEL_LIBRARY:
@@ -805,7 +904,8 @@ public class MainActivity extends AppCompatActivity
                 panelState = PanelState.PANEL_LIBRARY;
                 fabMenu.setVisibility(View.INVISIBLE);
 
-                // TODO load data music
+                getSupportActionBar().setTitle("LIBRARY");
+                searchButton.setVisible(true);
                 break;
 
             case PANEL_SHOP_MUSIC:
@@ -813,6 +913,8 @@ public class MainActivity extends AppCompatActivity
                 panelState = PanelState.PANEL_SHOP_MUSIC;
                 fabMenu.setVisibility(View.INVISIBLE);
 
+                getSupportActionBar().setTitle("SHOP");
+                searchButton.setVisible(true);
                 break;
 
             case PANEL_SHOP_VIDEO:
@@ -820,19 +922,26 @@ public class MainActivity extends AppCompatActivity
                 panelState = PanelState.PANEL_SHOP_VIDEO;
                 fabMenu.setVisibility(View.INVISIBLE);
 
-                // TODO load data
+                getSupportActionBar().setTitle("SHOP");
+                searchButton.setVisible(true);
                 break;
 
             case PANEL_DOWNLOAD:
                 panelDownloads.setVisibility(View.VISIBLE);
                 panelState = PanelState.PANEL_DOWNLOAD;
                 fabMenu.setVisibility(View.INVISIBLE);
+
+                getSupportActionBar().setTitle("DOWNLOADS");
+                searchButton.setVisible(true);
                 break;
 
             case PANEL_SETTING:
                 panelSettings.setVisibility(View.VISIBLE);
                 panelState = PanelState.PANEL_SETTING;
                 fabMenu.setVisibility(View.INVISIBLE);
+
+                getSupportActionBar().setTitle("SETTINGS");
+                searchButton.setVisible(true);
                 break;
 
             case PANEL_PROFILE:
@@ -850,7 +959,27 @@ public class MainActivity extends AppCompatActivity
                 editCity.setVisibility(View.INVISIBLE);
 
                 showPanelProfile();
+
+                getSupportActionBar().setTitle("MY PROFILE");
+                searchButton.setVisible(true);
                 break;
+
+            case PANEL_TOPUP:
+                panelTopup.setVisibility(View.VISIBLE);
+                panelState = PanelState.PANEL_TOPUP;
+                fabMenu.setVisibility(View.INVISIBLE);
+
+                getSupportActionBar().setTitle("TOPUP");
+                searchButton.setVisible(true);
+                break;
+
+            case PANEL_SEARCH:
+                panelSearch.setVisibility(View.VISIBLE);
+                panelState = PanelState.PANEL_SEARCH;
+                fabMenu.setVisibility(View.INVISIBLE);
+
+                getSupportActionBar().setTitle("SEARCH");
+                searchButton.setVisible(true);
         }
     }
 
@@ -910,9 +1039,9 @@ public class MainActivity extends AppCompatActivity
         if(CustomMediaPlayer.getInstance().isAudioPlayerShowing) {
             if(CustomMediaPlayer.getInstance().isTrackPaused())
                 CustomMediaPlayer.getInstance().closeMusicPlayer();
-        }
-
-        if(CustomMediaPlayer.getInstance().isVideoPlayerShowing) {
+            else
+                CustomMediaPlayer.getInstance().pauseTrack();
+        } else if(CustomMediaPlayer.getInstance().isVideoPlayerShowing) {
             CustomMediaPlayer.getInstance().closeVideoPlayer();
         } else if(CustomMediaPlayer.getInstance().isNewsDetailShowing) {
             CustomMediaPlayer.getInstance().closeNewsDetail();
@@ -926,14 +1055,32 @@ public class MainActivity extends AppCompatActivity
                 drawer.closeDrawer(GravityCompat.START);
             }
         } else {
-            if(!CustomMediaPlayer.getInstance().isAudioPlayerShowing) {
-                DataPool.getInstance().listHomeBanner.clear();
-                DataPool.getInstance().listHomeTopVideos.clear();
-                DataPool.getInstance().listHomeTopMusic.clear();
+            new AlertDialog.Builder(this)
+                    .setTitle("Quit Application")
+                    .setMessage("Are you sure you want to quit?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 
-                MainActivity.this.finish();
-            }
-//                super.onBackPressed();
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            //Stop the activity
+                            DataPool.getInstance().listHomeBanner.clear();
+                            DataPool.getInstance().listHomeTopVideos.clear();
+                            DataPool.getInstance().listHomeTopMusic.clear();
+
+                            MainActivity.this.finish();
+                        }
+
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+
+
+//            DataPool.getInstance().listHomeBanner.clear();
+//            DataPool.getInstance().listHomeTopVideos.clear();
+//            DataPool.getInstance().listHomeTopMusic.clear();
+//
+//            MainActivity.this.finish();
         }
 
     }
@@ -942,6 +1089,9 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+
+        searchButton = menu.findItem(R.id.action_search);
+        searchButton.setVisible(true);
         return true;
     }
 
@@ -954,8 +1104,20 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_search) {
-            // TODO handle search
-            Toast.makeText(getBaseContext(), "search", Toast.LENGTH_SHORT).show();
+            if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
+                CustomMediaPlayer.getInstance().closeNewsDetail();
+            if(CustomMediaPlayer.getInstance().isVideoPlayerShowing)
+                CustomMediaPlayer.getInstance().closeVideoPlayer();
+
+            FragmentSearchShop tempSearchShop = (FragmentSearchShop) pagerAdapterSearch.getItem(0);
+            FragmentSearchCommunity tempSearchComm =  (FragmentSearchCommunity) pagerAdapterSearch.getItem(1);
+
+            tempSearchShop.clearList();
+            tempSearchComm.clearList();
+
+            searchInput.setText("");
+
+            changePanel(PanelState.PANEL_SEARCH);
             return true;
         }
 
@@ -967,7 +1129,11 @@ public class MainActivity extends AppCompatActivity
     public void onClick(View view) {
         // SIDE MENU
         if(view == sideMenuTopup) {
-            Toast.makeText(getBaseContext(), "Top Up", Toast.LENGTH_SHORT).show();
+            if(CustomMediaPlayer.getInstance().isNewsDetailShowing)
+                CustomMediaPlayer.getInstance().closeNewsDetail();
+            if(CustomMediaPlayer.getInstance().isVideoPlayerShowing)
+                CustomMediaPlayer.getInstance().closeVideoPlayer();
+            changePanel(PanelState.PANEL_TOPUP);
         }
 
         if(view == sideMenuHome) {
@@ -1076,6 +1242,7 @@ public class MainActivity extends AppCompatActivity
             if(CustomMediaPlayer.getInstance().isVideoPlayerShowing)
                 CustomMediaPlayer.getInstance().closeVideoPlayer();
             changePanel(PanelState.PANEL_PROFILE);
+
         }
 
         if(view == profileEdit) {
@@ -1101,11 +1268,55 @@ public class MainActivity extends AppCompatActivity
         // SIDE MENU END
 
 
+        // TOPUP
+        if(view == topupButton3k) {
+            ApiManager.getInstance().topUpCredit("neo3000");
+        }
+
+        if(view == topupButton5k) {
+            ApiManager.getInstance().topUpCredit("neo5000");
+        }
+
+        if(view == topupButton10k) {
+            ApiManager.getInstance().topUpCredit("neo10000");
+        }
+
+        if(view == topupButton20k) {
+            ApiManager.getInstance().topUpCredit("neo20000");
+        }
+
+        if(view == topupButton50k) {
+            ApiManager.getInstance().topUpCredit("neo50000");
+        }
+        // TOPUP END
+
+        // SEARCH
+        if(view == searchPanelButton) {
+            searchKey = searchInput.getText().toString();
+
+            FragmentSearchShop tempSearchShop = (FragmentSearchShop) pagerAdapterSearch.getItem(0);
+            FragmentSearchCommunity tempSearchComm = (FragmentSearchCommunity) pagerAdapterSearch.getItem(1);
+
+            tempSearchShop.clearList();
+            tempSearchComm.clearList();
+
+            tempSearchShop.setSearchKey(searchKey);
+            tempSearchComm.setSearchKey(searchKey);
+
+            InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+
+            ApiManager.getInstance().getUserAccessToken();
+        }
     }
 
     @Override
     public void onProductPurchased(String productId, TransactionDetails details) {
+        Log.d("PURCHASE", details.purchaseInfo.responseData);
+        Log.d("PURCHASE", details.purchaseInfo.signature);
+        Log.d("PURCHASE", details.purchaseToken);
 
+        // TODO lempar ke api
     }
 
     @Override
@@ -1115,12 +1326,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBillingError(int errorCode, Throwable error) {
-
+        Log.d("PURCHASE", "ERROR");
     }
 
     @Override
     public void onBillingInitialized() {
-
+        Log.d("BILLING", "OKAY");
     }
 
     @Override

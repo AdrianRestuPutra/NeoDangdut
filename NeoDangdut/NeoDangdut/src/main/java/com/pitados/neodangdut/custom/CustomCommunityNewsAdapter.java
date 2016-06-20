@@ -14,6 +14,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.NewsData;
+import com.pitados.neodangdut.util.FontLoader;
 
 import java.util.List;
 
@@ -76,6 +77,8 @@ public class CustomCommunityNewsAdapter extends BaseAdapter {
 
             holder.thumbnail = (ImageView) view.findViewById(R.id.list_view_home_news_thumbnail);
             holder.newsTitle = (TextView) view.findViewById(R.id.list_view_home_news_title);
+
+            holder.newsTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
 
             view.setTag(holder);
         } else {

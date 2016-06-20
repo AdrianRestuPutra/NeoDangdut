@@ -28,8 +28,8 @@
 
                     <com.daimajia.slider.library.SliderLayout
                         android:id="@+id/home_slider"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         custom:auto_cycle="true" />
 
                     <com.daimajia.slider.library.Indicators.PagerIndicator
@@ -39,7 +39,7 @@
                         android:layout_alignParentBottom="true"
                         android:layout_centerHorizontal="true"
                         custom:selected_drawable="@drawable/icon_carousel_selected"
-                        custom:unselected_drawable="@drawable/icon_carousel_default" />
+                        custom:unselected_drawable="@drawable/icon_carousel_default"/>
                     <!--
                     custom:selected_padding_left="6dp"
                     custom:selected_padding_right="6dp"
@@ -95,7 +95,7 @@
                         <ListView
                             android:id="@+id/list_view_top_track"
                             android:layout_width="match_parent"
-                            android:layout_height="@dimen/top_list_height"
+                            android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/top_list_padding">
 
                         </ListView>

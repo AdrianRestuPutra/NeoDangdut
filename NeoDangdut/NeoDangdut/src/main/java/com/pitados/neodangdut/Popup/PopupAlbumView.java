@@ -17,6 +17,7 @@ import com.pitados.neodangdut.model.AlbumData;
 import com.pitados.neodangdut.util.ApiManager;
 import com.pitados.neodangdut.util.CustomMediaPlayer;
 import com.pitados.neodangdut.util.DataPool;
+import com.pitados.neodangdut.util.FontLoader;
 
 /**
  * Created by adrianrestuputranto on 5/31/16.
@@ -50,6 +51,9 @@ public class PopupAlbumView extends Dialog {
         albumArtist = (TextView) findViewById(R.id.album_item_artist);
         albumListItem = (ListView) findViewById(R.id.album_item_listview);
 
+        albumTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+        albumArtist.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()
                 .showImageOnLoading(R.drawable.icon_user)
@@ -68,7 +72,7 @@ public class PopupAlbumView extends Dialog {
         });
     }
 
-    public void showPopupLoading(final String albumID) {
+    public void showPopupAlbum(final String albumID) {
         ApiManager.getInstance().getAlbumDetail(albumID);
         ApiManager.getInstance().setOnAlbumDetailListener(new ApiManager.OnAlbumDetailReceived() {
             @Override
@@ -78,7 +82,7 @@ public class PopupAlbumView extends Dialog {
                 albumTitle.setText(album.albumName);
                 albumArtist.setText(album.singerName);
 
-                listAdapter = new CustomAlbumListAdapter(context, DataPool.getInstance().selectedAlbum.listAllMusic);
+                listAdapter = new CustomAlbumListAdapter(context, DataPool.getInstance().selectedAlbum.listAllMusic, album.coverURL);
                 albumListItem.setAdapter(listAdapter);
             }
 
@@ -92,7 +96,7 @@ public class PopupAlbumView extends Dialog {
     }
 
 
-    public void closePopupLoading() {
+    public void closePopupAlbum() {
         this.dismiss();
     }
 

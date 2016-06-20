@@ -5,6 +5,7 @@ import android.content.Context;
 import android.widget.TextView;
 
 import com.pitados.neodangdut.R;
+import com.pitados.neodangdut.util.FontLoader;
 
 /**
  * Created by adrianrestuputranto on 5/31/16.
@@ -26,6 +27,8 @@ public class PopupLoading extends Dialog {
 
     private void initialize() {
         loadingText = (TextView) findViewById(R.id.popup_loading_text);
+
+        loadingText.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
     }
 
     public void showPopupLoading(String message) {

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shop_music_list_item_height"
+        android:background="@color/main_bg"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5">
+
+            <TextView
+                android:id="@+id/list_view_uploaded_music_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/profile_preview_upload_item_margin_left"
+                android:text="Song Title"
+                android:textColor="@color/white_font"
+                android:textSize="@dimen/tab_text_large_size" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/list_view_uploaded_music_opt_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="@dimen/shop_opt_icon_width"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/dialog_artist_price_margin"
+                android:adjustViewBounds="true"
+                android:src="@drawable/icon_more_white" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_height"
+        android:background="@color/tab_divider"/>
+
+</RelativeLayout>

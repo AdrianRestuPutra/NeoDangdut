@@ -14,6 +14,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.LibraryData;
+import com.pitados.neodangdut.util.FontLoader;
 
 import java.util.List;
 
@@ -78,6 +79,9 @@ public class CustomLibraryVideoAdapter extends BaseAdapter {
             holder.thumbnail = (ImageView) view.findViewById(R.id.list_view_lib_video_thumbnail);
             holder.musicTitle = (TextView) view.findViewById(R.id.list_view_lib_video_title);
             holder.artistName = (TextView) view.findViewById(R.id.list_view_lib_video_artist_name);
+
+            holder.musicTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+            holder.artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
 
             view.setTag(holder);
         } else {

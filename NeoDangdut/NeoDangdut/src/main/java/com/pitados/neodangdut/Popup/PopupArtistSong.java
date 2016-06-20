@@ -11,9 +11,11 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.pitados.neodangdut.R;
+import com.pitados.neodangdut.model.AlbumItem;
 import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.model.MusicData;
 import com.pitados.neodangdut.util.CustomMediaPlayer;
+import com.pitados.neodangdut.util.FontLoader;
 
 /**
  * Created by adrianrestuputranto on 5/31/16.
@@ -55,6 +57,11 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
         albumName = (TextView) findViewById(R.id.popup_artist_song_album);
         listenCount = (TextView) findViewById(R.id.popup_artist_listen_count);
         likeCount = (TextView) findViewById(R.id.popup_artist_like_count);
+
+        title.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+        artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+        albumName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+        albumName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
 
         // Button
         buttonPlay = (RelativeLayout) findViewById(R.id.popup_artist_song_button_play);
@@ -102,6 +109,19 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
         this.show();
     }
 
+    public void showPopupArtistSong(AlbumItem data, String coverURL) {
+        albumID = data.ID;
+
+        imageLoader.displayImage(coverURL, thumbnail, opts);
+        price.setText(data.price);
+        title.setText(data.songName);
+        artistName.setText(data.singerName);
+        albumName.setText("");
+        listenCount.setText("0");
+        likeCount.setText("0");
+        this.show();
+    }
+
     public void closePopupArtistSong() {
         this.dismiss();
     }
@@ -116,7 +136,7 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
 //            ApiManager.getInstance().likeItem(ApiManager.LikeType.MUSIC, musicData.ID);
 //        }
         if(view == buttonAlbum) {
-            popupAlbum.showPopupLoading(albumID);
+            popupAlbum.showPopupAlbum(albumID);
             closePopupArtistSong();
         }
 //        if(view == buttonShareFB) {

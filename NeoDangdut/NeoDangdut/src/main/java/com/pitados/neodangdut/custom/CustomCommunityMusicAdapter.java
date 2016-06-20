@@ -17,6 +17,7 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.Popup.PopupCommunity;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.CommunityContentData;
+import com.pitados.neodangdut.util.FontLoader;
 
 import java.util.List;
 
@@ -91,6 +92,9 @@ public class CustomCommunityMusicAdapter extends BaseAdapter {
             holder.artistName = (TextView) view.findViewById(R.id.list_view_home_music_artist_name);
             holder.musicTitle = (TextView) view.findViewById(R.id.list_view_home_music_song_title);
             holder.optButton = (RelativeLayout) view.findViewById(R.id.list_view_home_music_optbutton);
+
+            holder.musicTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+            holder.artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
 
             view.setTag(holder);
         } else {

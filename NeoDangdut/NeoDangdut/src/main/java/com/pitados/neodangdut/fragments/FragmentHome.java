@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -96,10 +97,11 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
             public void onRefresh() {
                 homeBanner.removeAllSliders();
 
-                ApiManager.getInstance().getToken();
-                ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
+                ApiManager.getInstance().getUserAccessToken();
+                ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
+
                     @Override
-                    public void onTokenSaved() {
+                    public void onUserAccessTokenSaved() {
                         ApiManager.getInstance().getHomeBanner();
                         ApiManager.getInstance().getHomeTopMusic();
                         ApiManager.getInstance().getHomeTopVideos();
@@ -157,11 +159,14 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
 
     // Load Data
     private void loadBanner() {
+        homeBanner.removeAllSliders();
+
         for(BannerModel temp : DataPool.getInstance().listHomeBanner) {
             DefaultSliderView sliderImage = new DefaultSliderView(context);
             sliderImage
                     .image(temp.imageLink)
-                    .setOnSliderClickListener(FragmentHome.this);
+                    .setOnSliderClickListener(FragmentHome.this)
+                    .setScaleType(BaseSliderView.ScaleType.Fit);
 
             // TODO extra
             sliderImage.bundle(new Bundle());
@@ -176,6 +181,8 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
         listViewTopTrack.setAdapter(listTrackAdapter);
 
         listTrackAdapter.notifyDataSetChanged();
+
+        getListViewSize(listViewTopTrack);
     }
 
     private void loadTopVideo() {
@@ -183,6 +190,7 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
         listViewTopVideo.setAdapter(listVideoAdapter);
 
         listVideoAdapter.notifyDataSetChanged();
+        getListViewSize(listViewTopVideo);
     }
 
     private void loadLatestNews() {
@@ -190,6 +198,7 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
         listViewLatestNews.setAdapter(listNewsAdapter);
 
         listNewsAdapter.notifyDataSetChanged();
+        getListViewSize(listViewLatestNews);
     }
 
 
@@ -212,24 +221,25 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
         Toast.makeText(context, "TODO link to page", Toast.LENGTH_SHORT).show();
     }
 
-//    public static void setListViewHeightBasedOnChildren(ListView listView) {
-//        ListAdapter listAdapter = listView.getAdapter();
-//        if (listAdapter == null)
-//            return;
-//
-//        int desiredWidth = MeasureSpec.makeMeasureSpec(listView.getWidth(), MeasureSpec.UNSPECIFIED);
-//        int totalHeight = 0;
-//        View view = null;
-//        for (int i = 0; i < listAdapter.getCount(); i++) {
-//            view = listAdapter.getView(i, view, listView);
-//            if (i == 0)
-//                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, LayoutParams.WRAP_CONTENT));
-//
-//            view.measure(desiredWidth, MeasureSpec.UNSPECIFIED);
-//            totalHeight += view.getMeasuredHeight();
-//        }
-//        ViewGroup.LayoutParams params = listView.getLayoutParams();
-//        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-//        listView.setLayoutParams(params);
-//    }
+    private void getListViewSize(ListView myListView) {
+        ListAdapter myListAdapter = myListView.getAdapter();
+        if (myListAdapter == null) {
+            // do nothing return null
+            return;
+        }
+        // set listAdapter in loop for getting final size
+        int totalHeight = 0;
+        for (int size = 0; size < myListAdapter.getCount(); size++) {
+            View listItem = myListAdapter.getView(size, null, myListView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+        // setting listview item in adapter
+        ViewGroup.LayoutParams params = myListView.getLayoutParams();
+        params.height = totalHeight
+                + (myListView.getDividerHeight() * (myListAdapter.getCount() - 1));
+        myListView.setLayoutParams(params);
+        // print height of adapter on log
+        Log.i("height of listItem:", String.valueOf(totalHeight));
+    }
 }

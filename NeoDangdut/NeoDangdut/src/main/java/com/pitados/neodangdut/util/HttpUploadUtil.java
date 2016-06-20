@@ -47,6 +47,9 @@ public class HttpUploadUtil extends AsyncTask<Void, Void, String> {
 //                Log.d("BODY", result);
             }
 
+            result = request.body();
+
+            Log.d("UPLOAD", result);
             return result;
         } catch (HttpRequest.HttpRequestException e) {
             return null;

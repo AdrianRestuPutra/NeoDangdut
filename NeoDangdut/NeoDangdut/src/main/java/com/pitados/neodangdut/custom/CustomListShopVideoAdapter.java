@@ -16,11 +16,13 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.Popup.PopupArtistVideo;
 import com.pitados.neodangdut.Popup.PopupLoading;
+import com.pitados.neodangdut.Popup.PopupPurchase;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.model.VideoData;
 import com.pitados.neodangdut.util.ApiManager;
 import com.pitados.neodangdut.util.DataPool;
+import com.pitados.neodangdut.util.FontLoader;
 
 import java.util.List;
 
@@ -35,6 +37,7 @@ public class CustomListShopVideoAdapter extends BaseAdapter {
     private DisplayImageOptions opts;
 
     private PopupLoading popupLoading;
+    private PopupPurchase popupPurchase;
 
     static class ViewHolder {
         ImageView thumbnail;
@@ -64,6 +67,7 @@ public class CustomListShopVideoAdapter extends BaseAdapter {
 
         popupArtistVideo = new PopupArtistVideo(context, R.style.custom_dialog);
         popupLoading = new PopupLoading(context, R.style.custom_dialog);
+        popupPurchase = new PopupPurchase(context, R.style.custom_dialog);
     }
 
     @Override
@@ -107,6 +111,10 @@ public class CustomListShopVideoAdapter extends BaseAdapter {
             holder.price = (TextView) view.findViewById(R.id.list_view_shop_video_price);
             holder.optButton = (RelativeLayout) view.findViewById(R.id.list_view_shop_video_opt_button);
 
+            holder.videoTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+            holder.artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+            holder.price.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_BOLD));
+
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();
@@ -131,36 +139,26 @@ public class CustomListShopVideoAdapter extends BaseAdapter {
             holder.buyButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
 
-                    ApiManager.getInstance().getUserTransactionToken();
-                    ApiManager.getInstance().setOnUserTransactionTokenReceived(new ApiManager.OnUserTransactionTokenReceived() {
                         @Override
-                        public void onUserTransactionTokenSaved() {
-                            ApiManager.getInstance().purchaseItem(ApiManager.PurchaseType.SINGLE, listVideo.get(index).ID);
-                            ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
+                        public void onItemPurchased(String result) {
+                            Log.d("Result", result);
 
-                                @Override
-                                public void onItemPurchased(String result) {
-                                    Log.d("Result", result);
-
-                                    listVideo.get(index).inLibrary = true;
-                                    holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
-                                    // TODO notif user
-                                }
-
-                                @Override
-                                public void onError(String message) {
-                                    // TODO show popup
-
-                                }
-                            });
+                            listVideo.get(index).inLibrary = true;
+                            holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
+                            // TODO notif user
                         }
 
                         @Override
                         public void onError(String message) {
-                            popupLoading.setMessage("Purchase Failed");
+                            // TODO show popup
+
                         }
                     });
+
+                    popupPurchase.showPopupPurchase(listVideo.get(index));
+
                 }
             });
         }

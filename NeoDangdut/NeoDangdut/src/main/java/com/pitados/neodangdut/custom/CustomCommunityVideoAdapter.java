@@ -17,6 +17,7 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.Popup.PopupCommunity;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.CommunityContentData;
+import com.pitados.neodangdut.util.FontLoader;
 
 import java.util.List;
 
@@ -90,6 +91,9 @@ public class CustomCommunityVideoAdapter extends BaseAdapter {
             holder.videoTitle = (TextView) view.findViewById(R.id.list_view_home_video_song_title);
             holder.artistName = (TextView) view.findViewById(R.id.list_view_home_video_artist_name);
             holder.optButton = (RelativeLayout) view.findViewById(R.id.list_view_home_video_optbutton);
+
+            holder.videoTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+            holder.artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
 
             view.setTag(holder);
         } else {

@@ -18,11 +18,14 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.Popup.PopupAlbumView;
 import com.pitados.neodangdut.Popup.PopupArtistSong;
 import com.pitados.neodangdut.Popup.PopupLoading;
+import com.pitados.neodangdut.Popup.PopupPurchase;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.model.MusicData;
 import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.ConnManager;
 import com.pitados.neodangdut.util.DataPool;
+import com.pitados.neodangdut.util.FontLoader;
 
 import java.util.List;
 
@@ -38,6 +41,7 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
 
     private PopupArtistSong popupArtistSong;
     private PopupLoading popupLoading;
+    private PopupPurchase popupPurchase;
 
     static class ViewHolder {
         ImageView thumbnail;
@@ -67,6 +71,7 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
         popupArtistSong = new PopupArtistSong(context, R.style.custom_dialog);
         popupArtistSong.setPopupAlbum(popupAlbum);
         popupLoading = new PopupLoading(context, R.style.custom_dialog);
+        popupPurchase = new PopupPurchase(context, R.style.custom_dialog);
     }
 
     @Override
@@ -114,6 +119,10 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
 
             holder.optButton = (RelativeLayout) view.findViewById(R.id.list_view_shop_music_opt_button);
 
+            holder.musicTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+            holder.artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+            holder.albumName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+            holder.price.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_BOLD));
 
             view.setTag(holder);
         } else {
@@ -130,8 +139,16 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
 
         if(isInLibrary(listTrack.get(index).ID)) {
             listTrack.get(index).inLibrary = true;
-            holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
-            holder.price.setText("");
+
+            if(ConnManager.getInstance().fileExist(ConnManager.DataType.AUDIO, listTrack.get(index).albumName, listTrack.get(index).songTitle)) {
+                // Download
+                holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_blank);
+                holder.price.setText("Download");
+            } else {
+                holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
+                holder.price.setText("");
+            }
+
         } else {
             listTrack.get(index).inLibrary = false;
             holder.buyButton.setBackgroundResource(R.drawable.btn_price_artist_song);
@@ -141,35 +158,29 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View view) {
 
-                    ApiManager.getInstance().getUserTransactionToken();
-                    ApiManager.getInstance().setOnUserTransactionTokenReceived(new ApiManager.OnUserTransactionTokenReceived() {
-                        @Override
-                        public void onUserTransactionTokenSaved() {
-                            ApiManager.getInstance().purchaseItem(ApiManager.PurchaseType.SINGLE, listTrack.get(index).ID);
-                            ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
+                    if(!listTrack.get(index).inLibrary) {
+                        ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
 
-                                @Override
-                                public void onItemPurchased(String result) {
-                                    Log.d("Result", result);
+                            @Override
+                            public void onItemPurchased(String result) {
+                                Log.d("Result", result);
 
-                                    listTrack.get(index).inLibrary = true;
-                                    holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
-                                    // TODO notif user
-                                }
+                                listTrack.get(index).inLibrary = true;
+                                holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
+                                // TODO notif user
+                            }
 
-                                @Override
-                                public void onError(String message) {
-                                    // TODO show popup
+                            @Override
+                            public void onError(String message) {
+                                // TODO show popup
 
-                                }
-                            });
-                        }
+                            }
+                        });
 
-                        @Override
-                        public void onError(String message) {
+                        popupPurchase.showPopupPurchase(listTrack.get(index));
+                    } else {
 
-                        }
-                    });
+                    }
 
                 }
             });

@@ -19,6 +19,7 @@ import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.CommunityContentData;
 import com.pitados.neodangdut.util.ApiManager;
 import com.pitados.neodangdut.util.CustomMediaPlayer;
+import com.pitados.neodangdut.util.FontLoader;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -62,6 +63,11 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
         artistName = (TextView) findViewById(R.id.popup_community_song_artist_name);
         listenCountText = (TextView) findViewById(R.id.popup_community_listen_count_text);
         likeCountText = (TextView) findViewById(R.id.popup_community_like_count_text);
+
+        title.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+        artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+        listenCountText.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+        likeCountText.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
 
         // Button
         buttonPlay = (RelativeLayout) findViewById(R.id.popup_community_song_button_play);

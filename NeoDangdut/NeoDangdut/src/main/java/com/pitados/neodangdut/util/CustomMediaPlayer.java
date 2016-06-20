@@ -516,6 +516,8 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         return selectedLibraryData;
     }
 
+    public AlbumItem getSelectedAlbumItemData() { return  selectedAlbumItemData; }
+
     public long getCurrentPos() {
         return audioPlayer.getCurrentPosition();
     }
@@ -656,7 +658,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 //
 //            }
 //        });
-        getNewsDetail(ApiManager.getInstance().TOKEN, newsData.ID);
+        getNewsDetail(ApiManager.getInstance().USER_ACCESS_TOKEN, newsData.ID);
 
         isNewsDetailShowing = true;
     }

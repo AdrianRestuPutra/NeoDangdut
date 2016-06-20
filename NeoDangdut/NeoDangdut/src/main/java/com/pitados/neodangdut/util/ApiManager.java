@@ -1,9 +1,11 @@
 package com.pitados.neodangdut.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.anjlab.android.iab.v3.BillingProcessor;
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.Popup.PopupLoading;
 import com.pitados.neodangdut.Popup.PopupWebview;
@@ -65,15 +67,20 @@ public class ApiManager {
     }
 
     private Context context;
+    private Activity activity;
 
     private String CLIENT_ID = "15299018236589";
     private String CLIENT_SECRET = "7521e4a1c2b5cbf67024b3f9b1b4f7e1";
 
+    private BillingProcessor billingProc;
+
     // Listener
-    private OnTokenReceived listener;
+//    private OnTokenReceived listener;
     private OnUserAccessTokenReceived userAccessListener;
-    private OnUserTransactionTokenReceived userTransactionListener;
+//    private OnUserTransactionTokenReceived userTransactionListener;
     private OnHomeDataReceived dataListener;
+    private OnUploadedMusicReceived uploadedMusicListener;
+    private OnUploadedVideoReceived uploadedVideoListener;
     private OnCommunityMusicReceived commMusicListener;
     private OnCommunityVideoReceived commVideoListener;
     private OnCommunityNewsReceived commNewsListener;
@@ -90,16 +97,18 @@ public class ApiManager {
     private OnPurchase purchaseListener;
     private OnUpload uploadListener;
     private OnRegister registerListener;
+    private OnSearchReceived searchShopMusicListener, searchShopAlbumListener, searchShopVideoListener,
+                                searchCommunityMusicListener, searchCommunityVideoListener;
 
     private static ApiManager instance;
 
-    public String TOKEN = "token";
+//    public String TOKEN = "token";
 
     public String USER_ACCESS_TOKEN = "user_access_token";
     public String REFRESH_TOKEN = "refresh_token";
 
     public String TOKEN_TYPE = "type";
-    public long getTokenTime, getUserAccessTokenTime, getUserTransactionTokenTime;
+    public long getUserAccessTokenTime;
 
     private int limitData = 20;
 
@@ -128,211 +137,82 @@ public class ApiManager {
         popupWebview = new PopupWebview(context, R.style.custom_dialog);
     }
 
-    public void getToken() {
-        if(System.currentTimeMillis() - getTokenTime > 3600000l) {
-            Map<String, String> params = new HashMap<>();
-            params.put("client_id", CLIENT_ID);
-            params.put("client_secret", CLIENT_SECRET);
-            params.put("grant_type", "client_credentials");
-            HttpPostUtil request = new HttpPostUtil(Consts.URL_GET_TOKEN, "", params);
-
-            request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
-                @Override
-                public void afterExecute(String result) {
-                    if(result != null) {
-                        Log.d("Result API", result);
-
-                        try {
-                            JSONObject rawData = new JSONObject(result);
-
-                            if(!rawData.has("error")) {
-                                TOKEN = rawData.getString("access_token");
-                                TOKEN_TYPE = rawData.getString("token_type");
-                                getTokenTime = System.currentTimeMillis();
-
-                                listener.onTokenSaved();
-                            } else {
-                                String errorMessage = rawData.getString("error_description");
-
-                                listener.onError(errorMessage);
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-
-                @Override
-                public void beforeExecute() {
-
-                }
-            });
-            request.execute();
-
-        } else {
-            listener.onTokenSaved();
-        }
+    public void setBillingProc(Activity activity, BillingProcessor billingProc) {
+        this.activity = activity;
+        this.billingProc = billingProc;
     }
 
     public void getUserAccessToken() {
-        if(System.currentTimeMillis() - getUserAccessTokenTime > 3600000l) {
-            Map<String, String> params = new HashMap<>();
-            params.put("client_id", CLIENT_ID);
-            params.put("client_secret", CLIENT_SECRET);
-            params.put("scope", "user_actions");
-            params.put("grant_type", "password");
-            params.put("username", userLoginData.getUsername());
-            params.put("password", userLoginData.getPassword());
-            HttpPostUtil request = new HttpPostUtil(Consts.URL_GET_TOKEN, "", params);
+        if(System.currentTimeMillis() - userLoginData.getTokenTime() > 3600000l) {
 
-            request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
-                @Override
-                public void afterExecute(String result) {
-                    if(result != null) {
-                        Log.d("Result API", result);
+            if(userLoginData.getRefreshToken().length() > 0) {
+                refreshUserAccessToken();
+            } else {
+                Map<String, String> params = new HashMap<>();
+                params.put("client_id", CLIENT_ID);
+                params.put("client_secret", CLIENT_SECRET);
+                params.put("scope", "public_profile email birthday location phone password user_actions user_managements transaction");
+                if (userLoginData.getLoginWithFB() == true) {
+                    params.put("grant_type", "facebook");
+                    params.put("facebook_id", userLoginData.getUserFBID());
+                    params.put("email", userLoginData.getUserFBEmail());
+                } else {
+                    params.put("grant_type", "password");
+                    params.put("username", userLoginData.getUsername());
+                    params.put("password", userLoginData.getPassword());
+                }
+                HttpPostUtil request = new HttpPostUtil(Consts.URL_GET_TOKEN, "", params);
 
-                        try {
-                            JSONObject rawData = new JSONObject(result);
+                request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
+                    @Override
+                    public void afterExecute(String result) {
+                        if (result != null) {
+                            Log.d("Result TOKEN", result);
+
+                            try {
+                                JSONObject rawData = new JSONObject(result);
 
 
-                            if(!rawData.has("error")) {
-                                USER_ACCESS_TOKEN = rawData.getString("access_token");
-                                REFRESH_TOKEN = rawData.getString("refresh_token");
-                                getUserAccessTokenTime = System.currentTimeMillis();
+                                if (!rawData.has("error")) {
+                                    USER_ACCESS_TOKEN = rawData.getString("access_token");
+                                    REFRESH_TOKEN = rawData.getString("refresh_token");
+                                    getUserAccessTokenTime = System.currentTimeMillis();
 
-                                userLoginData.setRefreshToken(REFRESH_TOKEN);
+                                    userLoginData.setToken(USER_ACCESS_TOKEN);
+                                    userLoginData.setRefreshToken(REFRESH_TOKEN);
+                                    userLoginData.setTokenTime(System.currentTimeMillis());
 
-                                getUserData();
+                                    Log.d("REFRESH TOKEN", userLoginData.getRefreshToken());
 
-                                userAccessListener.onUserAccessTokenSaved();
-                            } else {
-                                String errorMessage = rawData.getString("error_description");
+                                    getUserData();
 
-                                userAccessListener.onError(errorMessage);
+                                    userAccessListener.onUserAccessTokenSaved();
+                                } else {
+                                    String errorMessage = rawData.getString("error_description");
+
+                                    userAccessListener.onError(errorMessage);
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
                     }
-                }
 
-                @Override
-                public void beforeExecute() {
+                    @Override
+                    public void beforeExecute() {
 
-                }
-            });
-            request.execute();
-
-        } else {
-            refreshUserAccessToken();
-        }
-    }
-
-    public void getUserAccessTokenWithFB() {
-        if(System.currentTimeMillis() - getUserAccessTokenTime > 3600000l) {
-            Map<String, String> params = new HashMap<>();
-            params.put("client_id", CLIENT_ID);
-            params.put("client_secret", CLIENT_SECRET);
-            params.put("scope", "user_actions");
-            params.put("grant_type", "facebook");
-            params.put("facebook_id", userLoginData.getUserFBID());
-            params.put("email", userLoginData.getUserFBEmail());
-            HttpPostUtil request = new HttpPostUtil(Consts.URL_GET_TOKEN, "", params);
-
-            request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
-                @Override
-                public void afterExecute(String result) {
-                    if(result != null) {
-                        Log.d("Result API", result);
-
-                        try {
-                            JSONObject rawData = new JSONObject(result);
-
-
-                            if(!rawData.has("error")) {
-                                USER_ACCESS_TOKEN = rawData.getString("access_token");
-                                REFRESH_TOKEN = rawData.getString("refresh_token");
-                                getUserAccessTokenTime = System.currentTimeMillis();
-
-                                userLoginData.setRefreshToken(REFRESH_TOKEN);
-
-                                getUserData();
-
-                                userAccessListener.onUserAccessTokenSaved();
-                            } else {
-                                String errorMessage = rawData.getString("error_description");
-
-                                userAccessListener.onError(errorMessage);
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
                     }
-                }
-
-                @Override
-                public void beforeExecute() {
-
-                }
-            });
-            request.execute();
+                });
+                request.execute();
+            }
 
         } else {
-            refreshUserAccessToken();
-        }
-    }
+            USER_ACCESS_TOKEN = userLoginData.getToken();
+            REFRESH_TOKEN = userLoginData.getRefreshToken();
+            getUserAccessTokenTime = userLoginData.getTokenTime();
 
-    public void getUserTransactionToken() {
-        if(System.currentTimeMillis() - getUserTransactionTokenTime > 3600000l && userLoginData.getRefreshToken().length() > 0) {
-            Map<String, String> params = new HashMap<>();
-            params.put("client_id", CLIENT_ID);
-            params.put("client_secret", CLIENT_SECRET);
-            params.put("scope", "transaction");
-            params.put("grant_type", "password");
-            params.put("username", userLoginData.getUsername());
-            params.put("password", userLoginData.getPassword());
-            HttpPostUtil request = new HttpPostUtil(Consts.URL_GET_TOKEN, "", params);
-
-            request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
-                @Override
-                public void afterExecute(String result) {
-                    if(result != null) {
-                        Log.d("Result API", result);
-
-                        try {
-                            JSONObject rawData = new JSONObject(result);
-
-
-                            if(!rawData.has("error")) {
-                                USER_ACCESS_TOKEN = rawData.getString("access_token");
-                                REFRESH_TOKEN = rawData.getString("refresh_token");
-                                getUserTransactionTokenTime = System.currentTimeMillis();
-
-                                userTransactionListener.onUserTransactionTokenSaved();
-                            } else {
-                                String errorMessage = rawData.getString("error_description");
-
-                                userTransactionListener.onError(errorMessage);
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-
-                @Override
-                public void beforeExecute() {
-
-                }
-            });
-            request.execute();
-
-        } else {
-            // TODO refresh
+            userAccessListener.onUserAccessTokenSaved();
         }
     }
 
@@ -340,18 +220,24 @@ public class ApiManager {
         Map<String, String> params = new HashMap<>();
         params.put("client_id", CLIENT_ID);
         params.put("client_secret", CLIENT_SECRET);
-        params.put("scope", "user_actions");
+        params.put("scope", "public_profile email birthday location phone password user_actions user_managements transaction");
         params.put("grant_type", "refresh_token");
-        params.put("username", userLoginData.getUsername());
-        params.put("password", userLoginData.getPassword());
+        if (userLoginData.getLoginWithFB() == true) {
+            params.put("facebook_id", userLoginData.getUserFBID());
+            params.put("email", userLoginData.getUserFBEmail());
+        } else {
+            params.put("username", userLoginData.getUsername());
+            params.put("password", userLoginData.getPassword());
+        }
         params.put("refresh_token", userLoginData.getRefreshToken());
+        Log.d("REFRESH TOKEN", userLoginData.getRefreshToken());
         HttpPostUtil request = new HttpPostUtil(Consts.URL_GET_TOKEN, "", params);
 
         request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
             @Override
             public void afterExecute(String result) {
                 if (result != null) {
-                    Log.d("Result API", result);
+                    Log.d("Result REFRESH", result);
 
                     try {
                         JSONObject rawData = new JSONObject(result);
@@ -359,6 +245,10 @@ public class ApiManager {
                         USER_ACCESS_TOKEN = rawData.getString("access_token");
                         REFRESH_TOKEN = rawData.getString("refresh_token");
                         getUserAccessTokenTime = System.currentTimeMillis();
+
+                        userLoginData.setToken(USER_ACCESS_TOKEN);
+                        userLoginData.setRefreshToken(REFRESH_TOKEN);
+                        userLoginData.setTokenTime(System.currentTimeMillis());
 
                         userAccessListener.onUserAccessTokenSaved();
 
@@ -378,20 +268,13 @@ public class ApiManager {
 
     }
 
-    public boolean tokenNotExpired() {
-        if(System.currentTimeMillis() - getTokenTime > 3600000l)
-            return true;
-
-        return false;
-    }
-
 
     // USER DATA
 
     public void getUserData() {
         Map<String, String> params = new HashMap<>();
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_USER_DATA, ApiManager.getInstance().USER_ACCESS_TOKEN ,params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_USER_DATA, USER_ACCESS_TOKEN ,params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -470,16 +353,18 @@ public class ApiManager {
         Map<String, String> params = new HashMap<>();
         params.put("shop", "0");
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_BANNER, ApiManager.getInstance().TOKEN ,params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_BANNER, USER_ACCESS_TOKEN ,params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
             public void afterExecute(String result) {
+                int prevDataCount = DataPool.getInstance().listHomeBanner.size();
+                int totalData = 0;
 
                 try {
                     JSONObject data = new JSONObject(result);
                     JSONArray arr = data.getJSONArray(Consts.TAG_BANNER);
-                    int total = data.getInt("total");
+                    totalData = data.getInt("total");
 
                     // Add to list
                     for (int i = 0; i < arr.length(); i++) {
@@ -492,7 +377,7 @@ public class ApiManager {
                         String link = obj.getString("link");
 
                         BannerModel model = new BannerModel(id, imageLink, title, description, link);
-                        if(DataPool.getInstance().listHomeBanner.size() < total)
+                        if (DataPool.getInstance().listHomeBanner.size() < totalData)
                             DataPool.getInstance().listHomeBanner.add(model);
                     }
 
@@ -501,7 +386,7 @@ public class ApiManager {
 
                 }
 
-                if(dataListener != null)
+                if (dataListener != null)
                     dataListener.onDataLoaded(ApiType.HOME_BANNER);
             }
 
@@ -521,7 +406,7 @@ public class ApiManager {
         params.put("limit", "5");
         params.put("sort", "desc");
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_MUSIC, ApiManager.getInstance().TOKEN, params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_MUSIC, USER_ACCESS_TOKEN, params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -588,7 +473,7 @@ public class ApiManager {
         params.put("limit", "2");
         params.put("sort", "desc");
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_VIDEO, ApiManager.getInstance().TOKEN ,params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_VIDEO, USER_ACCESS_TOKEN ,params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -653,7 +538,7 @@ public class ApiManager {
         params.put("limit", "5");
         params.put("sort", "desc");
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_NEWS, TOKEN, params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_NEWS, USER_ACCESS_TOKEN, params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -713,6 +598,7 @@ public class ApiManager {
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
             public void afterExecute(String result) {
+                int prevDataCount = DataPool.getInstance().listCommunityMusic.size();
                 int totalData = 0;
 
                 try {
@@ -753,7 +639,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(commMusicListener != null && DataPool.getInstance().listCommunityMusic.size() != totalData)
+                if(commMusicListener != null && prevDataCount < totalData)
                     commMusicListener.onDataLoaded(ApiType.COMMUNITY_MUSIC);
             }
 
@@ -779,6 +665,7 @@ public class ApiManager {
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
             public void afterExecute(String result) {
+                int prevDataCount = DataPool.getInstance().listCommunityVideo.size();
                 int totalData = 0;
 
                 try {
@@ -818,7 +705,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(commVideoListener != null && DataPool.getInstance().listCommunityVideo.size() != totalData)
+                if(commVideoListener != null && prevDataCount < totalData)
                     commVideoListener.onDataLoaded(ApiType.COMMUNITY_VIDEO);
             }
 
@@ -843,6 +730,7 @@ public class ApiManager {
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
             public void afterExecute(String result) {
+                int prevDataCount = DataPool.getInstance().listAllNews.size();
                 int totalData = 0;
 
                 try {
@@ -872,7 +760,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(commNewsListener != null && DataPool.getInstance().listAllNews.size() != totalData)
+                if(commNewsListener != null && prevDataCount < totalData)
                     commNewsListener.onDataLoaded(ApiType.COMMUNITY_NEWS);
             }
 
@@ -884,7 +772,144 @@ public class ApiManager {
 
         request.execute();
     }
+
     // COMMUNITY END
+
+    // History Upload
+    public void getUploadedMusic() {
+        Map<String, String> params = new HashMap<>();
+        params.put("limit", String.valueOf(limitData)); // get every 20
+        params.put("offset", String.valueOf(DataPool.getInstance().listUploadedMusic.size()));
+        params.put("order", "id");
+        params.put("sort", "desc");
+        params.put("user_id", userLoginData.getUserID());
+        params.put("category", "music");
+
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_COMMUNITY_CONTENT, ApiManager.getInstance().USER_ACCESS_TOKEN, params);
+
+        request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                int prevDataCount = DataPool.getInstance().listUploadedMusic.size();
+                int totalData = 0;
+                try {
+                    JSONObject rawData = new JSONObject(result);
+                    JSONArray arrCommunityMusic = rawData.getJSONArray("contents");
+                    totalData = rawData.getInt("total");
+                    Log.d("TOTAL UPLOAD MUSIC", totalData+"");
+
+                    for (int i = 0; i < arrCommunityMusic.length(); i++) {
+                        JSONObject obj = arrCommunityMusic.getJSONObject(i);
+                        JSONObject userObj = obj.getJSONObject("user");
+
+                        String ID = obj.getString("id");
+                        String userID = userObj.getString("id");
+                        String userName = userObj.getString("name");
+                        String firstName = userObj.getString("first_name");
+                        String lastName = userObj.getString("last_name");
+                        String photoURL = userObj.getString("photo");
+                        int userTotalLikes = userObj.getInt("total_likes");
+                        String songName = obj.getString("name");
+                        String description = obj.getString("description");
+                        String category = obj.getString("category");
+                        String fileURL = obj.getString("file");
+                        String coverURL = obj.getString("cover");
+                        int songTotalLikes = obj.getInt("total_likes");
+                        int songTotalViews = obj.getInt("total_views");
+                        String created = obj.getString("created");
+                        String isLikeable = obj.getString("is_likeable");
+
+                        CommunityContentData tempData = new CommunityContentData(ID, userID, userName, firstName, lastName, photoURL, userTotalLikes,
+                                songName, description, category, fileURL, coverURL,
+                                songTotalLikes, songTotalViews, created, isLikeable);
+                        DataPool.getInstance().listUploadedMusic.add(tempData);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if(uploadedMusicListener != null && prevDataCount < totalData)
+                    uploadedMusicListener.onDataLoaded();
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        request.execute();
+    }
+
+    public void getUploadedVideo() {
+        Map<String, String> params = new HashMap<>();
+        params.put("limit", String.valueOf(limitData)); // get every 20
+        params.put("offset", String.valueOf(DataPool.getInstance().listUploadedVideo.size()));
+        params.put("order", "id");
+        params.put("sort", "desc");
+        params.put("user_id", userLoginData.getUserID());
+        params.put("category", "music video");
+
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_COMMUNITY_CONTENT, ApiManager.getInstance().USER_ACCESS_TOKEN, params);
+
+        request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                int prevDataCount = DataPool.getInstance().listUploadedVideo.size();
+                int totalData = 0;
+
+                try {
+                    JSONObject rawData = new JSONObject(result);
+                    JSONArray arrCommunityMusic = rawData.getJSONArray("contents");
+                    totalData = rawData.getInt("total");
+                    Log.d("TOTAL UPLOAD VIDEO", totalData+"");
+                    Log.d("UPLOAD VIDEO", result);
+
+                    for (int i = 0; i < arrCommunityMusic.length(); i++) {
+                        JSONObject obj = arrCommunityMusic.getJSONObject(i);
+                        JSONObject userObj = obj.getJSONObject("user");
+
+                        String ID = obj.getString("id");
+                        String userID = userObj.getString("id");
+                        String userName = userObj.getString("name");
+                        String firstName = userObj.getString("first_name");
+                        String lastName = userObj.getString("last_name");
+                        String photoURL = userObj.getString("photo");
+                        int userTotalLikes = userObj.getInt("total_likes");
+                        String songName = obj.getString("name");
+                        String description = obj.getString("description");
+                        String category = obj.getString("category");
+                        String fileURL = obj.getString("file");
+                        String coverURL = obj.getString("cover");
+                        int songTotalLikes = obj.getInt("total_likes");
+                        int songTotalViews = obj.getInt("total_views");
+                        String created = obj.getString("created");
+                        String isLikeable = obj.getString("is_likeable");
+
+                        CommunityContentData tempData = new CommunityContentData(ID, userID, userName, firstName, lastName, photoURL, userTotalLikes,
+                                songName, description, category, fileURL, coverURL,
+                                songTotalLikes, songTotalViews, created, isLikeable);
+                        DataPool.getInstance().listUploadedVideo.add(tempData);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if(uploadedMusicListener != null && prevDataCount < totalData)
+                    uploadedVideoListener.onDataLoaded();
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        request.execute();
+    }
+    // Hisory Upload End
 
     // LIBRARY
     public void getLibraryMusic() {
@@ -1027,7 +1052,7 @@ public class ApiManager {
         params.put("limit", "5");
         params.put("sort", "desc");
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_MUSIC, ApiManager.getInstance().TOKEN, params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_MUSIC, USER_ACCESS_TOKEN, params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -1095,7 +1120,7 @@ public class ApiManager {
         params.put("limit", "50");
         params.put("sort", "desc");
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_MUSIC, ApiManager.getInstance().TOKEN, params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_MUSIC, USER_ACCESS_TOKEN, params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -1161,12 +1186,13 @@ public class ApiManager {
         params.put("limit", "50");
         params.put("sort", "desc");
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_ALBUM, ApiManager.getInstance().TOKEN, params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_ALBUM, USER_ACCESS_TOKEN, params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
             public void afterExecute(String result) {
                 Log.d("Result", result);
+                int prevDataCount = DataPool.getInstance().listShopMusicTopAlbums.size();
                 int totalData = 0;
                 try {
 
@@ -1199,7 +1225,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(shopTopAlbumListener != null && DataPool.getInstance().listShopMusicTopAlbums.size() != totalData)
+                if(shopTopAlbumListener != null && prevDataCount < totalData)
                     shopTopAlbumListener.onDataLoaded(ApiType.SHOP_MUSIC_TOP_ALBUM);
             }
 
@@ -1212,6 +1238,7 @@ public class ApiManager {
         request.execute();
     }
 
+
     public void getShopMusicNewSongs() {
         Map<String, String> params = new HashMap<>();
         params.put("order", "id");
@@ -1219,7 +1246,7 @@ public class ApiManager {
         params.put("sort", "desc");
         params.put("offset", String.valueOf(DataPool.getInstance().listShopMusicNewSongs.size()));
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_MUSIC, ApiManager.getInstance().TOKEN, params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_MUSIC, USER_ACCESS_TOKEN, params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -1288,16 +1315,19 @@ public class ApiManager {
         params.put("sort", "asc");
         params.put("offset", String.valueOf(DataPool.getInstance().listShopMusicAllSongs.size()));
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_MUSIC, ApiManager.getInstance().TOKEN, params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_MUSIC, USER_ACCESS_TOKEN, params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
             public void afterExecute(String result) {
+                int prevDataCount = DataPool.getInstance().listShopMusicAllSongs.size();
+                int totalData = 0;
                 Log.d("Result", result);
                 try {
 
                     JSONObject raw = new JSONObject(result);
                     JSONArray arrMusic = raw.getJSONArray("music");
+                    totalData = raw.getInt("total");
 
                     for (int i = 0; i < arrMusic.length(); i++) {
                         JSONObject obj = arrMusic.getJSONObject(i);
@@ -1335,7 +1365,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(shopAllSongsListener != null)
+                if(shopAllSongsListener != null && prevDataCount < totalData)
                     shopAllSongsListener.onDataLoaded(ApiType.SHOP_MUSIC_ALL_SONG);
             }
 
@@ -1356,7 +1386,7 @@ public class ApiManager {
         params.put("limit", "3");
         params.put("sort", "desc");
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_VIDEO, ApiManager.getInstance().TOKEN ,params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_VIDEO, USER_ACCESS_TOKEN ,params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -1423,7 +1453,7 @@ public class ApiManager {
         params.put("limit", "50");
         params.put("sort", "desc");
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_VIDEO, ApiManager.getInstance().TOKEN ,params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_VIDEO, USER_ACCESS_TOKEN ,params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -1489,7 +1519,7 @@ public class ApiManager {
         params.put("limit", "50");
         params.put("sort", "desc");
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_VIDEO, ApiManager.getInstance().TOKEN ,params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_VIDEO, USER_ACCESS_TOKEN ,params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -1556,16 +1586,19 @@ public class ApiManager {
         params.put("sort", "asc");
         params.put("offset", String.valueOf(DataPool.getInstance().listShopVideoAllVideos.size()));
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_VIDEO, ApiManager.getInstance().TOKEN ,params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_VIDEO, USER_ACCESS_TOKEN ,params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
             public void afterExecute(String result) {
+                int prevDataCount = DataPool.getInstance().listShopVideoAllVideos.size();
+                int totalData = 0;
                 Log.d("Result", result);
 
                 try {
                     JSONObject raw = new JSONObject(result);
                     JSONArray arrVideo = raw.getJSONArray("video");
+                    totalData = raw.getInt("total");
 
                     for (int i = 0; i < arrVideo.length(); i++) {
                         JSONObject obj = arrVideo.getJSONObject(i);
@@ -1600,7 +1633,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if (shopVideoAllVideosListener != null)
+                if (shopVideoAllVideosListener != null && prevDataCount < totalData)
                     shopVideoAllVideosListener.onDataLoaded(ApiType.SHOP_VIDEO_ALL_VIDEO);
             }
 
@@ -1614,6 +1647,343 @@ public class ApiManager {
     }
     // SHOP VIDEO END
 
+    // SEARCH
+    public void getSearchShopMusicAlbums(String searchKey) {
+        Map<String, String> params = new HashMap<>();
+        params.put("order", "name");
+        params.put("limit", String.valueOf(5));
+        params.put("sort", "asc");
+        params.put("search", searchKey);
+        params.put("offset", String.valueOf(DataPool.getInstance().listSearchShopMusicAlbum.size()));
+
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_ALBUM, USER_ACCESS_TOKEN, params);
+
+        request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                Log.d("Result", result);
+                int prevDataCount = DataPool.getInstance().listSearchShopMusicAlbum.size();
+                int totalData = 0;
+                try {
+
+                    JSONObject raw = new JSONObject(result);
+                    JSONArray arrAlbum = raw.getJSONArray("album");
+                    totalData = raw.getInt("total");
+
+                    for (int i = 0; i < arrAlbum.length(); i++) {
+                        JSONObject obj = arrAlbum.getJSONObject(i);
+                        JSONObject singerObj = obj.getJSONObject("singer");
+
+                        String ID = obj.getString("id");
+                        String albumName = obj.getString("name");
+                        String coverURL = obj.getString("cover");
+                        String singerID = singerObj.getString("id");
+                        String singerName = singerObj.getString("name");
+                        String releaseDate = obj.getString("released");
+                        String price = obj.getString("price");
+                        String discount = obj.getString("discount");
+                        String totalPurchased = obj.getString("total_purchased");
+
+                        AlbumData tempData = new AlbumData(ID, albumName, coverURL, singerID, singerName,
+                                releaseDate, price, discount, totalPurchased);
+
+                        DataPool.getInstance().listSearchShopMusicAlbum.add(tempData);
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if(searchShopAlbumListener != null && prevDataCount < totalData)
+                    searchShopAlbumListener.onDataLoaded();
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        request.execute();
+    }
+
+    public void getSearchShopMusic(String searchKey) {
+        Map<String, String> params = new HashMap<>();
+        params.put("order", "name");
+        params.put("limit", String.valueOf(limitData));
+        params.put("sort", "asc");
+        params.put("offset", String.valueOf(DataPool.getInstance().listSearchShopMusic.size()));
+        params.put("search", searchKey);
+
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_MUSIC, USER_ACCESS_TOKEN, params);
+
+        request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                int prevDataCount = DataPool.getInstance().listSearchShopMusic.size();
+                int totalData = 0;
+                Log.d("Result", result);
+                try {
+
+                    JSONObject raw = new JSONObject(result);
+                    JSONArray arrMusic = raw.getJSONArray("music");
+                    totalData = raw.getInt("total");
+
+                    for (int i = 0; i < arrMusic.length(); i++) {
+                        JSONObject obj = arrMusic.getJSONObject(i);
+                        JSONObject singerObj = obj.getJSONObject("singer");
+                        JSONObject albumObj = obj.getJSONObject("album");
+                        JSONObject labelObj = obj.getJSONObject("label");
+
+                        String ID = obj.getString("id");
+                        String cover = obj.getString("cover");
+                        String songTitle = obj.getString("name");
+                        String previewURL = obj.getString("preview");
+                        String duration = obj.getString("duration");
+                        String price = obj.getString("price");
+                        String discount = obj.getString("discount");
+                        String singerID = singerObj.getString("id");
+                        String singerName = singerObj.getString("name");
+                        String albumID = albumObj.getString("id");
+                        String albumName = albumObj.getString("name");
+                        String albumCover = albumObj.getString("cover");
+                        String labelID = labelObj.optString("id");
+                        String labelName = labelObj.optString("name");
+                        String description = obj.getString("description");
+                        String totalPlayed = obj.getString("total_played");
+                        String totalPurchased = obj.getString("total_purchased");
+
+                        MusicData tempData = new MusicData(i, ID, cover, songTitle, previewURL, duration,
+                                price, discount, singerID, singerName, albumID, albumName, albumCover,
+                                labelID, labelName,
+                                description, totalPlayed, totalPurchased);
+                        DataPool.getInstance().listSearchShopMusic.add(tempData);
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if(searchShopMusicListener != null && prevDataCount < totalData)
+                    searchShopMusicListener.onDataLoaded();
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        request.execute();
+    }
+
+    public void getSearchShopVideos(String searchKey) {
+        Map<String, String> params = new HashMap<>();
+        params.put("order", "name");
+        params.put("limit", String.valueOf(limitData));
+        params.put("sort", "asc");
+        params.put("offset", String.valueOf(DataPool.getInstance().listSearchShopVideo.size()));
+        params.put("search", searchKey);
+
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_VIDEO, USER_ACCESS_TOKEN ,params);
+
+        request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                int prevDataCount = DataPool.getInstance().listSearchShopVideo.size();
+                int totalData = 0;
+                Log.d("Result", result);
+
+                try {
+                    JSONObject raw = new JSONObject(result);
+                    JSONArray arrVideo = raw.getJSONArray("video");
+                    totalData = raw.getInt("total");
+
+                    for (int i = 0; i < arrVideo.length(); i++) {
+                        JSONObject obj = arrVideo.getJSONObject(i);
+                        JSONObject singerObj = obj.getJSONObject("singer");
+                        JSONObject labelObj = obj.getJSONObject("label");
+
+                        String ID = obj.getString("id");
+                        String cover = obj.getString("cover");
+                        String songTitle = obj.getString("name");
+                        String previewURL = obj.getString("preview");
+                        String duration = obj.getString("duration");
+                        String price = obj.getString("price");
+                        String discount = obj.getString("discount");
+                        String singerID = singerObj.getString("id");
+                        String singerName = singerObj.getString("name");
+                        String labelID = labelObj.optString("id");
+                        String labelName = labelObj.optString("name");
+                        String description = obj.getString("description");
+                        String totalPlayed = obj.getString("total_played");
+                        String totalPurchased = obj.getString("total_purchased");
+
+                        VideoData tempData = new VideoData(ID, cover, songTitle, previewURL, duration,
+                                price, discount, singerID, singerName,
+                                labelID, labelName,
+                                description, totalPlayed, totalPurchased);
+                        DataPool.getInstance().listSearchShopVideo.add(tempData);
+
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if (searchShopVideoListener != null && prevDataCount < totalData)
+                    searchShopVideoListener.onDataLoaded();
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        request.execute();
+    }
+
+    public void getSearchCommunityMusic(String searchKey) {
+        Map<String, String> params = new HashMap<>();
+        params.put("limit", String.valueOf(limitData)); // get every 20
+        params.put("offset", String.valueOf(DataPool.getInstance().listSearchCommunityMusic.size()));
+        params.put("order", "id");
+        params.put("sort", "desc");
+        params.put("category", "music");
+        params.put("search", searchKey);
+
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_COMMUNITY_CONTENT, ApiManager.getInstance().USER_ACCESS_TOKEN, params);
+
+        request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                int prevDataCount = DataPool.getInstance().listSearchCommunityMusic.size();
+                int totalData = 0;
+
+                try {
+                    JSONObject rawData = new JSONObject(result);
+                    JSONArray arrCommunityMusic = rawData.getJSONArray("contents");
+                    totalData = rawData.getInt("total");
+                    Log.d("MUSIC TOTAL", totalData+"");
+
+                    for (int i = 0; i < arrCommunityMusic.length(); i++) {
+                        JSONObject obj = arrCommunityMusic.getJSONObject(i);
+                        JSONObject userObj = obj.getJSONObject("user");
+
+                        String ID = obj.getString("id");
+                        String userID = userObj.getString("id");
+                        String userName = userObj.getString("name");
+                        String firstName = userObj.getString("first_name");
+                        String lastName = userObj.getString("last_name");
+                        String photoURL = userObj.getString("photo");
+                        int userTotalLikes = userObj.getInt("total_likes");
+                        String songName = obj.getString("name");
+                        String description = obj.getString("description");
+                        String category = obj.getString("category");
+                        String fileURL = obj.getString("file");
+                        String coverURL = obj.getString("cover");
+                        int songTotalLikes = obj.getInt("total_likes");
+                        int songTotalViews = obj.getInt("total_views");
+                        String created = obj.getString("created");
+                        String isLikeable = obj.getString("is_likeable");
+
+
+                        CommunityContentData tempData = new CommunityContentData(ID, userID, userName, firstName, lastName, photoURL, userTotalLikes,
+                                songName, description, category, fileURL, coverURL,
+                                songTotalLikes, songTotalViews, created, isLikeable);
+                        DataPool.getInstance().listSearchCommunityMusic.add(tempData);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if(searchCommunityMusicListener != null && prevDataCount < totalData)
+                    searchCommunityMusicListener.onDataLoaded();
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        request.execute();
+    }
+
+    public void getSearchCommunityVideo(String searchKey) {
+        Map<String, String> params = new HashMap<>();
+        params.put("limit", String.valueOf(limitData)); // get every 20
+        params.put("offset", String.valueOf(DataPool.getInstance().listSearchCommunityVideo.size()));
+        params.put("order", "id");
+        params.put("sort", "desc");
+        params.put("category", "music video");
+        params.put("search", searchKey);
+
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_COMMUNITY_CONTENT, ApiManager.getInstance().USER_ACCESS_TOKEN, params);
+
+        request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                int prevDataCount = DataPool.getInstance().listSearchCommunityVideo.size();
+                int totalData = 0;
+
+                try {
+                    JSONObject rawData = new JSONObject(result);
+                    JSONArray arrCommunityMusic = rawData.getJSONArray("contents");
+                    totalData = rawData.getInt("total");
+                    Log.d("VIDEO TOTAL", totalData+"");
+
+                    for (int i = 0; i < arrCommunityMusic.length(); i++) {
+                        JSONObject obj = arrCommunityMusic.getJSONObject(i);
+                        JSONObject userObj = obj.getJSONObject("user");
+
+                        String ID = obj.getString("id");
+                        String userID = userObj.getString("id");
+                        String userName = userObj.getString("name");
+                        String firstName = userObj.getString("first_name");
+                        String lastName = userObj.getString("last_name");
+                        String photoURL = userObj.getString("photo");
+                        int userTotalLikes = userObj.getInt("total_likes");
+                        String songName = obj.getString("name");
+                        String description = obj.getString("description");
+                        String category = obj.getString("category");
+                        String fileURL = obj.getString("file");
+                        String coverURL = obj.getString("cover");
+                        int songTotalLikes = obj.getInt("total_likes");
+                        int songTotalViews = obj.getInt("total_views");
+                        String created = obj.getString("created");
+                        String isLikeable = obj.getString("is_likeable");
+
+                        CommunityContentData tempData = new CommunityContentData(ID, userID, userName, firstName, lastName, photoURL, userTotalLikes,
+                                songName, description, category, fileURL, coverURL,
+                                songTotalLikes, songTotalViews, created, isLikeable);
+                        DataPool.getInstance().listSearchCommunityVideo.add(tempData);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if(searchCommunityVideoListener != null && prevDataCount < totalData)
+                    searchCommunityVideoListener.onDataLoaded();
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        request.execute();
+    }
+
+    // SEARCH END
+
     // ALBUM
     public void getAlbumDetail(String albumID) {
 
@@ -1621,7 +1991,7 @@ public class ApiManager {
 
         Map<String, String> params = new HashMap<>();
 
-        HttpGetUtil request = new HttpGetUtil(url, ApiManager.getInstance().TOKEN, params);
+        HttpGetUtil request = new HttpGetUtil(url, USER_ACCESS_TOKEN, params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -1671,11 +2041,11 @@ public class ApiManager {
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    if(albumDetailListener != null)
+                    if (albumDetailListener != null)
                         albumDetailListener.onError();
                 }
 
-                if(albumDetailListener != null)
+                if (albumDetailListener != null)
                     albumDetailListener.onDataLoaded();
             }
 
@@ -1856,20 +2226,23 @@ public class ApiManager {
         upload.setOnHttpPostUtilListener(new HttpUploadUtil.HttpPostUtilListener() {
             @Override
             public void afterExecute(String result) {
-                try {
-                    JSONObject rawData = new JSONObject(result);
+                if(result != null) {
+                    Log.d("Upload", result);
+                    try {
+                        JSONObject rawData = new JSONObject(result);
 
-                    if(rawData.has("status")) {
-                        // succeed
-                        uploadListener.onSucceed();
-                    } else {
-                        String message = rawData.getString("error_description");
-                        // Show popup
-                        uploadListener.onFailed(message);
+                        if (rawData.has("status")) {
+                            // succeed
+                            uploadListener.onSucceed();
+                        } else {
+                            String message = rawData.getString("error_description");
+                            // Show popup
+                            uploadListener.onFailed(message);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        uploadListener.onFailed("Upload Failed");
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    uploadListener.onFailed("Upload Failed");
                 }
             }
 
@@ -1974,10 +2347,19 @@ public class ApiManager {
 
     }
 
-    public void setOnTokenReceived(OnTokenReceived listener) {  this.listener = listener; }
+    // IAP COMMAND
+    public void topUpCredit(String productID) {
+        Log.d("TOP UP", "TEST");
+        billingProc.purchase(activity, productID);
+    }
+
+//    public void setOnTokenReceived(OnTokenReceived listener) {  this.listener = listener; }
     public void setOnUserAccessTokenReceved(OnUserAccessTokenReceived listener) { this.userAccessListener = listener; }
-    public void setOnUserTransactionTokenReceived(OnUserTransactionTokenReceived listener) { this.userTransactionListener = listener; }
+//    public void setOnUserTransactionTokenReceived(OnUserTransactionTokenReceived listener) { this.userTransactionListener = listener; }
     public void setOnHomeListener(OnHomeDataReceived listener) { this.dataListener =  listener; }
+
+    public void setOnUploadedMusicListener(OnUploadedMusicReceived listener) { this.uploadedMusicListener = listener; }
+    public void setOnUploadedVideoListener(OnUploadedVideoReceived listener) { this.uploadedVideoListener = listener; }
 
     public void setOnCommunityMusicListener(OnCommunityMusicReceived listener) { this.commMusicListener = listener; }
     public void setOnCommunityVideoListener(OnCommunityVideoReceived listener) { this.commVideoListener = listener; }
@@ -2003,23 +2385,27 @@ public class ApiManager {
 
     public void setOnRegisterListener(OnRegister listener) { this.registerListener = listener; }
 
-    public interface OnTokenReceived {
-        void onTokenSaved();
-        void onError(String message);
-    }
+    public void setOnSearchShopMusicListener(OnSearchReceived listener) { this.searchShopMusicListener = listener; }
+    public void setOnSearchShopVideoListener(OnSearchReceived listener) { this.searchShopVideoListener = listener; }
+    public void setOnSearchShopAlbumListener(OnSearchReceived listener) { this.searchShopAlbumListener = listener; }
+    public void setOnSearchCommunityMusicListener(OnSearchReceived listener) { this.searchCommunityMusicListener = listener; }
+    public void setOnSearchCommunityVideoListener(OnSearchReceived listener) { this.searchCommunityVideoListener = listener; }
 
     public interface OnUserAccessTokenReceived {
         void onUserAccessTokenSaved();
         void onError(String message);
     }
 
-    public interface OnUserTransactionTokenReceived {
-        void onUserTransactionTokenSaved();
-        void onError(String message);
-    }
-
     public interface OnHomeDataReceived {
         void onDataLoaded(ApiType type);
+    }
+
+    public interface OnUploadedMusicReceived {
+        void onDataLoaded();
+    }
+
+    public interface OnUploadedVideoReceived {
+        void onDataLoaded();
     }
 
     public interface OnCommunityMusicReceived {
@@ -2090,5 +2476,10 @@ public class ApiManager {
     public interface OnRegister {
         void onSucceed();
         void onFailed(String message);
+    }
+
+    public interface OnSearchReceived {
+        void onDataLoaded();
+        void onError();
     }
 }

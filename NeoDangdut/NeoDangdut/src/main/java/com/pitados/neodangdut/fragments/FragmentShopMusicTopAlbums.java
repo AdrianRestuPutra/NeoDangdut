@@ -16,6 +16,7 @@ import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomListShopAlbumAdapter;
 import com.pitados.neodangdut.util.ApiManager;
 import com.pitados.neodangdut.util.DataPool;
+import com.pitados.neodangdut.util.FontLoader;
 
 /**
  * Created by adrianrestuputranto on 4/10/16.
@@ -65,6 +66,8 @@ public class FragmentShopMusicTopAlbums extends Fragment {
         topTitle = (TextView) view.findViewById(R.id.shop_music_top_50_title);
         topTitle.setText("TOP 50 ALBUMS");
 
+        topTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+
         listTopAlbums = (ListView) view.findViewById(R.id.shop_music_top_50_listview);
         listTopAlbums.setFocusable(false);
 
@@ -75,7 +78,7 @@ public class FragmentShopMusicTopAlbums extends Fragment {
         listTopAlbums.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                popupAlbum.showPopupLoading(DataPool.getInstance().listShopMusicTopAlbums.get(i).ID);
+                popupAlbum.showPopupAlbum(DataPool.getInstance().listShopMusicTopAlbums.get(i).ID);
             }
         });
 
@@ -90,16 +93,16 @@ public class FragmentShopMusicTopAlbums extends Fragment {
         if(DataPool.getInstance().listShopMusicTopAlbums.size() > 0) {
             listAdapter = new CustomListShopAlbumAdapter(context, DataPool.getInstance().listShopMusicTopAlbums);
             listTopAlbums.setAdapter(listAdapter);
-        } else {
-            ApiManager.getInstance().setOnShopMusicTopAlbumListener(new ApiManager.OnShopMusicTopAlbumReceived() {
-                @Override
-                public void onDataLoaded(ApiManager.ApiType type) {
-                    listAdapter = new CustomListShopAlbumAdapter(context, DataPool.getInstance().listShopMusicTopAlbums);
-                    listTopAlbums.setAdapter(listAdapter);
-
-                    listAdapter.notifyDataSetChanged();
-                }
-            });
         }
+
+        ApiManager.getInstance().setOnShopMusicTopAlbumListener(new ApiManager.OnShopMusicTopAlbumReceived() {
+            @Override
+            public void onDataLoaded(ApiManager.ApiType type) {
+                listAdapter = new CustomListShopAlbumAdapter(context, DataPool.getInstance().listShopMusicTopAlbums);
+                listTopAlbums.setAdapter(listAdapter);
+
+                listAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }

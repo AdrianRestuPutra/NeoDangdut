@@ -13,6 +13,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.VideoData;
 import com.pitados.neodangdut.util.CustomMediaPlayer;
+import com.pitados.neodangdut.util.FontLoader;
 
 /**
  * Created by adrianrestuputranto on 5/31/16.
@@ -46,6 +47,12 @@ public class PopupArtistVideo extends Dialog implements View.OnClickListener{
         artistName = (TextView) findViewById(R.id.popup_artist_video_artist_name);
         viewCount = (TextView) findViewById(R.id.popup_artist_video_view_count);
         likeCount = (TextView) findViewById(R.id.popup_artist_video_like_count);
+
+        title.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+        price.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+        artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+        viewCount.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+        likeCount.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
 
         // Button
         buttonPlay = (RelativeLayout) findViewById(R.id.popup_artist_video_button_play);

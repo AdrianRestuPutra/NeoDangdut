@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Gallery;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.pitados.neodangdut.Consts;
@@ -76,10 +77,11 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                ApiManager.getInstance().getToken();
-                ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
+                ApiManager.getInstance().getUserAccessToken();
+                ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
+
                     @Override
-                    public void onTokenSaved() {
+                    public void onUserAccessTokenSaved() {
                         ApiManager.getInstance().getShopMusicTopSongs();
                         ApiManager.getInstance().getFeaturedShopMusic();
                     }
@@ -112,33 +114,37 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
             listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicTopSongs, popupAlbum);
             listTopSong.setAdapter(listAdapter);
 
+            getListViewSize(listTopSong);
+
             featuredAdapter = new ShopMusicFeaturedAdapter(context, DataPool.getInstance().listShopMusicFeatured);
             listFeatured.setAdapter(featuredAdapter);
             listFeatured.setSelection(2);
-        } else {
-            ApiManager.getInstance().setOnShopMusicTopSongListener(new ApiManager.OnShopMusicTopSongReceived() {
-                @Override
-                public void onDataLoaded(ApiManager.ApiType type) {
-                    listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicTopSongs, popupAlbum);
-                    listTopSong.setAdapter(listAdapter);
-
-                    listAdapter.notifyDataSetChanged();
-
-                    if (swipeRefresh != null)
-                        swipeRefresh.setRefreshing(false);
-                }
-
-                @Override
-                public void onFeaturedLoaded() {
-                    featuredAdapter = new ShopMusicFeaturedAdapter(context, DataPool.getInstance().listShopMusicFeatured);
-                    listFeatured.setAdapter(featuredAdapter);
-                    listFeatured.setSelection(2);
-
-                    if (swipeRefresh != null)
-                        swipeRefresh.setRefreshing(false);
-                }
-            });
         }
+
+        ApiManager.getInstance().setOnShopMusicTopSongListener(new ApiManager.OnShopMusicTopSongReceived() {
+            @Override
+            public void onDataLoaded(ApiManager.ApiType type) {
+                listAdapter = new CustomListShopMusicAdapter(context, DataPool.getInstance().listShopMusicTopSongs, popupAlbum);
+                listTopSong.setAdapter(listAdapter);
+
+                listAdapter.notifyDataSetChanged();
+
+                getListViewSize(listTopSong);
+
+                if (swipeRefresh != null)
+                    swipeRefresh.setRefreshing(false);
+            }
+
+            @Override
+            public void onFeaturedLoaded() {
+                featuredAdapter = new ShopMusicFeaturedAdapter(context, DataPool.getInstance().listShopMusicFeatured);
+                listFeatured.setAdapter(featuredAdapter);
+                listFeatured.setSelection(2);
+
+                if (swipeRefresh != null)
+                    swipeRefresh.setRefreshing(false);
+            }
+        });
     }
 
     public void refreshListview() {
@@ -146,6 +152,8 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
         listTopSong.setAdapter(listAdapter);
 
         listAdapter.notifyDataSetChanged();
+
+        getListViewSize(listTopSong);
     }
 
     @Override
@@ -157,5 +165,27 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
         if(adapterView == listFeatured) {
             CustomMediaPlayer.getInstance().playTrack(DataPool.getInstance().listShopMusicFeatured.get(i), true);
         }
+    }
+
+    private void getListViewSize(ListView myListView) {
+        ListAdapter myListAdapter = myListView.getAdapter();
+        if (myListAdapter == null) {
+            // do nothing return null
+            return;
+        }
+        // set listAdapter in loop for getting final size
+        int totalHeight = 0;
+        for (int size = 0; size < myListAdapter.getCount(); size++) {
+            View listItem = myListAdapter.getView(size, null, myListView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+        // setting listview item in adapter
+        ViewGroup.LayoutParams params = myListView.getLayoutParams();
+        params.height = totalHeight
+                + (myListView.getDividerHeight() * (myListAdapter.getCount() - 1));
+        myListView.setLayoutParams(params);
+        // print height of adapter on log
+        Log.i("height of listItem:", String.valueOf(totalHeight));
     }
 }

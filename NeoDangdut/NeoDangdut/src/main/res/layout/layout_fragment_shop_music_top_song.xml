@@ -71,7 +71,7 @@
                 <ListView
                     android:id="@+id/shop_music_top_song_listview"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/shop_music_top_song_list_height"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/top_list_padding">
 
                 </ListView>

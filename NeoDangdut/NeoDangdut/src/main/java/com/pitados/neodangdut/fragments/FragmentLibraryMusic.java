@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,6 +97,7 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
     }
 
     public void loadData() {
+        Log.d("LOAD LIBRARY", "Loaded");
         // TODO search local data
         if(DataPool.getInstance().listLibraryMusic.size() > 0) {
             listAdapter = new CustomLibraryMusicAdapter(context, DataPool.getInstance().listLibraryMusic);
@@ -128,6 +130,7 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
     }
 
     public void reloadData() {
+        DataPool.getInstance().listLibraryMusic.clear();
         ApiManager.getInstance().getLibraryMusic();
     }
 }

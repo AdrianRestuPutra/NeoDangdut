@@ -124,7 +124,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         userLoginData.setUserFBID(fbID);
                         userLoginData.setUserFBEmail(fbEmail);
 
-                        ApiManager.getInstance().getUserAccessTokenWithFB();
+                        ApiManager.getInstance().getUserAccessToken();
                         ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
                             @Override
                             public void onUserAccessTokenSaved() {

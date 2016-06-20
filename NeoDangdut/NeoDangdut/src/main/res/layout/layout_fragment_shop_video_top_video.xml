@@ -70,7 +70,7 @@
                 <ListView
                     android:id="@+id/shop_video_top_video_listview"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/shop_video_top_video_list_height"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/top_list_padding">
 
                 </ListView>

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.facebook.login.LoginManager;
-import com.pitados.neodangdut.util.ApiManager;
 
 /**
  * Created by adrianrestuputranto on 6/3/16.
@@ -16,7 +15,9 @@ public class UserLoginData {
     private SharedPreferences.Editor preferencesEditor;
     private String USERNAME = "USERNAME";
     private String PASSWORD = "PASSWORD";
+    private String TOKEN = "TOKEN";
     private String REFRESH_TOKEN = "REFRESH_TOKEN";
+    private String TOKEN_TIME = "TIME";
 
     // USER DATA
     private String USER_ID = "ID";
@@ -44,9 +45,15 @@ public class UserLoginData {
         return preferences.getString(PASSWORD, "");
     }
 
+    public String getToken() {
+        return preferences.getString(TOKEN, "");
+    }
+
     public String getRefreshToken() {
         return preferences.getString(REFRESH_TOKEN, "");
     }
+
+    public long getTokenTime() { return preferences.getLong(TOKEN_TIME, 0l); }
 
     // User data
     public String getUserID() {
@@ -87,8 +94,16 @@ public class UserLoginData {
         preferencesEditor.putString(PASSWORD, password).commit();
     }
 
+    public void setToken(String token) {
+        preferencesEditor.putString(TOKEN, token).commit();
+    }
+
     public void setRefreshToken(String refreshToken) {
         preferencesEditor.putString(REFRESH_TOKEN, refreshToken).commit();
+    }
+
+    public void setTokenTime(long tokenTime) {
+        preferencesEditor.putLong(TOKEN_TIME, tokenTime).commit();
     }
 
     public void setUserID(String id) {
@@ -128,6 +143,8 @@ public class UserLoginData {
         setFullName("");
         setCredit("");
         setPhotoURL("");
+        setToken("");
+        setTokenTime(0l);
         setRefreshToken("");
 
         setLoginWithFB(false);
@@ -135,7 +152,5 @@ public class UserLoginData {
         setUserFBEmail("");
 
         LoginManager.getInstance().logOut();
-
-        ApiManager.getInstance().getUserAccessTokenTime = 0l;
     }
 }

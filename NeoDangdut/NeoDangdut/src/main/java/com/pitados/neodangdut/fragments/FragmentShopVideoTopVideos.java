@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Gallery;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.pitados.neodangdut.Consts;
@@ -72,10 +73,10 @@ public class FragmentShopVideoTopVideos extends Fragment {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                ApiManager.getInstance().getToken();
-                ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
+                ApiManager.getInstance().getUserAccessToken();
+                ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
                     @Override
-                    public void onTokenSaved() {
+                    public void onUserAccessTokenSaved() {
                         ApiManager.getInstance().getShopVideoTopVideos();
                         ApiManager.getInstance().getFeaturedShopVideo();
                     }
@@ -117,12 +118,16 @@ public class FragmentShopVideoTopVideos extends Fragment {
         listTopVideos.setAdapter(listAdapter);
 
         listAdapter.notifyDataSetChanged();
+
+        getListViewSize(listTopVideos);
     }
 
     public void loadData() {
         if(DataPool.getInstance().listShopVideoTopVideos.size() > 0) {
             listAdapter = new CustomListShopVideoAdapter(context, DataPool.getInstance().listShopVideoTopVideos);
             listTopVideos.setAdapter(listAdapter);
+
+            getListViewSize(listTopVideos);
 
             Log.d("Featured", DataPool.getInstance().listShopVideoFeatured.size() + "");
             featuredAdapter = new ShopVideoFeaturedAdapter(context, DataPool.getInstance().listShopVideoFeatured);
@@ -138,6 +143,8 @@ public class FragmentShopVideoTopVideos extends Fragment {
                 listTopVideos.setAdapter(listAdapter);
 
                 listAdapter.notifyDataSetChanged();
+
+                getListViewSize(listTopVideos);
             }
 
             @Override
@@ -151,5 +158,27 @@ public class FragmentShopVideoTopVideos extends Fragment {
                     swipeRefresh.setRefreshing(false);
             }
         });
+    }
+
+    private void getListViewSize(ListView myListView) {
+        ListAdapter myListAdapter = myListView.getAdapter();
+        if (myListAdapter == null) {
+            // do nothing return null
+            return;
+        }
+        // set listAdapter in loop for getting final size
+        int totalHeight = 0;
+        for (int size = 0; size < myListAdapter.getCount(); size++) {
+            View listItem = myListAdapter.getView(size, null, myListView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+        // setting listview item in adapter
+        ViewGroup.LayoutParams params = myListView.getLayoutParams();
+        params.height = totalHeight
+                + (myListView.getDividerHeight() * (myListAdapter.getCount() - 1));
+        myListView.setLayoutParams(params);
+        // print height of adapter on log
+        Log.i("height of listItem:", String.valueOf(totalHeight));
     }
 }

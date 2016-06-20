@@ -82,8 +82,7 @@
 
             <RelativeLayout
                 android:layout_width="@dimen/music_player_thumbnail_container_width"
-                android:layout_height="match_parent"
-                android:background="@color/black_panel">
+                android:layout_height="match_parent">
 
                 <ImageView
                     android:id="@+id/music_player_thumbnail"
@@ -274,6 +273,19 @@
         <include layout="@layout/layout_news_detail" />
     </RelativeLayout>
     <!-- News Detail End -->
+
+    <!-- Topup -->
+    <RelativeLayout
+        android:id="@+id/panel_topup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:visibility="invisible">
+
+        <include layout="@layout/layout_topup"/>
+
+    </RelativeLayout>
+    <!-- Topup End -->
 
     <!-- Upload -->
     <RelativeLayout

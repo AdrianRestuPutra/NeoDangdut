@@ -15,10 +15,13 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.pitados.neodangdut.Popup.PopupAlbumView;
 import com.pitados.neodangdut.Popup.PopupLoading;
+import com.pitados.neodangdut.Popup.PopupPurchase;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.AlbumData;
 import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.FontLoader;
 
 import java.util.List;
 
@@ -33,6 +36,8 @@ public class CustomListShopAlbumAdapter extends BaseAdapter {
     private DisplayImageOptions opts;
 
     private PopupLoading popupLoading;
+    private PopupPurchase popupPurchase;
+    private PopupAlbumView popupAlbum;
 
     static class ViewHolder {
         ImageView thumbnail;
@@ -59,6 +64,8 @@ public class CustomListShopAlbumAdapter extends BaseAdapter {
                 .build();
 
         popupLoading = new PopupLoading(context, R.style.custom_dialog);
+        popupPurchase = new PopupPurchase(context, R.style.custom_dialog);
+        popupAlbum = new PopupAlbumView(context, R.style.custom_dialog);
     }
 
     @Override
@@ -94,51 +101,9 @@ public class CustomListShopAlbumAdapter extends BaseAdapter {
             holder.price = (TextView) view.findViewById(R.id.list_view_shop_music_top_album_price);
             holder.buyButton = (RelativeLayout) view.findViewById(R.id.list_view_shop_music_top_album_button);
 
-            final int index = i;
-            holder.buyButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    popupLoading.showPopupLoading("Purchasing..");
-
-                    ApiManager.getInstance().getUserTransactionToken();
-                    ApiManager.getInstance().setOnUserTransactionTokenReceived(new ApiManager.OnUserTransactionTokenReceived() {
-                        @Override
-                        public void onUserTransactionTokenSaved() {
-                            ApiManager.getInstance().purchaseItem(ApiManager.PurchaseType.ALBUM, listTopAlbum.get(index).ID);
-                            ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
-
-                                @Override
-                                public void onItemPurchased(String result) {
-                                    Log.d("Result", result);
-
-                                    popupLoading.closePopupLoading();
-                                    // TODO notif user
-                                }
-
-                                @Override
-                                public void onError(String message) {
-                                    // TODO show popup
-                                    popupLoading.setMessage("Purchase Failed");
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onError(String message) {
-                            popupLoading.setMessage("Purchase Failed");
-                        }
-                    });
-                }
-            });
-
-
-            holder.optButton = (RelativeLayout) view.findViewById(R.id.list_view_shop_music_top_album_opt_button);
-            holder.optButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                }
-            });
+            holder.albumName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+            holder.artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+            holder.price.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_BOLD));
 
             view.setTag(holder);
         } else {
@@ -152,6 +117,37 @@ public class CustomListShopAlbumAdapter extends BaseAdapter {
 
         holder.price.setText("Rp "+listTopAlbum.get(i).price);
 
+        final int index = i;
+        holder.buyButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
+
+                    @Override
+                    public void onItemPurchased(String result) {
+                        Log.d("Result", result);
+
+                        // TODO notif user
+                    }
+
+                    @Override
+                    public void onError(String message) {
+
+                    }
+                });
+
+                popupPurchase.showPopupPurchase(listTopAlbum.get(index));
+
+            }
+        });
+
+        holder.optButton = (RelativeLayout) view.findViewById(R.id.list_view_shop_music_top_album_opt_button);
+        holder.optButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                popupAlbum.showPopupAlbum(listTopAlbum.get(index).ID);
+            }
+        });
         return view;
     }
 }

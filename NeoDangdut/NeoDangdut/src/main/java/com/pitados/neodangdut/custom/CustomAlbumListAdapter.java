@@ -15,9 +15,12 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.pitados.neodangdut.Popup.PopupArtistSong;
+import com.pitados.neodangdut.Popup.PopupPurchase;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.AlbumItem;
 import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.FontLoader;
 
 import java.util.List;
 
@@ -31,6 +34,11 @@ public class CustomAlbumListAdapter extends BaseAdapter {
     private ImageLoader imageLoader;
     private DisplayImageOptions opts;
 
+    private PopupArtistSong popupArtistSong;
+    private PopupPurchase popupPurchase;
+
+    private String coverURL;
+
     static class ViewHolder {
         TextView musicTitle;
         TextView artistName;
@@ -40,9 +48,10 @@ public class CustomAlbumListAdapter extends BaseAdapter {
         ImageView optButton;
     }
 
-    public CustomAlbumListAdapter(Context context, List<AlbumItem> listTopTrack) {
+    public CustomAlbumListAdapter(Context context, List<AlbumItem> listTopTrack, String coverURL) {
         this.context = context;
         this.listTrack = listTopTrack;
+        this.coverURL = coverURL;
 
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()
@@ -54,6 +63,9 @@ public class CustomAlbumListAdapter extends BaseAdapter {
                 .resetViewBeforeLoading(true)
                 .imageScaleType(ImageScaleType.EXACTLY)
                 .build();
+
+        popupArtistSong = new PopupArtistSong(context, R.style.custom_dialog);
+        popupPurchase = new PopupPurchase(context, R.style.custom_dialog);
     }
 
     @Override
@@ -99,6 +111,9 @@ public class CustomAlbumListAdapter extends BaseAdapter {
 
             holder.optButton = (ImageView) view.findViewById(R.id.list_view_album_item_opt_button);
 
+            holder.musicTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+            holder.artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+            holder.price.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
 
             view.setTag(holder);
         } else {
@@ -123,36 +138,25 @@ public class CustomAlbumListAdapter extends BaseAdapter {
             holder.buyButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
 
-                    ApiManager.getInstance().getUserTransactionToken();
-                    ApiManager.getInstance().setOnUserTransactionTokenReceived(new ApiManager.OnUserTransactionTokenReceived() {
                         @Override
-                        public void onUserTransactionTokenSaved() {
-                            ApiManager.getInstance().purchaseItem(ApiManager.PurchaseType.SINGLE, listTrack.get(index).ID);
-                            ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
-
-                                @Override
-                                public void onItemPurchased(String result) {
-                                    Log.d("Result", result);
+                        public void onItemPurchased(String result) {
+                            Log.d("Result", result);
 
 //                                    listTrack.get(index).inLibrary = true;
-                                    holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
-                                    // TODO notif user
-                                }
-
-                                @Override
-                                public void onError(String message) {
-                                    // TODO show popup
-
-                                }
-                            });
+                            holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
+                            // TODO notif user
                         }
 
                         @Override
                         public void onError(String message) {
+                            // TODO show popup
 
                         }
                     });
+
+                    popupPurchase.showPopupPurchase(listTrack.get(index));
 
                 }
             });
@@ -161,8 +165,7 @@ public class CustomAlbumListAdapter extends BaseAdapter {
         holder.optButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-
-//                popupArtistSong.showPopupArtistSong(listTrack.get(index));
+                popupArtistSong.showPopupArtistSong(listTrack.get(index), coverURL);
             }
         });
 

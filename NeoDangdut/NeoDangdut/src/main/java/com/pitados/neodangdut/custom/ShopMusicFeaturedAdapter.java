@@ -15,9 +15,11 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.Popup.PopupLoading;
+import com.pitados.neodangdut.Popup.PopupPurchase;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.MusicData;
 import com.pitados.neodangdut.util.ApiManager;
+import com.pitados.neodangdut.util.FontLoader;
 
 import java.util.List;
 
@@ -32,6 +34,7 @@ public class ShopMusicFeaturedAdapter extends BaseAdapter {
     private DisplayImageOptions opts;
 
     private PopupLoading popupLoading;
+    private PopupPurchase popupPurchase;
 
     static class ViewHolder {
         ImageView thumbnail;
@@ -58,6 +61,7 @@ public class ShopMusicFeaturedAdapter extends BaseAdapter {
                 .build();
 
         popupLoading = new PopupLoading(context, R.style.custom_dialog);
+        popupPurchase = new PopupPurchase(context, R.style.custom_dialog);
     }
 
     @Override
@@ -93,6 +97,11 @@ public class ShopMusicFeaturedAdapter extends BaseAdapter {
 
             holder.buyButton = (RelativeLayout) view.findViewById(R.id.shop_music_featured_buy_button);
 
+            holder.musicTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+            holder.artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+            holder.albumName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
+            holder.price.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_BOLD));
+
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();
@@ -111,34 +120,27 @@ public class ShopMusicFeaturedAdapter extends BaseAdapter {
         holder.buyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ApiManager.getInstance().getUserTransactionToken();
-                ApiManager.getInstance().setOnUserTransactionTokenReceived(new ApiManager.OnUserTransactionTokenReceived() {
+                Log.d("FEATURED", index+"");
+
+                ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
+
                     @Override
-                    public void onUserTransactionTokenSaved() {
-                        ApiManager.getInstance().purchaseItem(ApiManager.PurchaseType.SINGLE, listData.get(index).ID);
-                        ApiManager.getInstance().setOnPurchasedListener(new ApiManager.OnPurchase() {
+                    public void onItemPurchased(String result) {
+                        Log.d("Result", result);
 
-                            @Override
-                            public void onItemPurchased(String result) {
-                                Log.d("Result", result);
-
-                                popupLoading.closePopupLoading();
-                                // TODO notif user
-                            }
-
-                            @Override
-                            public void onError(String message) {
-                                // TODO show popup
-                                popupLoading.setMessage("Purchase Failed");
-                            }
-                        });
+                        popupLoading.closePopupLoading();
+                        // TODO notif user
                     }
 
                     @Override
                     public void onError(String message) {
+                        // TODO show popup
                         popupLoading.setMessage("Purchase Failed");
                     }
                 });
+
+                popupPurchase.showPopupPurchase(listData.get(index));
+
             }
         });
 

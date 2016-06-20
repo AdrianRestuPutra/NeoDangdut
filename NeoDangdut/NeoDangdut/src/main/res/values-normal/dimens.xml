@@ -9,7 +9,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="divider_height">1dp</dimen>
-    <dimen name="icon_width">30dp</dimen>
+    <dimen name="icon_width">20dp</dimen>
     <dimen name="setting_icon_width">20dp</dimen>
     <dimen name="option_icon_width">20dp</dimen>
 
@@ -197,6 +197,8 @@
     <dimen name="profile_preview_city_margin">15dp</dimen>
     <dimen name="profile_preview_description_margin">20dp</dimen>
     <dimen name="profile_preview_description_text">6pt</dimen>
+    <dimen name="profile_preview_description_panel_height">80dp</dimen>
+    <dimen name="profile_preview_upload_item_margin_left">10dp</dimen>
 
     <!-- Popup webview -->
     <dimen name="dialog_webview_width">300dp</dimen>
@@ -206,5 +208,28 @@
     <dimen name="album_item_button_width">100dp</dimen>
     <dimen name="album_item_button_height">20dp</dimen>
     <dimen name="album_item_thumbnail_width">80dp</dimen>
+
+    <!-- Top Up -->
+    <dimen name="topup_margin_top">30dp</dimen>
+    <dimen name="topup_page_padding">20dp</dimen>
+    <dimen name="topup_item_spacing">10dp</dimen>
+    <dimen name="topup_item_height">70dp</dimen>
+    <dimen name="topup_text_size">8pt</dimen>
     
+    <!-- Popup Purchase -->
+    <dimen name="dialog_purchase_text_title">6pt</dimen>
+    <dimen name="dialog_purchase_text_regular">4pt</dimen>
+    <dimen name="dialog_purchase_icon">15dp</dimen>
+    <dimen name="dialog_purchase_padding">15dp</dimen>
+    <dimen name="dialog_purchase_thumbnail">60dp</dimen>
+
+    <!-- Search -->
+    <dimen name="search_input_height">50dp</dimen>
+    <dimen name="search_input_padding">10dp</dimen>
+    <dimen name="search_panel_padding">15dp</dimen>
+    <dimen name="search_title_container_height">30dp</dimen>
+    <dimen name="search_title_icon_width">15dp</dimen>
+    <dimen name="search_title_icon_margin">10dp</dimen>
+    <dimen name="search_load_more_button_height">50dp</dimen>
+
 </resources>

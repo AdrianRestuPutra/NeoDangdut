@@ -107,6 +107,7 @@ public class FragmentLibraryVideo extends Fragment implements AdapterView.OnItem
     }
 
     public void reloadData() {
+        DataPool.getInstance().listLibraryVideo.clear();
         ApiManager.getInstance().getLibraryVideo();
     }
 

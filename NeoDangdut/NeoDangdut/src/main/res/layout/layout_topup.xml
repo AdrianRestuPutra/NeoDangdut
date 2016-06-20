@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_bg"
+    android:padding="@dimen/topup_page_padding">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <!-- 3000 -->
+        <RelativeLayout
+            android:id="@+id/topup_btn_3k"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/topup_item_height"
+            android:background="@drawable/bg_btn_purple">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="IDR 3000"
+                android:textColor="@color/white_font"
+                android:textSize="@dimen/topup_text_size"/>
+
+        </RelativeLayout>
+
+        <!-- 5000 -->
+        <RelativeLayout
+            android:id="@+id/topup_btn_5k"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/topup_item_height"
+            android:layout_marginTop="@dimen/topup_item_spacing"
+            android:background="@drawable/bg_btn_purple">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="IDR 5000"
+                android:textColor="@color/white_font"
+                android:textSize="@dimen/topup_text_size"/>
+
+        </RelativeLayout>
+
+        <!-- 10000 -->
+        <RelativeLayout
+            android:id="@+id/topup_btn_10k"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/topup_item_height"
+            android:layout_marginTop="@dimen/topup_item_spacing"
+            android:background="@drawable/bg_btn_purple">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="IDR 10000"
+                android:textColor="@color/white_font"
+                android:textSize="@dimen/topup_text_size"/>
+
+        </RelativeLayout>
+
+        <!-- 20000 -->
+        <RelativeLayout
+            android:id="@+id/topup_btn_20k"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/topup_item_height"
+            android:layout_marginTop="@dimen/topup_item_spacing"
+            android:background="@drawable/bg_btn_purple">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="IDR 20000"
+                android:textColor="@color/white_font"
+                android:textSize="@dimen/topup_text_size"/>
+
+        </RelativeLayout>
+
+        <!-- 50000 -->
+        <RelativeLayout
+            android:id="@+id/topup_btn_50k"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/topup_item_height"
+            android:layout_marginTop="@dimen/topup_item_spacing"
+            android:background="@drawable/bg_btn_purple">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="IDR 50000"
+                android:textColor="@color/white_font"
+                android:textSize="@dimen/topup_text_size"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+
+</RelativeLayout>
