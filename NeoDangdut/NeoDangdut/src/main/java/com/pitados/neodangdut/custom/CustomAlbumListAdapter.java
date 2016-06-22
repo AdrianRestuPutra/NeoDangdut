@@ -191,7 +191,6 @@ public class CustomAlbumListAdapter extends BaseAdapter {
                             holder.price.setText("Download");
                             holder.price.setTextColor(context.getResources().getColor(R.color.white_font));
                             listTrack.get(index).inLibrary = true;
-                            holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
                         }
 
                         @Override

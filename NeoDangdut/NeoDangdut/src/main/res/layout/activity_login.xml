@@ -82,7 +82,9 @@
                         android:paddingLeft="@dimen/signup_padding"
                         android:textColor="@color/white_font"
                         android:textColorHint="@color/purple_font"
-                        android:hint="Username"/>
+                        android:hint="Username"
+                        android:singleLine="true"
+                        android:imeOptions="actionNext"/>
 
                     <EditText
                         android:id="@+id/login_form_password"
@@ -96,7 +98,9 @@
                         android:inputType="textPassword"
                         android:textColor="@color/white_font"
                         android:textColorHint="@color/purple_font"
-                        android:hint="Password" />
+                        android:hint="Password"
+                        android:singleLine="true"
+                        android:imeOptions="actionDone"/>
 
                     <Button
                         android:id="@+id/login_button_login"

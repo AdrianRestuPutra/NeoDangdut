@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.daimajia.slider.library.Indicators.PagerIndicator;
@@ -22,6 +23,7 @@ import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
 import com.pitados.neodangdut.Consts;
+import com.pitados.neodangdut.Popup.PopupAlbumView;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomCommunityNewsAdapter;
 import com.pitados.neodangdut.custom.CustomListTopTrackAdapter;
@@ -43,6 +45,7 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
     private SliderLayout homeBanner;
     private PagerIndicator homeBannerIndicator;
     private ListView listViewTopTrack, listViewTopVideo, listViewLatestNews;
+    private RelativeLayout loadingBar;
 
     // Adapters
     private CustomListTopTrackAdapter listTrackAdapter;
@@ -50,6 +53,8 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
     private CustomCommunityNewsAdapter listNewsAdapter;
 
     private SwipeRefreshLayout swipeRefresh;
+
+    private PopupAlbumView popupAlbum;
 
     public static FragmentHome newInstance(int page, String title) {
         FragmentHome home = new FragmentHome();
@@ -80,8 +85,11 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
 
         View view = inflater.inflate(R.layout.layout_fragment_home, container, false);
 
+        popupAlbum = new PopupAlbumView(context, R.style.custom_dialog);
 
         // TODO init widgets
+        loadingBar = (RelativeLayout) view.findViewById(R.id.home_loading);
+
         homeBanner = (SliderLayout) view.findViewById(R.id.home_slider);
         homeBannerIndicator = (PagerIndicator) view.findViewById(R.id.home_slider_indicator);
         homeBanner.setCustomIndicator(homeBannerIndicator);
@@ -100,7 +108,7 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
             @Override
             public void onRefresh() {
 
-                if(isNetworkAvailable()) {
+                if (isNetworkAvailable()) {
                     homeBanner.removeAllSliders();
 
                     ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
@@ -129,7 +137,7 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
 
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    if(isNetworkAvailable()) {
+                                    if (isNetworkAvailable()) {
                                         ApiManager.getInstance().getHomeBanner();
                                         ApiManager.getInstance().getHomeTopMusic();
                                         ApiManager.getInstance().getHomeTopVideos();
@@ -144,6 +152,7 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
             }
         });
 
+        loadingBar.setVisibility(View.VISIBLE);
         loadData();
 
         // On click listener
@@ -205,7 +214,7 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
     }
 
     private void loadTopMusic() {
-        listTrackAdapter = new CustomListTopTrackAdapter(context, DataPool.getInstance().listHomeTopMusic);
+        listTrackAdapter = new CustomListTopTrackAdapter(context, DataPool.getInstance().listHomeTopMusic, popupAlbum);
         listViewTopTrack.setAdapter(listTrackAdapter);
 
         listTrackAdapter.notifyDataSetChanged();
@@ -227,6 +236,8 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
 
         listNewsAdapter.notifyDataSetChanged();
         getListViewSize(listViewLatestNews);
+
+        loadingBar.setVisibility(View.INVISIBLE);
     }
 
 

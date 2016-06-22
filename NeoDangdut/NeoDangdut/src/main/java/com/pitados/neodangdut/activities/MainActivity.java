@@ -1,7 +1,6 @@
 package com.pitados.neodangdut.activities;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -37,7 +36,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
@@ -47,6 +45,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.pitados.neodangdut.Consts;
+import com.pitados.neodangdut.Popup.PopupAlbumView;
 import com.pitados.neodangdut.Popup.PopupArtistSong;
 import com.pitados.neodangdut.Popup.PopupCommunity;
 import com.pitados.neodangdut.Popup.PopupLoading;
@@ -77,6 +76,7 @@ import com.pitados.neodangdut.util.ApiManager;
 import com.pitados.neodangdut.util.ConnManager;
 import com.pitados.neodangdut.util.CustomMediaPlayer;
 import com.pitados.neodangdut.util.DataPool;
+import com.pitados.neodangdut.util.FilePath;
 import com.pitados.neodangdut.util.FontLoader;
 import com.pitados.neodangdut.util.StateManager;
 
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity
 
     private int REQUEST_STORAGE_PERMISSION_CODE = 100;
     private int UPLOAD_FILE_CODE = 250;
-
+    private int UPLOAD_PROFPIC = 256;
 
     private enum PanelState {
         PANEL_NEW_POST,
@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity
     private com.getbase.floatingactionbutton.FloatingActionButton fabMusic, fabVideo;
     // Panel
     private RelativeLayout panelNewPost, panelLibrary, panelShopMusic, panelShopVideo, panelDownloads, panelSettings, panelUpload, panelProfile, panelTopup, panelSearch;
+//    private RelativeLayout panelLoading;
     // Media Panel
     private LinearLayout panelMusicPlayer;
     private RelativeLayout musicPlayerPauseButton, musicPlayerShuffleButton, musicPlayerLoopbutton;
@@ -151,9 +152,9 @@ public class MainActivity extends AppCompatActivity
 
     // Profile
     private ImageView profilePicture;
-    private EditText profileName, profileCountry, profileCity;
+    private EditText profileName, profileCountry, profileCity, profileDescription;
     private ImageView profileEdit, editName, editCountry, editCity;
-    private TextView profileLikeCount, profileMusicCount, profileVideoCount, profileDescription;
+    private TextView profileLikeCount, profileMusicCount, profileVideoCount;
 
     private boolean notifIsOn, downloadWIFIOnlyOn;
     private boolean canEditProfile;
@@ -190,6 +191,7 @@ public class MainActivity extends AppCompatActivity
     private PopupLoading popupLoading;
     private PopupArtistSong popupArtistSong;
     private PopupCommunity popupCommunitySong;
+    private PopupAlbumView popupAlbum;
     // EXIT
 
     // MENU
@@ -209,6 +211,7 @@ public class MainActivity extends AppCompatActivity
 
         initIAB();
 
+        DataPool.getInstance().mainActivity = MainActivity.this;
         userLoginData = new UserLoginData(getBaseContext());
 
         imageLoader = ImageLoader.getInstance();
@@ -221,7 +224,6 @@ public class MainActivity extends AppCompatActivity
                 .resetViewBeforeLoading(true)
                 .build();
 
-
         // init panel
         panelNewPost = (RelativeLayout) findViewById(R.id.panel_new_post);
         panelLibrary = (RelativeLayout) findViewById(R.id.panel_library);
@@ -232,6 +234,7 @@ public class MainActivity extends AppCompatActivity
         panelProfile = (RelativeLayout) findViewById(R.id.panel_profile);
         panelTopup = (RelativeLayout) findViewById(R.id.panel_topup);
         panelSearch = (RelativeLayout) findViewById(R.id.panel_search);
+
 
         popupLoading = new PopupLoading(MainActivity.this, R.style.custom_dialog);
 
@@ -273,6 +276,11 @@ public class MainActivity extends AppCompatActivity
 //        }
         Consts.APP_BASE_DIR = Environment.getExternalStorageDirectory()+"/NeoDangdut";
 
+        String testPath = "/sdcard/"+Consts.APP_BASE_DIR+"/Music/Salome/Salome.mp3";
+        File testFile = new File(testPath);
+
+        Log.d("TEST FILE", testFile.exists()+"");
+
         // TODO handle floating button
         fabMenu = (FloatingActionsMenu) findViewById(R.id.fab_menu);
         fabMusic = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_upload_music);
@@ -305,12 +313,116 @@ public class MainActivity extends AppCompatActivity
         // Action Bar
         getSupportActionBar().setTitle("Neo Dangdut");
 
+//        ApiManager.getInstance().setOnUserDataListener(new ApiManager.OnUserDataReceived() {
+//            @Override
+//            public void onUserDataLoaded() {
+//                setSideMenuData();
+//            }
+//        });
+//        ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
+//            @Override
+//            public void onUserAccessTokenSaved() {
+//                if (panelState == PanelState.PANEL_SEARCH) {
+//                    // Search
+//                    ApiManager.getInstance().getSearchShopMusic(searchKey);
+//                    ApiManager.getInstance().getSearchShopVideos(searchKey);
+//                    ApiManager.getInstance().getSearchShopMusicAlbums(searchKey);
+//                    ApiManager.getInstance().getSearchCommunityMusic(searchKey);
+//                    ApiManager.getInstance().getSearchCommunityVideo(searchKey);
+//                } else if (panelState == PanelState.PANEL_TOPUP) {
+//                    Log.d("PURCHASE", "confirm");
+//                    ApiManager.getInstance().setOnConfirmIAP(new ApiManager.OnConfirmIAP() {
+//                        @Override
+//                        public void onConfirm() {
+//
+//                            billingProc.consumePurchase(sku);
+//                            ApiManager.getInstance().getUserData();
+//                        }
+//                    });
+//
+//                    ApiManager.getInstance().confirmIAP(originalJSON, purchaseSignature);
+//                } else {
+//                    ApiManager.getInstance().getUserData();
+//
+//                    ApiManager.getInstance().getLibraryMusic();
+//                    ApiManager.getInstance().getLibraryVideo();
+//
+//                    ApiManager.getInstance().getHomeBanner();
+//                    ApiManager.getInstance().getHomeTopMusic();
+//                    ApiManager.getInstance().getHomeTopVideos();
+//                    ApiManager.getInstance().getHomeLatestNews();
+//                    // SHOP MUSIC
+//                    ApiManager.getInstance().getShopMusicTopSongs();
+//                    ApiManager.getInstance().getFeaturedShopMusic();
+//                    ApiManager.getInstance().getShopMusicTopAlbums();
+//                    ApiManager.getInstance().getShopMusicNewSongs();
+//                    ApiManager.getInstance().getShopMusicAllSongs();
+//                    // SHOP VIDEO
+//                    ApiManager.getInstance().getShopVideoTopVideos();
+//                    ApiManager.getInstance().getFeaturedShopVideo();
+//                    ApiManager.getInstance().getShopVideoNewVideos();
+//                    ApiManager.getInstance().getShopVideoAllVideos();
+//
+//                    // Community
+//                    ApiManager.getInstance().getCommunityMusic();
+//                    ApiManager.getInstance().getCommunityVideo();
+//                    ApiManager.getInstance().getAllNews();
+//
+//                    ApiManager.getInstance().getUploadedMusic();
+//                    ApiManager.getInstance().getUploadedVideo();
+//                }
+//            }
+//
+//            @Override
+//            public void onError(String message) {
+//
+//            }
+//        });
+
+        setHomeListener();
+
+        if(isNetworkAvailable()){
+            ApiManager.getInstance().getUserAccessToken();
+        } else {
+            goToLibrary(false);
+            new AlertDialog.Builder(this)
+                    .setTitle("Connection Error")
+                    .setMessage("No Internet Connection")
+                    .setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if(isNetworkAvailable())
+                                ApiManager.getInstance().getUserAccessToken();
+                        }
+
+                    })
+                    .setNegativeButton("Close", null)
+                    .show();
+        }
+    }
+
+    private void setHomeListener() {
         ApiManager.getInstance().setOnUserDataListener(new ApiManager.OnUserDataReceived() {
             @Override
             public void onUserDataLoaded() {
                 setSideMenuData();
+                showPanelProfile();
             }
         });
+
+        ApiManager.getInstance().setOnUserDataUpdatedListener(new ApiManager.OnUserDataUpdated() {
+            @Override
+            public void onUserDataUpdated() {
+                ApiManager.getInstance().getUserData();
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
+
         ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
             @Override
             public void onUserAccessTokenSaved() {
@@ -336,6 +448,11 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     ApiManager.getInstance().getUserData();
 
+                    DataPool.getInstance().listLibraryMusic.clear();
+                    DataPool.getInstance().listLibraryVideo.clear();
+                    ApiManager.getInstance().getLibraryMusic();
+                    ApiManager.getInstance().getLibraryVideo();
+
                     ApiManager.getInstance().getHomeBanner();
                     ApiManager.getInstance().getHomeTopMusic();
                     ApiManager.getInstance().getHomeTopVideos();
@@ -357,9 +474,6 @@ public class MainActivity extends AppCompatActivity
                     ApiManager.getInstance().getCommunityVideo();
                     ApiManager.getInstance().getAllNews();
 
-                    ApiManager.getInstance().getLibraryMusic();
-                    ApiManager.getInstance().getLibraryVideo();
-
                     ApiManager.getInstance().getUploadedMusic();
                     ApiManager.getInstance().getUploadedVideo();
                 }
@@ -370,25 +484,6 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
-
-        if(isNetworkAvailable()){
-            ApiManager.getInstance().getUserAccessToken();
-        } else {
-            new AlertDialog.Builder(this)
-                    .setTitle("Connection Error")
-                    .setMessage("No Internet Connection")
-                    .setPositiveButton("Retry", new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if(isNetworkAvailable())
-                                ApiManager.getInstance().getUserAccessToken();
-                        }
-
-                    })
-                    .setNegativeButton("Close", null)
-                    .show();
-        }
     }
 
     private void initIAB() {
@@ -431,6 +526,11 @@ public class MainActivity extends AppCompatActivity
         musicPlayerPauseIcon = (ImageView) findViewById(R.id.music_player_pause_icon);
         musicPlayerPauseButton = (RelativeLayout) findViewById(R.id.music_player_pause);
         musicPlayerOptButton = (ImageView) findViewById(R.id.music_player_opt_button);
+
+        popupAlbum = new PopupAlbumView(this, R.style.custom_dialog);
+        popupArtistSong = new PopupArtistSong(MainActivity.this, R.style.custom_dialog);
+        popupArtistSong.setPopupAlbum(popupAlbum);
+        popupCommunitySong = new PopupCommunity(MainActivity.this, R.style.custom_dialog);
 
         musicPlayerPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -519,9 +619,6 @@ public class MainActivity extends AppCompatActivity
         CustomMediaPlayer.getInstance().setVideoPanel(panelVideoPlayer, videoView, videoDate, videoDescription, videoPlayerThumbnail);
 
         CustomMediaPlayer.getInstance().setNewsPanel(panelNewsDetail, newsDetailThumbnail, newsDetailTitle, newsDetailDate, newsDetailDescription, loadingBar, newsScrollView);
-
-        popupArtistSong = new PopupArtistSong(MainActivity.this, R.style.custom_dialog);
-        popupCommunitySong = new PopupCommunity(MainActivity.this, R.style.custom_dialog);
 
     }
 
@@ -689,23 +786,28 @@ public class MainActivity extends AppCompatActivity
         settingSupportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getBaseContext(), "Support Button", Toast.LENGTH_SHORT).show();
+                openInBrowser(Consts.URL_HELP_SUPPORT);
             }
         });
 
         settingPrivacyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getBaseContext(), "Privacy Button", Toast.LENGTH_SHORT).show();
+                openInBrowser(Consts.URL_PRIVACY_POLICY);
             }
         });
 
         settingAboutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getBaseContext(), "About", Toast.LENGTH_SHORT).show();
+                openInBrowser(Consts.URL_ABOUT);
             }
         });
+    }
+
+    private void openInBrowser(String url) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(browserIntent);
     }
 
     private void initUploadForm() {
@@ -731,10 +833,20 @@ public class MainActivity extends AppCompatActivity
         profileName = (EditText) findViewById(R.id.profile_preview_name);
         profileCountry = (EditText) findViewById(R.id.profile_preview_country);
         profileCity = (EditText) findViewById(R.id.profile_preview_city);
+        profileDescription = (EditText) findViewById(R.id.profile_preview_description);
 
         profileLikeCount = (TextView) findViewById(R.id.profile_preview_like_count_text);
         profileMusicCount = (TextView) findViewById(R.id.profile_preview_music_count_text);
         profileVideoCount = (TextView) findViewById(R.id.profile_preview_video_count_text);
+
+        profileName.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_REGULAR));
+        profileCity.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_LIGHT));
+        profileCountry.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_LIGHT));
+        profileDescription.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_LIGHT));
+
+        profileLikeCount.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_LIGHT));
+        profileMusicCount.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_LIGHT));
+        profileVideoCount.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_LIGHT));
 
         editName = (ImageView) findViewById(R.id.profile_preview_name_edit);
         editCountry = (ImageView) findViewById(R.id.profile_preview_country_edit);
@@ -742,6 +854,7 @@ public class MainActivity extends AppCompatActivity
         profileEdit = (ImageView) findViewById(R.id.profile_preview_edit);
 
         profileEdit.setOnClickListener(this);
+        profilePicture.setOnClickListener(this);
 
         // pool fragment TEST
         List<FragmentModel> list = new ArrayList<>();
@@ -757,7 +870,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void showPanelProfile() {
+    public void showPanelProfile() {
         UserProfileData data = DataPool.getInstance().userProfileData;
 
         imageLoader.displayImage(data.photoURL, profilePicture, opts);
@@ -767,6 +880,7 @@ public class MainActivity extends AppCompatActivity
         profileLikeCount.setText(String.valueOf(data.totalLikes));
         profileMusicCount.setText(String.valueOf(data.totalMusic));
         profileVideoCount.setText(String.valueOf(data.totalVideo));
+        profileDescription.setText(data.profile);
     }
 
     private void initPanelUpload() {
@@ -827,7 +941,7 @@ public class MainActivity extends AppCompatActivity
         if(isMusic)
             intent.setType("audio/*");
         else
-            intent.setType("*/*");
+            intent.setType("video/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
         startActivityForResult(Intent.createChooser(intent, "Select a file to upload"), UPLOAD_FILE_CODE);
@@ -856,14 +970,6 @@ public class MainActivity extends AppCompatActivity
         return null;
     }
 
-    public static String getRealPathFromUri(Activity activity, Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-        Cursor cursor = activity.managedQuery(contentUri, proj, null, null, null);
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(!billingProc.handleActivityResult(requestCode, resultCode, data))
@@ -873,10 +979,20 @@ public class MainActivity extends AppCompatActivity
             if(resultCode == RESULT_OK) {
                 Uri uri = data.getData();
 
-                String filePath = getRealPathFromUri(this, uri);
-                tempFile = new File(data.toString());
+                String filePath = FilePath.getPath(this, uri);
+                tempFile = new File(filePath);
 
-                showUploadForm(uri.getPath());
+                showUploadForm(filePath);
+            }
+        }
+
+        if(requestCode == UPLOAD_PROFPIC) {
+            if(resultCode == RESULT_OK) {
+                Uri photoURI = data.getData();
+
+                String filePath = FilePath.getPath(this, photoURI);
+                File profPic = new File(filePath);
+                ApiManager.getInstance().changeProfilePicture(profPic);
             }
         }
 
@@ -1058,6 +1174,33 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+//    public void showLoading() {
+//        panelLoading.setVisibility(View.VISIBLE);
+//    }
+//
+//    public void closeLoading() {
+//        panelLoading.setVisibility(View.INVISIBLE);
+//    }
+
+    public void goToLibrary(boolean isVideo) {
+        if (CustomMediaPlayer.getInstance().isNewsDetailShowing)
+            CustomMediaPlayer.getInstance().closeNewsDetail();
+        if (CustomMediaPlayer.getInstance().isVideoPlayerShowing)
+            CustomMediaPlayer.getInstance().closeVideoPlayer();
+        changePanel(PanelState.PANEL_LIBRARY);
+
+        FragmentLibraryMusic fragLibMusic = (FragmentLibraryMusic) pagerAdapterLibrary.getItem(0);
+        fragLibMusic.reloadData();
+
+        FragmentLibraryVideo fragLibVideo = (FragmentLibraryVideo) pagerAdapterLibrary.getItem(1);
+        fragLibVideo.reloadData();
+
+        if(isVideo)
+            viewPagerLibrary.setCurrentItem(1);
+        else
+            viewPagerLibrary.setCurrentItem(0);
+    }
+
     private void showMessageRequestPermission() {
         new AlertDialog.Builder(MainActivity.this)
                 .setMessage("You need to allow access to storage to download musics and videos")
@@ -1094,7 +1237,8 @@ public class MainActivity extends AppCompatActivity
             if(CustomMediaPlayer.getInstance().isTrackPaused())
                 CustomMediaPlayer.getInstance().closeMusicPlayer();
             else
-                CustomMediaPlayer.getInstance().pauseTrack();
+                moveTaskToBack(true);
+//                CustomMediaPlayer.getInstance().pauseTrack();
         } else if(CustomMediaPlayer.getInstance().isVideoPlayerShowing) {
             CustomMediaPlayer.getInstance().closeVideoPlayer();
         } else if(CustomMediaPlayer.getInstance().isNewsDetailShowing) {
@@ -1104,31 +1248,39 @@ public class MainActivity extends AppCompatActivity
         } else if(isUploadFormShowing) {
             closeUploadForm();
         }else if(getCurrentPanel(panelState) != panelNewPost) {
+            viewPagerNewPost.setCurrentItem(0);
+
+            setHomeListener();
+
             changePanel(PanelState.PANEL_NEW_POST);
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
             }
         } else {
-            new AlertDialog.Builder(this)
-                    .setTitle("Quit Application")
-                    .setMessage("Are you sure you want to quit?")
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            if(fabMenu.isExpanded()) {
+                fabMenu.collapse();
+            } else {
 
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                new AlertDialog.Builder(this)
+                        .setTitle("Quit Application")
+                        .setMessage("Are you sure you want to quit?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 
-                            //Stop the activity
-                            DataPool.getInstance().listHomeBanner.clear();
-                            DataPool.getInstance().listHomeTopVideos.clear();
-                            DataPool.getInstance().listHomeTopMusic.clear();
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
 
-                            MainActivity.this.finish();
-                        }
+                                //Stop the activity
+                                DataPool.getInstance().listHomeBanner.clear();
+                                DataPool.getInstance().listHomeTopVideos.clear();
+                                DataPool.getInstance().listHomeTopMusic.clear();
 
-                    })
-                    .setNegativeButton("Close", null)
-                    .show();
+                                MainActivity.this.finish();
+                            }
 
+                        })
+                        .setNegativeButton("Not Now", null)
+                        .show();
+            }
         }
 
     }
@@ -1194,6 +1346,8 @@ public class MainActivity extends AppCompatActivity
                 if (CustomMediaPlayer.getInstance().isVideoPlayerShowing)
                     CustomMediaPlayer.getInstance().closeVideoPlayer();
                 changePanel(PanelState.PANEL_NEW_POST);
+
+                setHomeListener();
             }
 
             if (view == sideMenuLibrary) {
@@ -1264,13 +1418,6 @@ public class MainActivity extends AppCompatActivity
                 String fileName = uploadInputTitle.getText().toString();
                 String fileDescription = uploadInputDescription.getText().toString();
 
-                if (isUploadMusic) {
-                    ApiManager.getInstance().uploadContent(tempFile, "music", fileName, fileDescription);
-                } else {
-                    ApiManager.getInstance().uploadContent(tempFile, "video", fileName, fileDescription);
-                }
-
-                popupLoading.showPopupLoading("Uploading..");
                 ApiManager.getInstance().setOnUploadListener(new ApiManager.OnUpload() {
                     @Override
                     public void onSucceed() {
@@ -1279,9 +1426,19 @@ public class MainActivity extends AppCompatActivity
 
                     @Override
                     public void onFailed(String message) {
+                        Log.d("UPLOAD FAILED", message);
                         popupLoading.setMessage("Upload Failed");
                     }
                 });
+
+                if (isUploadMusic) {
+                    ApiManager.getInstance().uploadContent(tempFile, "music", fileName, fileDescription);
+                } else {
+                    ApiManager.getInstance().uploadContent(tempFile, "video", fileName, fileDescription);
+                }
+
+                popupLoading.showPopupLoading("Uploading..");
+
             }
             // UPLOAD END
 
@@ -1300,6 +1457,7 @@ public class MainActivity extends AppCompatActivity
                 profileName.setEnabled(canEditProfile);
                 profileCountry.setEnabled(canEditProfile);
                 profileCity.setEnabled(canEditProfile);
+                profileDescription.setEnabled(canEditProfile);
 
                 if (canEditProfile) {
                     editName.setVisibility(View.VISIBLE);
@@ -1309,6 +1467,22 @@ public class MainActivity extends AppCompatActivity
                     editName.setVisibility(View.INVISIBLE);
                     editCountry.setVisibility(View.INVISIBLE);
                     editCity.setVisibility(View.INVISIBLE);
+
+                    String name = profileName.getText().toString();
+                    String city = profileCity.getText().toString();
+                    String country = profileCountry.getText().toString();
+                    String profileDesc = profileDescription.getText().toString();
+                    ApiManager.getInstance().updateUserData(name, city, country, profileDesc);
+                }
+            }
+
+            if(view == profilePicture) {
+                if(canEditProfile) {
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("image/*");
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+                    startActivityForResult(Intent.createChooser(intent, "Select picture"), UPLOAD_PROFPIC);
                 }
             }
             // Profile END
@@ -1355,6 +1529,8 @@ public class MainActivity extends AppCompatActivity
 
                 InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+
+                setHomeListener();
 
                 ApiManager.getInstance().getUserAccessToken();
             }

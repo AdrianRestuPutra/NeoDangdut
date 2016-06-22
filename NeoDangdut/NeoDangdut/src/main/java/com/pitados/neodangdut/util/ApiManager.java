@@ -6,6 +6,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.anjlab.android.iab.v3.BillingProcessor;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.Popup.PopupLoading;
 import com.pitados.neodangdut.Popup.PopupWebview;
@@ -26,10 +29,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by adrianrestuputranto on 5/17/16.
@@ -75,10 +81,9 @@ public class ApiManager {
     private BillingProcessor billingProc;
 
     // Listener
-//    private OnTokenReceived listener;
     private OnUserAccessTokenReceived userAccessListener;
-//    private OnUserTransactionTokenReceived userTransactionListener;
     private OnUserDataReceived userDataListener;
+    private OnUserDataUpdated userDataUpdatedListener;
     private OnHomeDataReceived dataListener;
     private OnUploadedMusicReceived uploadedMusicListener;
     private OnUploadedVideoReceived uploadedVideoListener;
@@ -416,7 +421,7 @@ public class ApiManager {
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
             public void afterExecute(String result) {
-                Log.d("Result", result);
+                Log.d("Top Track", result);
 
                 try {
 
@@ -788,6 +793,7 @@ public class ApiManager {
         params.put("order", "id");
         params.put("sort", "desc");
         params.put("user_id", userLoginData.getUserID());
+        Log.d("USER ID", userLoginData.getUserID());
         params.put("category", "music");
 
         HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_COMMUNITY_CONTENT, ApiManager.getInstance().USER_ACCESS_TOKEN, params);
@@ -1247,7 +1253,7 @@ public class ApiManager {
     public void getShopMusicNewSongs() {
         Map<String, String> params = new HashMap<>();
         params.put("order", "id");
-        params.put("limit", String.valueOf(limitData));
+        params.put("limit", String.valueOf(50));
         params.put("sort", "desc");
         params.put("offset", String.valueOf(DataPool.getInstance().listShopMusicNewSongs.size()));
 
@@ -1256,7 +1262,7 @@ public class ApiManager {
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
             public void afterExecute(String result) {
-                Log.d("Result", result);
+                Log.d("New Songs", result);
                 try {
 
                     JSONObject raw = new JSONObject(result);
@@ -1277,13 +1283,11 @@ public class ApiManager {
                         String discount = obj.getString("discount");
                         String singerID = singerObj.getString("id");
                         String singerName = singerObj.getString("name");
-                        String albumID = albumObj.getString("id");
-                        String albumName = albumObj.getString("name");
-                        String albumCover = albumObj.getString("cover");
-//                        String labelID = labelObj.getString("id");
-                        String labelID = "id-default";
-//                        String labelName = labelObj.getString("name");
-                        String labelName = "name-default";
+                        String albumID = albumObj.optString("id");
+                        String albumName = albumObj.optString("name");
+                        String albumCover = albumObj.optString("cover");
+                        String labelID = labelObj.optString("id");
+                        String labelName = labelObj.optString("name");
                         String description = obj.getString("description");
                         String totalPlayed = obj.getString("total_played");
                         String totalPurchased = obj.getString("total_purchased");
@@ -1349,9 +1353,9 @@ public class ApiManager {
                         String discount = obj.getString("discount");
                         String singerID = singerObj.getString("id");
                         String singerName = singerObj.getString("name");
-                        String albumID = albumObj.getString("id");
-                        String albumName = albumObj.getString("name");
-                        String albumCover = albumObj.getString("cover");
+                        String albumID = albumObj.optString("id");
+                        String albumName = albumObj.optString("name");
+                        String albumCover = albumObj.optString("cover");
                         String labelID = labelObj.optString("id");
                         String labelName = labelObj.optString("name");
                         String description = obj.getString("description");
@@ -2168,6 +2172,26 @@ public class ApiManager {
 
         request.execute();
     }
+    public void addListen(String id) {
+        Map<String, String> params = new HashMap<>();
+        params.put("unique", id);
+
+        HttpPostUtil request = new HttpPostUtil(Consts.URL_ADD_LISTEN, USER_ACCESS_TOKEN, params);
+
+        request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        request.execute();
+    }
 
     public void purchaseItem(PurchaseType type, String id) {
         Map<String, String> params = new HashMap<>();
@@ -2224,43 +2248,105 @@ public class ApiManager {
     public void uploadContent(File file, String category, String name, String description) {
         String url = Consts.URL_GET_TOKEN + "/me/"+category;
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("description", description);
-        params.put("file", file);
-        Log.d("FILE", file.length() + "");
+        Log.d("URL UPLOAD", url);
 
-        final HttpUploadUtil upload = new HttpUploadUtil(url, USER_ACCESS_TOKEN, file, params);
-        upload.setOnHttpPostUtilListener(new HttpUploadUtil.HttpPostUtilListener() {
+        try {
+            RequestParams params = new RequestParams();
+            params.put("name", name);
+            params.put("description", description);
+            params.put("file", file);
+
+            AsyncHttpClient request = new AsyncHttpClient();
+            request.addHeader("Authorization", "Bearer " + USER_ACCESS_TOKEN);
+            request.post(url, params, new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    uploadListener.onSucceed();
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    uploadListener.onFailed("Upload Failed :" + statusCode + " | " + error.getMessage());
+                }
+            });
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void updateUserData(String name, String city, String country, String profile) {
+        Map<String, String> params = new HashMap<>();
+        params.put("first_name", name);
+        params.put("city", city);
+        params.put("country", country);
+        params.put("profile", profile);
+
+        HttpPostUtil request = new HttpPostUtil(Consts.URL_UPDATE_PROFILE, USER_ACCESS_TOKEN, params);
+
+        request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
             @Override
             public void afterExecute(String result) {
                 if(result != null) {
-                    Log.d("Upload", result);
+                    Log.d("result", result);
                     try {
                         JSONObject rawData = new JSONObject(result);
 
-                        if (rawData.has("status")) {
-                            // succeed
-                            uploadListener.onSucceed();
+                        if(rawData.has("error")) {
+                            String message = rawData.getString("error");
+
+                            popupLoading.setMessage("Update Failed");
+                            userDataUpdatedListener.onError();
                         } else {
-                            String message = rawData.getString("error_description");
-                            // Show popup
-                            uploadListener.onFailed(message);
+                            boolean status = rawData.getBoolean("status");
+                            if(status == true) {
+                                // Success
+                                popupLoading.setMessage("Data Updated");
+                                userDataUpdatedListener.onUserDataUpdated();
+                            } else {
+                                popupLoading.setMessage("Update Failed");
+                                purchaseListener.onError("Purchased Failed");
+                            }
                         }
+
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        uploadListener.onFailed("Upload Failed");
                     }
                 }
+
             }
 
             @Override
             public void beforeExecute() {
-
+                popupLoading.showPopupLoading("Updating..");
             }
         });
 
-        upload.execute();
+        request.execute();
+    }
+
+    public void changeProfilePicture(File file) {
+        RequestParams params = new RequestParams();
+        try {
+            params.put("file", file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        AsyncHttpClient request = new AsyncHttpClient();
+        request.addHeader("Authorization", "Bearer "+USER_ACCESS_TOKEN);
+        request.post(Consts.URL_CHANGE_PHOTO, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                Log.d("CHANGE PP", "Success");
+                getUserData();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.d("CHANGE PP", "Failed");
+            }
+        });
     }
 
     public void getRegisterToken(final RegisterModel data) {
@@ -2274,13 +2360,13 @@ public class ApiManager {
         request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
             @Override
             public void afterExecute(String result) {
-                if(result != null) {
+                if (result != null) {
                     Log.d("Result API", result);
 
                     try {
                         JSONObject rawData = new JSONObject(result);
 
-                        if(!rawData.has("error")) {
+                        if (!rawData.has("error")) {
                             String registerToken = rawData.getString("access_token");
 
                             registerNewUser(registerToken, data);
@@ -2386,6 +2472,8 @@ public class ApiManager {
             public void beforeExecute() {
             }
         });
+
+        request.execute();
     }
 
     // IAP COMMAND
@@ -2394,12 +2482,11 @@ public class ApiManager {
         billingProc.purchase(activity, productID);
     }
 
-//    public void setOnTokenReceived(OnTokenReceived listener) {  this.listener = listener; }
     public void setOnUserAccessTokenReceved(OnUserAccessTokenReceived listener) { this.userAccessListener = listener; }
-//    public void setOnUserTransactionTokenReceived(OnUserTransactionTokenReceived listener) { this.userTransactionListener = listener; }
     public void setOnHomeListener(OnHomeDataReceived listener) { this.dataListener =  listener; }
 
     public void setOnUserDataListener(OnUserDataReceived listener) { this.userDataListener = listener; }
+    public void setOnUserDataUpdatedListener(OnUserDataUpdated listener) { this.userDataUpdatedListener = listener; }
 
     public void setOnUploadedMusicListener(OnUploadedMusicReceived listener) { this.uploadedMusicListener = listener; }
     public void setOnUploadedVideoListener(OnUploadedVideoReceived listener) { this.uploadedVideoListener = listener; }
@@ -2443,6 +2530,11 @@ public class ApiManager {
 
     public interface OnUserDataReceived {
         void onUserDataLoaded();
+    }
+
+    public interface OnUserDataUpdated {
+        void onUserDataUpdated();
+        void onError();
     }
 
     public interface OnHomeDataReceived {

@@ -155,7 +155,7 @@
     <dimen name="dialog_artist_song_upper_panel_height">100dp</dimen>
     <dimen name="dialog_artist_song_width">200dp</dimen>
     <dimen name="dialog_artist_song_height">200dp</dimen>
-    <dimen name="dialog_artist_song_price_height">20dp</dimen>
+    <dimen name="dialog_artist_song_price_height">15dp</dimen>
     <dimen name="dialog_artist_song_thumbnail_size">60dp</dimen>
     <dimen name="dialog_artist_left_panel_margin">2dp</dimen>
     <dimen name="dialog_artist_price_margin">10dp</dimen>

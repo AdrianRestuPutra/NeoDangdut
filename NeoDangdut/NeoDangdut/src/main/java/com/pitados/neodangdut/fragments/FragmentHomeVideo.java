@@ -76,7 +76,7 @@ public class FragmentHomeVideo extends Fragment {
         listViewCommunityVideo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                CustomMediaPlayer.getInstance().playVideo(DataPool.getInstance().listCommunityVideo.get(i));
+                CustomMediaPlayer.getInstance().playVideo(listAdapter.getContentItem(i));
             }
         });
 
@@ -84,7 +84,6 @@ public class FragmentHomeVideo extends Fragment {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                ApiManager.getInstance().getUserAccessToken();
                 ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
 
                     @Override
@@ -97,6 +96,7 @@ public class FragmentHomeVideo extends Fragment {
 
                     }
                 });
+                ApiManager.getInstance().getUserAccessToken();
             }
         });
 

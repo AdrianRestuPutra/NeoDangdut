@@ -59,6 +59,8 @@ public class CustomCommunityNewsAdapter extends BaseAdapter {
         return listNews.get(i);
     }
 
+    public NewsData getContentItem(int i ) { return listNews.get(i); }
+
     @Override
     public long getItemId(int i) {
         // TODO change to item id

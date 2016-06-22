@@ -1,5 +1,6 @@
 package com.pitados.neodangdut.util;
 
+import com.pitados.neodangdut.activities.MainActivity;
 import com.pitados.neodangdut.model.AlbumData;
 import com.pitados.neodangdut.model.BannerModel;
 import com.pitados.neodangdut.model.CommunityContentData;
@@ -54,6 +55,8 @@ public class DataPool {
     public List<VideoData> listSearchShopVideo;
 
     public AlbumData selectedAlbum;
+
+    public MainActivity mainActivity;
 
     public DataPool() {
         userProfileData = new UserProfileData();

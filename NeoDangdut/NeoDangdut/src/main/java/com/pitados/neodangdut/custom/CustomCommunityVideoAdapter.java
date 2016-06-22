@@ -71,6 +71,8 @@ public class CustomCommunityVideoAdapter extends BaseAdapter {
         return listVideo.get(i);
     }
 
+    public CommunityContentData getContentItem(int i ) { return listVideo.get(i); }
+
     @Override
     public long getItemId(int i) {
         // TODO change to item id

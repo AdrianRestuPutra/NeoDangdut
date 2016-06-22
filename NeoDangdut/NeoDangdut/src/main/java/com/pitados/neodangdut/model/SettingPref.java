@@ -24,7 +24,7 @@ public class SettingPref {
     }
 
     public boolean getDowloadWifiOnlyState() {
-        return preferences.getBoolean(DOWNLOAD_WIFI_STATE, true);
+        return preferences.getBoolean(DOWNLOAD_WIFI_STATE, false);
     }
 
     public void setNotifState(boolean state) {

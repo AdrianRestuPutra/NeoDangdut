@@ -45,7 +45,9 @@
                     android:layout_height="wrap_content"
                     android:text="Username"
                     android:textColor="@color/white_font"
-                    android:textSize="@dimen/profile_preview_top_large_text" />
+                    android:textSize="@dimen/profile_preview_top_large_text"
+                    android:singleLine="true"
+                    android:imeOptions="actionNext"/>
 
                 <ImageView
                     android:id="@+id/profile_preview_name_edit"
@@ -68,7 +70,9 @@
                     android:layout_height="wrap_content"
                     android:text="Indonesia"
                     android:textColor="@color/white_font"
-                    android:textSize="@dimen/profile_preview_top_medium_text" />
+                    android:textSize="@dimen/profile_preview_top_medium_text"
+                    android:singleLine="true"
+                    android:imeOptions="actionNext"/>
 
                 <ImageView
                     android:id="@+id/profile_preview_country_edit"
@@ -201,7 +205,9 @@
                     android:layout_marginLeft="@dimen/profile_preview_city_margin"
                     android:text="Jakarta"
                     android:textColor="@color/white_font"
-                    android:textSize="@dimen/profile_preview_top_medium_text" />
+                    android:textSize="@dimen/profile_preview_top_medium_text"
+                    android:singleLine="true"
+                    android:imeOptions="actionNext"/>
 
                 <ImageView
                     android:id="@+id/profile_preview_city_edit"
@@ -237,14 +243,15 @@
             android:orientation="vertical"
             android:padding="@dimen/profile_preview_description_margin">
 
-            <TextView
+            <EditText
                 android:id="@+id/profile_preview_description"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="left"
                 android:text="Description"
                 android:textColor="@color/white_font"
-                android:textSize="@dimen/profile_preview_description_text" />
+                android:textSize="@dimen/profile_preview_description_text"
+                android:imeOptions="actionDone"/>
 
         </LinearLayout>
         <!-- About End -->

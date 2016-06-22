@@ -113,6 +113,6 @@ public class FragmentLibraryVideo extends Fragment implements AdapterView.OnItem
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        CustomMediaPlayer.getInstance().playItem(DataPool.getInstance().listLibraryVideo.get(i));
+        CustomMediaPlayer.getInstance().playItem(listAdapter.getLibraryItem(i), listAdapter.getListLibrary());
     }
 }

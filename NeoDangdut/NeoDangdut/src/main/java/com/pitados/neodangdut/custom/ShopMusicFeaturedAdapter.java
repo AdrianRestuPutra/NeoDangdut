@@ -84,6 +84,7 @@ public class ShopMusicFeaturedAdapter extends BaseAdapter {
 
     private boolean isInLibrary(String ID) {
         for(LibraryData data : DataPool.getInstance().listLibraryMusic) {
+            Log.d("FEATURED MUSIC", data.ID+" | "+ID);
             if(ID.equalsIgnoreCase(data.ID))
                 return true;
         }

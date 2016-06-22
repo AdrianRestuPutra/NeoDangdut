@@ -11,7 +11,7 @@ public class Consts {
     public static String APP_BASE_DIR = "Directory";
 
     // Notification
-    public static String NOTIF_DOWNLOAD_TITLE = "Download File";
+    public static String NOTIF_DOWNLOAD_TITLE = "Download File : ";
     public static String NOTIF_DOWNLOAD_DESCRIPTION = "Downloading in Progress..";
 
     public static String AUDIO_SAMPLE_URL = "https://archive.org/download/count_monte_cristo_0711_librivox/count_of_monte_cristo_001_dumas.mp3";
@@ -42,8 +42,16 @@ public class Consts {
     public static String URL_LIKE = URL_GET_TOKEN+"/me/like/";
     public static String URL_UNLIKE = URL_GET_TOKEN+"/me/unlike/";
     public static String URL_PURCHASE = URL_GET_TOKEN+"/me/purchase";
+    public static String URL_ADD_LISTEN = URL_GET_TOKEN+"/content/listen";
+    public static String URL_CHANGE_PHOTO = URL_GET_TOKEN+"/me/photo";
+    public static String URL_UPDATE_PROFILE = URL_GET_TOKEN+"/me/update";
 
     public static String URL_CONFIRM = URL_GET_TOKEN+"/IAP/android";
+
+    public static String URL_HELP_SUPPORT = "http://neodangdut.com/help";
+    public static String URL_PRIVACY_POLICY = "http://neodangdut.com/privacy-policy";
+    public static String URL_ABOUT = "http://neodangdut.com/about";
+
 
     // TAG TOKEN
     public static String TAG_TOKEN = "access_token";

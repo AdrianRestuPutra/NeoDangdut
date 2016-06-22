@@ -81,6 +81,8 @@ public class CustomListShopVideoAdapter extends BaseAdapter {
         return listVideo.get(i);
     }
 
+    public VideoData getVideoItem(int i) { return listVideo.get(i); }
+
     @Override
     public long getItemId(int i) {
         // TODO change to item id
@@ -189,8 +191,9 @@ public class CustomListShopVideoAdapter extends BaseAdapter {
                             holder.price.setText("Download");
                             holder.price.setTextColor(context.getResources().getColor(R.color.white_font));
                             listVideo.get(index).inLibrary = true;
-                            holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
                             // TODO notif user
+
+                            ApiManager.getInstance().getLibraryVideo();
                         }
 
                         @Override

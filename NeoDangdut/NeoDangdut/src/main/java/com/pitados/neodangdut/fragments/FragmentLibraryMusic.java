@@ -124,8 +124,9 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         if (adapterView == listViewMusic && !StateManager.isTopView) {
-            CustomMediaPlayer.getInstance().playItem(DataPool.getInstance().listLibraryMusic.get(i));
-//            ConnManager.getInstance().downloadFile(Consts.AUDIO_SAMPLE_URL, ConnManager.DataType.AUDIO, "MixTape", "Track-"+i);
+//            LibraryData selected = (LibraryData) listAdapter.getItem(i);
+            CustomMediaPlayer.getInstance().playItem(listAdapter.getLibraryItem(i), listAdapter.getListLibrary());
+//            CustomMediaPlayer.getInstance().playItem(DataPool.getInstance().listLibraryMusic.get(i));
         }
     }
 

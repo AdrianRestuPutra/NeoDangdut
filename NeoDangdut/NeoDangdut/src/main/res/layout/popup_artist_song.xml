@@ -33,6 +33,7 @@
                     android:src="@drawable/ic_menu_camera" />
 
                 <RelativeLayout
+                    android:id="@+id/popup_artist_song_price_buy_button"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/dialog_artist_song_price_height"
                     android:layout_margin="@dimen/dialog_artist_left_panel_margin"
@@ -42,9 +43,11 @@
                         android:id="@+id/popup_artist_song_price"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
                         android:layout_marginLeft="@dimen/dialog_artist_price_margin"
-                        android:text="1000"
-                        android:textColor="@color/white_font" />
+                        android:text="Rp 1000"
+                        android:textSize="@dimen/tab_text_size"
+                        android:textColor="@color/purple_font" />
 
                 </RelativeLayout>
             </LinearLayout>

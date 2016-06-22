@@ -107,7 +107,7 @@
                             android:id="@+id/search_shop_title_video"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="ALBUMS"
+                            android:text="VIDEOS"
                             android:textColor="@color/white_font"
                             android:textSize="@dimen/tab_text_large_size" />
 

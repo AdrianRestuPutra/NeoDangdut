@@ -18,6 +18,19 @@
             android:textColor="@color/white_font"
             android:textSize="@dimen/dialog_loading_text"/>
 
+        <RelativeLayout
+            android:id="@+id/loading_panel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_centerInParent="true"
+                android:progressDrawable="@drawable/loading_circular"/>
+        </RelativeLayout>
     </RelativeLayout>
     
 </LinearLayout>

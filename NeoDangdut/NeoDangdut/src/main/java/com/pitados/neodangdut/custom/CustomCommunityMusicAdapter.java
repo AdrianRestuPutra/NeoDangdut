@@ -72,6 +72,8 @@ public class CustomCommunityMusicAdapter extends BaseAdapter {
         return listMusic.get(i);
     }
 
+    public CommunityContentData getContentItem(int i ) { return listMusic.get(i); }
+
     @Override
     public long getItemId(int i) {
         // TODO change to item id

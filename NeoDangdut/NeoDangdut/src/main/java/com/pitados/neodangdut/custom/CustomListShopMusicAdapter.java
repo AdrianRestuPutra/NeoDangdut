@@ -199,8 +199,10 @@ public class CustomListShopMusicAdapter extends BaseAdapter {
                             holder.price.setText("Download");
                             holder.price.setTextColor(context.getResources().getColor(R.color.white_font));
                             listTrack.get(index).inLibrary = true;
-                            holder.buyButton.setBackgroundResource(R.drawable.btn_inlibrary_def);
+
                             // TODO notif user
+                            ApiManager.getInstance().getUserData();
+                            ApiManager.getInstance().getLibraryMusic();
                         }
 
                         @Override

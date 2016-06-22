@@ -81,7 +81,7 @@
                     android:id="@+id/video_player_detail_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Posted on Apr 9, 2016"
+                    android:text=""
                     android:textColor="@color/purple_font"/>
 
                 <TextView
@@ -89,7 +89,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/video_player_description_margin_top"
-                    android:text="This is description"
+                    android:text=""
                     android:textColor="@color/white_font"/>
             </LinearLayout>
             <!-- End Of Description Video -->

@@ -98,7 +98,7 @@ public class FragmentShopVideoTopVideos extends Fragment {
         listTopVideos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                CustomMediaPlayer.getInstance().playVideo(DataPool.getInstance().listShopVideoTopVideos.get(i));
+                CustomMediaPlayer.getInstance().playVideo(listAdapter.getVideoItem(i));
             }
         });
 

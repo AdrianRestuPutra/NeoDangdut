@@ -3,6 +3,7 @@ package com.pitados.neodangdut.Popup;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -15,6 +16,7 @@ import com.pitados.neodangdut.model.AlbumItem;
 import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.model.MusicData;
 import com.pitados.neodangdut.util.CustomMediaPlayer;
+import com.pitados.neodangdut.util.DataPool;
 import com.pitados.neodangdut.util.FontLoader;
 
 /**
@@ -25,7 +27,7 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
 
     private ImageView thumbnail;
     private TextView price, title, artistName, albumName, listenCount, likeCount;
-    private RelativeLayout buttonPlay, buttonLike, buttonAlbum, buttonShareFB, buttonShareTwitter;
+    private RelativeLayout buttonPlay, buttonLike, buttonAlbum, buttonShareFB, buttonShareTwitter, buttonBuy;
 
     private MusicData musicData;
     private String albumID;
@@ -34,6 +36,8 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
     private DisplayImageOptions opts;
 
     private PopupAlbumView popupAlbum;
+
+    private boolean purchased, inLibrary;
 
     public PopupArtistSong(Context context, int themeResId) {
         super(context, themeResId);
@@ -61,11 +65,12 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
         title.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
         artistName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
         albumName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
-        albumName.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
+        price.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
 
         // Button
         buttonPlay = (RelativeLayout) findViewById(R.id.popup_artist_song_button_play);
         buttonAlbum = (RelativeLayout) findViewById(R.id.popup_artist_song_button_album);
+        buttonBuy = (RelativeLayout) findViewById(R.id.popup_artist_song_price_buy_button);
 
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()
@@ -79,6 +84,29 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
 
         buttonPlay.setOnClickListener(this);
         buttonAlbum.setOnClickListener(this);
+        buttonBuy.setOnClickListener(this);
+    }
+
+    private boolean isInLibrary(String ID) {
+        for(LibraryData data : DataPool.getInstance().listLibraryMusic) {
+            Log.d("FEATURED MUSIC", data.ID + " | " + ID);
+            if(ID.equalsIgnoreCase(data.ID))
+                return true;
+        }
+
+        return false;
+    }
+
+    private LibraryData getLibraryItem(String songID) {
+        Log.d("LIBRARY SIZE", DataPool.getInstance().listLibraryMusic.size()+"");
+        for(int i = 0; i < DataPool.getInstance().listLibraryMusic.size(); i++) {
+            LibraryData data = DataPool.getInstance().listLibraryMusic.get(i);
+            Log.d("COMPARE", data.ID + " | "+songID);
+            if(data.ID.equalsIgnoreCase(songID))
+                return data;
+        }
+
+        return null;
     }
 
     public void showPopupArtistSong(MusicData data) {
@@ -87,12 +115,32 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
         albumID = data.albumID;
 
         imageLoader.displayImage(data.albumCover, thumbnail, opts);
-        price.setText(data.price);
+//        price.setText(data.price);
         title.setText(data.songTitle);
         artistName.setText(data.singerName);
         albumName.setText(data.albumName);
         listenCount.setText("0");
         likeCount.setText("0");
+
+        purchased = false;
+        inLibrary = false;
+
+        if(data.purchased) {
+            Log.d("SONG", "DOWNLOAD");
+            buttonBuy.setBackgroundResource(R.drawable.btn_inlibrary_blank);
+            price.setText("Download");
+            price.setTextColor(context.getResources().getColor(R.color.white_font));
+            purchased = true;
+        } else if(data.inLibrary) {
+            Log.d("SONG", "IN LIBRARY");
+            buttonBuy.setBackgroundResource(R.drawable.btn_inlibrary_def);
+            price.setText("");
+            inLibrary = true;
+        } else {
+            buttonBuy.setBackgroundResource(R.drawable.btn_price_artist_song);
+            price.setText("Rp " + data.price);
+        }
+
         this.show();
     }
 
@@ -136,7 +184,8 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
 //            ApiManager.getInstance().likeItem(ApiManager.LikeType.MUSIC, musicData.ID);
 //        }
         if(view == buttonAlbum) {
-            popupAlbum.showPopupAlbum(albumID);
+            if(albumID != null)
+                popupAlbum.showPopupAlbum(albumID);
             closePopupArtistSong();
         }
 //        if(view == buttonShareFB) {
@@ -145,5 +194,12 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
 //        if(view == buttonShareTwitter) {
 //
 //        }
+
+        if(view == buttonBuy) {
+            if(inLibrary) {
+                DataPool.getInstance().mainActivity.goToLibrary(false);
+                closePopupArtistSong();
+            }
+        }
     }
 }

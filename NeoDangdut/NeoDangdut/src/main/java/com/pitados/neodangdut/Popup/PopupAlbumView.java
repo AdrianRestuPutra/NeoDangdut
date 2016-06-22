@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -27,6 +28,7 @@ public class PopupAlbumView extends Dialog {
 
     private ImageView albumThumbnail;
     private TextView albumTitle, albumArtist;
+    private RelativeLayout loading;
 
     private ListView albumListItem;
 
@@ -50,6 +52,7 @@ public class PopupAlbumView extends Dialog {
         albumTitle = (TextView)findViewById(R.id.album_item_title);
         albumArtist = (TextView) findViewById(R.id.album_item_artist);
         albumListItem = (ListView) findViewById(R.id.album_item_listview);
+        loading = (RelativeLayout) findViewById(R.id.album_item_loading);
 
         albumTitle.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_REGULAR));
         albumArtist.setTypeface(FontLoader.getTypeFace(context, FontLoader.FontType.HEADLINE_LIGHT));
@@ -73,7 +76,6 @@ public class PopupAlbumView extends Dialog {
     }
 
     public void showPopupAlbum(final String albumID) {
-        ApiManager.getInstance().getAlbumDetail(albumID);
         ApiManager.getInstance().setOnAlbumDetailListener(new ApiManager.OnAlbumDetailReceived() {
             @Override
             public void onDataLoaded() {
@@ -84,6 +86,9 @@ public class PopupAlbumView extends Dialog {
 
                 listAdapter = new CustomAlbumListAdapter(context, DataPool.getInstance().selectedAlbum.listAllMusic, album.coverURL);
                 albumListItem.setAdapter(listAdapter);
+
+                loading.setVisibility(View.INVISIBLE);
+                PopupAlbumView.this.show();
             }
 
             @Override
@@ -92,7 +97,9 @@ public class PopupAlbumView extends Dialog {
             }
         });
 
-        this.show();
+        loading.setVisibility(View.VISIBLE);
+        ApiManager.getInstance().getAlbumDetail(albumID);
+
     }
 
 

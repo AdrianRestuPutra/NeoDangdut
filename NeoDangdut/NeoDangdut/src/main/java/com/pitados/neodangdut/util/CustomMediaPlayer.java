@@ -1,12 +1,14 @@
 package com.pitados.neodangdut.util;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.NotificationCompat;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -34,6 +36,7 @@ import com.pitados.neodangdut.model.CommunityContentData;
 import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.model.MusicData;
 import com.pitados.neodangdut.model.NewsData;
+import com.pitados.neodangdut.model.UserLoginData;
 import com.pitados.neodangdut.model.VideoData;
 
 import org.json.JSONException;
@@ -41,6 +44,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -91,6 +95,10 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
     public boolean isVideoPlayerShowing, isAudioPlayerShowing, isNewsDetailShowing;
 
+    private UserLoginData userLoginData;
+    private NotificationManager notifManager;
+    private NotificationCompat.Builder mBuilder;
+
     public static CustomMediaPlayer getInstance() {
         if(instance == null)
             instance = new CustomMediaPlayer();
@@ -116,6 +124,9 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                               ImageView audioPauseIcon) {
         this.panelMusicPlayer = panelMusicPlayer;
         this.context = context;
+
+        notifManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        mBuilder = new NotificationCompat.Builder(context);
 
         audioPlayerDuration = duration;
         audioPlayerThumbnail = thumbnailContainer;
@@ -158,7 +169,12 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
         trackType = MusicType.SHOP;
         selectedMusicData = data;
-        // TODO set panel music player default / loading
+        // TODO set notif
+        mBuilder.setSmallIcon(R.drawable.nd_local_512);
+        mBuilder.setContentTitle("Now Playing");
+        mBuilder.setContentText(data.singerName + " - " + data.songTitle);
+        notifManager.notify(100, mBuilder.build());
+
         panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
         audioPauseIcon.setImageResource(R.drawable.icon_play);
 
@@ -173,7 +189,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
             Log.d("MEDIA", "URL");
             audioPlayer.setDataSource(context, Uri.parse(data.previewURL));
         }
-        audioPlayer.prepareAsync();
+
         audioPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
@@ -187,10 +203,19 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 audioPlayerArtistName.setText(data.singerName);
                 audioPlayerDuration.setText(data.duration);
 
-                int duration = (int)audioPlayer.getDuration() / 1000;
+                int duration = (int) audioPlayer.getDuration() / 1000;
                 audioProgress.setMax(duration);
             }
         });
+
+        audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                notifManager.cancelAll();
+            }
+        });
+
+        audioPlayer.prepareAsync();
 
         final Handler mHandler = new Handler();
         Activity currentActivity =  (Activity) context;
@@ -200,6 +225,11 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 if(audioPlayer != null) {
                     int mCurrentPos = (int)audioPlayer.getCurrentPosition() / 1000;
                     audioProgress.setProgress(mCurrentPos);
+
+                    int duration = ((int)audioPlayer.getDuration() / 1000) - mCurrentPos;
+                    int minutes = duration / 60;
+                    int seconds = duration % 60;
+                    audioPlayerDuration.setText(minutes + ":" + ((seconds < 10) ? "0" + seconds : seconds));
                 }
 
                 mHandler.postDelayed(this, 1000);
@@ -212,6 +242,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
             public void onProgressChanged(SeekBar seekBar, int pos, boolean fromUser) {
                 if(audioPlayer != null && fromUser) {
                     audioPlayer.seekTo(pos * 1000);
+
                 }
             }
 
@@ -242,7 +273,14 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
         trackType = MusicType.COMMUNITY;
         selectedCommunityData = data;
-        // TODO set panel music player default / loading
+        data.totalViews += 1;
+        ApiManager.getInstance().addListen(data.ID);
+
+        mBuilder.setSmallIcon(R.drawable.nd_local_512);
+        mBuilder.setContentTitle("Now Playing");
+        mBuilder.setContentText(data.userName+" - "+data.songName);
+        notifManager.notify(100, mBuilder.build());
+
         panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
         audioPauseIcon.setImageResource(R.drawable.icon_play);
 
@@ -250,7 +288,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
             audioPlayer.stopPlayback();
 
         audioPlayer.setDataSource(context, Uri.parse(data.fileURL));
-        audioPlayer.prepareAsync();
+
         audioPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
@@ -259,15 +297,24 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 audioPauseIcon.setImageResource(R.drawable.icon_pause);
 
                 // TODO change audio data
-                imageLoader.displayImage(data.coverURL, audioPlayerThumbnail, opts);
+                imageLoader.displayImage(data.photoURL, audioPlayerThumbnail, opts);
                 audioPlayerSongTitle.setText(data.songName);
                 audioPlayerArtistName.setText(data.userName);
                 audioPlayerDuration.setText("");
 
-                int duration = (int)audioPlayer.getDuration() / 1000;
+                int duration = (int) audioPlayer.getDuration() / 1000;
                 audioProgress.setMax(duration);
             }
         });
+
+        audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                notifManager.cancelAll();
+            }
+        });
+
+        audioPlayer.prepareAsync();
 
         final Handler mHandler = new Handler();
         Activity currentActivity =  (Activity) context;
@@ -277,6 +324,11 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 if(audioPlayer != null) {
                     int mCurrentPos = (int)audioPlayer.getCurrentPosition() / 1000;
                     audioProgress.setProgress(mCurrentPos);
+
+                    int duration = ((int)audioPlayer.getDuration() / 1000) - mCurrentPos;
+                    int minutes = duration / 60;
+                    int seconds = duration % 60;
+                    audioPlayerDuration.setText(minutes + ":" + ((seconds < 10) ? "0" + seconds : seconds));
                 }
 
                 mHandler.postDelayed(this, 1000);
@@ -319,7 +371,12 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
         trackType = MusicType.ALBUM_ITEM;
         selectedAlbumItemData = data;
-        // TODO set panel music player default / loading
+
+        mBuilder.setSmallIcon(R.drawable.nd_local_512);
+        mBuilder.setContentTitle("Now Playing");
+        mBuilder.setContentText(data.singerName+" - "+data.songName);
+        notifManager.notify(100, mBuilder.build());
+
         panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
         audioPauseIcon.setImageResource(R.drawable.icon_play);
 
@@ -335,7 +392,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
             Log.d("MEDIA", "URL");
             audioPlayer.setDataSource(context, Uri.parse(data.previewURL));
         }
-        audioPlayer.prepareAsync();
+
         audioPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
@@ -349,10 +406,19 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 audioPlayerArtistName.setText(data.singerName);
                 audioPlayerDuration.setText("");
 
-                int duration = (int)audioPlayer.getDuration() / 1000;
+                int duration = (int) audioPlayer.getDuration() / 1000;
                 audioProgress.setMax(duration);
             }
         });
+
+        audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                notifManager.cancelAll();
+            }
+        });
+
+        audioPlayer.prepareAsync();
 
         final Handler mHandler = new Handler();
         Activity currentActivity =  (Activity) context;
@@ -362,6 +428,11 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 if(audioPlayer != null) {
                     int mCurrentPos = (int)audioPlayer.getCurrentPosition() / 1000;
                     audioProgress.setProgress(mCurrentPos);
+
+                    int duration = ((int)audioPlayer.getDuration() / 1000) - mCurrentPos;
+                    int minutes = duration / 60;
+                    int seconds = duration % 60;
+                    audioPlayerDuration.setText(minutes + ":" + ((seconds < 10) ? "0" + seconds : seconds));
                 }
 
                 mHandler.postDelayed(this, 1000);
@@ -391,7 +462,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         });
     }
 
-    public void playItem(final LibraryData data) {
+    public void playItem(final LibraryData data, final List<LibraryData> listLibrary) {
         if(data.category.equalsIgnoreCase("music")) {
             if(isVideoPlayerShowing) {
                 isVideoPlayerShowing = false;
@@ -406,7 +477,12 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
             trackType = MusicType.LIBRARY;
             selectedLibraryData = data;
-            // TODO set panel music player default / loading
+
+            mBuilder.setSmallIcon(R.drawable.nd_local_512);
+            mBuilder.setContentTitle("Now Playing");
+            mBuilder.setContentText(data.singerName+" - "+data.songTitle);
+            notifManager.notify(100, mBuilder.build());
+
             panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
             audioPauseIcon.setImageResource(R.drawable.icon_play);
 
@@ -423,7 +499,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 Log.d("MEDIA", "URL");
                 audioPlayer.setDataSource(context, Uri.parse(data.fileURL));
             }
-            audioPlayer.prepareAsync();
+
             audioPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mediaPlayer) {
@@ -432,13 +508,30 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                     audioPauseIcon.setImageResource(R.drawable.icon_pause);
 
                     // TODO change audio data
-                    imageLoader.displayImage(data.coverURL, audioPlayerThumbnail, opts);
+                    imageLoader.displayImage(data.albumCover, audioPlayerThumbnail, opts);
                     audioPlayerSongTitle.setText(data.songTitle);
                     audioPlayerArtistName.setText(data.singerName);
                     audioPlayerDuration.setText("");
 
-                    int duration = (int)audioPlayer.getDuration() / 1000;
+                    int duration = (int) audioPlayer.getDuration() / 1000;
                     audioProgress.setMax(duration);
+                }
+            });
+
+            audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    notifManager.cancelAll();
+                }
+            });
+
+            audioPlayer.prepareAsync();
+
+            final int nextIndex = (listLibrary.indexOf(data) + 1) % listLibrary.size();
+            audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    playItem(listLibrary.get(nextIndex), listLibrary);
                 }
             });
 
@@ -450,6 +543,11 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                     if(audioPlayer != null) {
                         int mCurrentPos = (int)audioPlayer.getCurrentPosition() / 1000;
                         audioProgress.setProgress(mCurrentPos);
+
+                        int duration = ((int)audioPlayer.getDuration() / 1000) - mCurrentPos;
+                        int minutes = duration / 60;
+                        int seconds = duration % 60;
+                        audioPlayerDuration.setText(minutes + ":" + ((seconds < 10) ? "0"+seconds : seconds));
                     }
 
                     mHandler.postDelayed(this, 1000);
@@ -499,6 +597,14 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 public void onPrepared(MediaPlayer mediaPlayer) {
                     // TODO close buffering indicator
                     videoPlayer.start();
+                }
+            });
+
+            final int nextIndex = (listLibrary.indexOf(data) + 1) % listLibrary.size();
+            videoPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    playItem(listLibrary.get(nextIndex), listLibrary);
                 }
             });
 
@@ -587,6 +693,8 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
             stopTrack();
         }
 
+        videoData.totalViews += 1;
+        ApiManager.getInstance().addListen(videoData.ID);
         showVideoPlayer();
         videoPlayer.setVideoURI(Uri.parse(videoData.fileURL));
         videoPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -641,6 +749,8 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
     }
 
     public void closeMusicPlayer() {
+        notifManager.cancelAll();
+
         TranslateAnimation translate = new TranslateAnimation(TranslateAnimation.RELATIVE_TO_SELF, 0f, TranslateAnimation.RELATIVE_TO_SELF, 0f, TranslateAnimation.RELATIVE_TO_SELF, 0f, TranslateAnimation.RELATIVE_TO_SELF, 1f);
         translate.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -735,7 +845,9 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                         imageLoader.displayImage(thumbnailURL, newsThumbnail, opts);
                         newsDetailTitle.setText(title);
                         newsDetailDate.setText(created);
-                        newsDescription.setText(Html.fromHtml(content));
+
+                        String parsedContent = content.replaceAll("(\r\n)", "<br />");
+                        newsDescription.setText(Html.fromHtml(parsedContent));
 
                         loadingBar.setVisibility(View.INVISIBLE);
                     } catch (JSONException e) {

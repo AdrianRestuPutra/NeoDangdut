@@ -71,7 +71,7 @@ public class FragmentHomeNews extends Fragment {
         listNews.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                CustomMediaPlayer.getInstance().showNewsDetail(DataPool.getInstance().listAllNews.get(i));
+                CustomMediaPlayer.getInstance().showNewsDetail(listAdapter.getContentItem(i));
             }
         });
 

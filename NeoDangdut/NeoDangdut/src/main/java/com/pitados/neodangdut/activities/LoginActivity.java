@@ -124,7 +124,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         userLoginData.setUserFBID(fbID);
                         userLoginData.setUserFBEmail(fbEmail);
 
-                        ApiManager.getInstance().getUserAccessToken();
                         ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
                             @Override
                             public void onUserAccessTokenSaved() {
@@ -142,6 +141,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                             }
                         });
+
+                        ApiManager.getInstance().getUserAccessToken();
                     }
                 });
 
@@ -229,7 +230,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             userLoginData.setPassword(password);
 
             popupLoading.showPopupLoading("Logging in..");
-            ApiManager.getInstance().getUserAccessToken();
             ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
                 @Override
                 public void onUserAccessTokenSaved() {
@@ -247,6 +247,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                 }
             });
+
+            ApiManager.getInstance().getUserAccessToken();
 
         } else {
             Toast.makeText(getBaseContext(), "Username or Password incorrect", Toast.LENGTH_SHORT).show();

@@ -14,8 +14,10 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.LibraryData;
+import com.pitados.neodangdut.util.ConnManager;
 import com.pitados.neodangdut.util.FontLoader;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,7 +38,7 @@ public class CustomLibraryMusicAdapter extends BaseAdapter {
 
     public CustomLibraryMusicAdapter(Context context, List<LibraryData> listMusic) {
         this.context = context;
-        this.listMusic = listMusic;
+//        this.listMusic = listMusic;
 
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()
@@ -48,6 +50,15 @@ public class CustomLibraryMusicAdapter extends BaseAdapter {
                 .imageScaleType(ImageScaleType.EXACTLY)
                 .resetViewBeforeLoading(true)
                 .build();
+
+        List<LibraryData> validatedList = new ArrayList<>();
+        // validate count
+        for(LibraryData temp : listMusic) {
+            if (ConnManager.getInstance().fileExist(ConnManager.DataType.AUDIO, temp.albumName, temp.songTitle)) {
+                validatedList.add(temp);
+            }
+        }
+        this.listMusic = validatedList;
     }
 
     @Override
@@ -59,6 +70,12 @@ public class CustomLibraryMusicAdapter extends BaseAdapter {
     public Object getItem(int i) {
         return listMusic.get(i);
     }
+
+    public LibraryData getLibraryItem(int i ) {
+        return listMusic.get(i);
+    }
+
+    public List<LibraryData> getListLibrary() { return listMusic; }
 
     @Override
     public long getItemId(int i) {

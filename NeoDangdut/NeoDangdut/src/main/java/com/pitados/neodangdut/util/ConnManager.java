@@ -45,7 +45,9 @@ public class ConnManager {
             downloadRequest.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
         }
 
-        downloadRequest.setTitle(Consts.NOTIF_DOWNLOAD_TITLE);
+//        downloadRequest.setTitle(Consts.NOTIF_DOWNLOAD_TITLE);
+        String ext = (type == DataType.AUDIO) ? ".mp3" : ".mp4";
+        downloadRequest.setTitle(Consts.NOTIF_DOWNLOAD_TITLE + filename + ext);
         downloadRequest.setDescription(Consts.NOTIF_DOWNLOAD_DESCRIPTION);
         String filePath = "";
         if(type == DataType.AUDIO) {

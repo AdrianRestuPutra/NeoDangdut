@@ -107,7 +107,7 @@ public class FragmentHomeMusic extends Fragment {
         listViewCommunityMusic.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                CustomMediaPlayer.getInstance().playTrack(DataPool.getInstance().listCommunityMusic.get(i));
+                CustomMediaPlayer.getInstance().playTrack(listAdapter.getContentItem(i));
             }
         });
 

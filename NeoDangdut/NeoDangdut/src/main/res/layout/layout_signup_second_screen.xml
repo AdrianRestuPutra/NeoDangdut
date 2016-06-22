@@ -13,7 +13,9 @@
         android:hint="First Name"
         android:paddingLeft="@dimen/signup_padding"
         android:textColor="@color/white_font"
-        android:textColorHint="@color/purple_font" />
+        android:textColorHint="@color/purple_font"
+        android:singleLine="true"
+        android:imeOptions="actionNext"/>
 
     <EditText
         android:id="@+id/signup_lastname"
@@ -24,7 +26,9 @@
         android:hint="Last Name"
         android:paddingLeft="@dimen/signup_padding"
         android:textColor="@color/white_font"
-        android:textColorHint="@color/purple_font" />
+        android:textColorHint="@color/purple_font"
+        android:singleLine="true"
+        android:imeOptions="actionNext"/>
 
     <EditText
         android:id="@+id/signup_city"
@@ -35,7 +39,9 @@
         android:hint="City/Town"
         android:paddingLeft="@dimen/signup_padding"
         android:textColor="@color/white_font"
-        android:textColorHint="@color/purple_font" />
+        android:textColorHint="@color/purple_font"
+        android:singleLine="true"
+        android:imeOptions="actionNext"/>
 
     <!-- Drop Down Country -->
     <EditText
@@ -48,7 +54,9 @@
         android:hint="Country"
         android:paddingLeft="@dimen/signup_padding"
         android:textColor="@color/white_font"
-        android:textColorHint="@color/purple_font" />
+        android:textColorHint="@color/purple_font"
+        android:singleLine="true"
+        android:imeOptions="actionNext"/>
 
 
     <!-- Birthday -->
@@ -88,7 +96,9 @@
                 android:inputType="date"
                 android:maxLength="2"
                 android:hint="dd"
-                android:textColorHint="@color/purple_font"/>
+                android:textColorHint="@color/purple_font"
+                android:singleLine="true"
+                android:imeOptions="actionNext"/>
 
             <TextView
                 android:layout_width="@dimen/signup_picker_margin"
@@ -108,7 +118,9 @@
                 android:inputType="date"
                 android:maxLength="2"
                 android:hint="mm"
-                android:textColorHint="@color/purple_font"/>
+                android:textColorHint="@color/purple_font"
+                android:singleLine="true"
+                android:imeOptions="actionNext"/>
 
             <TextView
                 android:layout_width="@dimen/signup_picker_margin"
@@ -128,7 +140,9 @@
                 android:inputType="date"
                 android:maxLength="4"
                 android:hint="yyyy"
-                android:textColorHint="@color/purple_font"/>
+                android:textColorHint="@color/purple_font"
+                android:singleLine="true"
+                android:imeOptions="actionNext"/>
             
         </LinearLayout>
     </LinearLayout>
