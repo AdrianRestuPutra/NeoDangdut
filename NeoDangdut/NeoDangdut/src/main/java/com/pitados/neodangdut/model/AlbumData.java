@@ -46,4 +46,8 @@ public class AlbumData {
 
     }
 
+    private void checkIsAvailable() {
+
+    }
+
 }

@@ -3,98 +3,161 @@
     xmlns:EMVideoView="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     android:background="@color/main_bg">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/main_bg"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <com.devbrackets.android.exomedia.EMVideoView
-            android:id="@+id/video_player_view"
-            EMVideoView:defaultControlsEnabled="true"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/video_player_height">
-
-            <ImageView
-                android:id="@+id/video_player_fullscreen_button"
-                android:layout_width="@dimen/video_player_icon_width"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="true"
-                android:src="@drawable/icon_fullscreen"/>
-        </com.devbrackets.android.exomedia.EMVideoView>
-
-        <!-- Detail video -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="@dimen/video_player_detail_padding">
+            android:background="@color/main_bg"
+            android:orientation="vertical">
 
-
-            <LinearLayout
+            <com.devbrackets.android.exomedia.EMVideoView
+                android:id="@+id/video_player_view"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/video_player_detail_height"
-                android:orientation="horizontal">
+                android:layout_height="@dimen/video_player_height"
+                EMVideoView:defaultControlsEnabled="true">
 
-                <RelativeLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
+                <ImageView
+                    android:id="@+id/video_player_fullscreen_button"
+                    android:layout_width="@dimen/video_player_icon_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:src="@drawable/icon_fullscreen" />
+            </com.devbrackets.android.exomedia.EMVideoView>
 
-                    <ImageView
-                        android:id="@+id/video_player_thumbnail"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:adjustViewBounds="true"
-                        android:src="@drawable/ic_menu_camera" />
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="3"
-                    android:orientation="vertical">
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:orientation="horizontal"></LinearLayout>
-            </LinearLayout>
-            <!-- End Of Detail Video -->
-
-            <!-- Description Video -->
+            <!-- Detail video -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/video_player_description_margin_top"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="@dimen/video_player_detail_padding">
 
-                <TextView
-                    android:id="@+id/video_player_detail_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="@color/purple_font"/>
 
-                <TextView
-                    android:id="@+id/video_player_detail_description"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/video_player_detail_height"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:id="@+id/video_player_thumbnail"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/ic_menu_camera" />
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="3"
+                        android:orientation="vertical">
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:orientation="horizontal">
+
+
+                    </LinearLayout>
+                </LinearLayout>
+                <!-- End Of Detail Video -->
+
+                <!-- Description Video -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/video_player_description_margin_top"
-                    android:text=""
-                    android:textColor="@color/white_font"/>
-            </LinearLayout>
-            <!-- End Of Description Video -->
-        </LinearLayout>
-    </LinearLayout>
+                    android:orientation="vertical">
 
+                    <TextView
+                        android:id="@+id/video_player_detail_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/purple_font" />
+
+                    <TextView
+                        android:id="@+id/video_player_detail_description"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/video_player_description_margin_top"
+                        android:text=""
+                        android:textColor="@color/white_font" />
+                </LinearLayout>
+                <!-- End Of Description Video -->
+
+                <!-- Comment -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Input comment -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <EditText
+                            android:id="@+id/video_player_comment_input"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/comment_input_height"
+                            android:background="@drawable/bg_input"
+                            android:hint="Write comment here.."
+                            android:paddingLeft="@dimen/comment_input_padding"
+                            android:textColor="@color/white_font"
+                            android:textColorHint="@color/purple_font"
+                            android:textSize="@dimen/comment_text_normal" />
+
+                        <RelativeLayout
+                            android:id="@+id/video_player_comment_button_submit"
+                            android:layout_width="@dimen/comment_submit_button_width"
+                            android:layout_height="@dimen/comment_submit_button_height"
+                            android:layout_gravity="right"
+                            android:layout_marginTop="@dimen/comment_input_padding"
+                            android:background="@drawable/bg_btn_purple">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:text="Submit"
+                                android:textColor="@color/white_font" />
+
+                        </RelativeLayout>
+                    </LinearLayout>
+                    <!-- End of input comment -->
+
+                    <!-- Comment -->
+                    <ListView
+                        android:id="@+id/video_player_comment_listview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                    </ListView>
+
+
+                </LinearLayout>
+                <!-- End Of Comment -->
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </RelativeLayout>

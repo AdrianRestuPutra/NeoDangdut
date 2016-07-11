@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_bg">
+
+    <LinearLayout
+        android:layout_width="@dimen/dialog_artist_song_width"
+        android:layout_height="@dimen/dialog_artist_video_height"
+        android:layout_centerInParent="true"
+        android:background="@drawable/popup_artistsong_bg"
+        android:orientation="horizontal"
+        android:padding="@dimen/dialog_artist_price_margin">
+
+
+        <!-- Right Panel -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dialog_artist_song_upper_panel_height"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2">
+
+                        <TextView
+                            android:id="@+id/popup_exit_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:text="Quit Neo Dangdut?"
+                            android:textColor="@color/white_font"
+                            android:textSize="@dimen/popup_exit_font_size" />
+
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+            <!-- Button -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <!-- Cancel -->
+                <RelativeLayout
+                    android:id="@+id/popup_exit_button_no"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+
+                    <TextView
+                        android:id="@+id/popup_exit_button_no_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="No"
+                        android:textColor="@color/white_font"
+                        android:textSize="@dimen/tab_text_large_size" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="@dimen/divider_height"
+                    android:layout_height="match_parent"
+                    android:background="@color/tab_divider"/>
+
+                <!-- Play -->
+                <RelativeLayout
+                    android:id="@+id/popup_exit_button_yes"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/popup_exit_button_yes_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="Yes"
+                        android:textColor="@color/white_font"
+                        android:textSize="@dimen/tab_text_large_size" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+        <!-- Right Panel End -->
+
+    </LinearLayout>
+
+
+</RelativeLayout>

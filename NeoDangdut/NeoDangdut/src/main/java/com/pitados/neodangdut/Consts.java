@@ -38,6 +38,7 @@ public class Consts {
     public static String URL_GET_COMMUNITY_CONTENT = URL_GET_TOKEN+"/content";
     public static String URL_GET_ALBUM = URL_GET_TOKEN+"/album";
     public static String URL_GET_LIBRARY = URL_GET_TOKEN+"/me/history";
+    public static String URL_GET_COMMENTS = URL_GET_TOKEN+"/comment";
 
     public static String URL_LIKE = URL_GET_TOKEN+"/me/like/";
     public static String URL_UNLIKE = URL_GET_TOKEN+"/me/unlike/";
@@ -52,6 +53,7 @@ public class Consts {
     public static String URL_PRIVACY_POLICY = "http://neodangdut.com/privacy-policy";
     public static String URL_ABOUT = "http://neodangdut.com/about";
 
+    public static String URL_FORGOT = "http://neodangdut.com/authorize/forgot";
 
     // TAG TOKEN
     public static String TAG_TOKEN = "access_token";

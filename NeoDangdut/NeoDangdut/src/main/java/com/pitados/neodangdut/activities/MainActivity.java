@@ -32,6 +32,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
@@ -40,6 +41,7 @@ import android.widget.TextView;
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.devbrackets.android.exomedia.EMVideoView;
+import com.facebook.share.widget.ShareDialog;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -48,6 +50,7 @@ import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.Popup.PopupAlbumView;
 import com.pitados.neodangdut.Popup.PopupArtistSong;
 import com.pitados.neodangdut.Popup.PopupCommunity;
+import com.pitados.neodangdut.Popup.PopupExit;
 import com.pitados.neodangdut.Popup.PopupLoading;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.custom.CustomPagerAdapter;
@@ -79,6 +82,7 @@ import com.pitados.neodangdut.util.DataPool;
 import com.pitados.neodangdut.util.FilePath;
 import com.pitados.neodangdut.util.FontLoader;
 import com.pitados.neodangdut.util.StateManager;
+import com.pitados.neodangdut.util.UncaughtException;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -127,13 +131,18 @@ public class MainActivity extends AppCompatActivity
     private ImageView videoPlayerFullscreenButton;
     // TODO widget video
     private TextView videoDate, videoDescription;
+    private EditText videoInputComment;
+    private RelativeLayout videoSubmitCommentButton;
+    private ListView videoComment;
     // NEWS
     private RelativeLayout panelNewsDetail, loadingBar;
     private ScrollView newsScrollView;
     private ImageView newsDetailThumbnail;
-    private TextView newsDetailTitle;
-    private TextView newsDetailDate;
-    private TextView newsDetailDescription;
+    private TextView newsDetailTitle, newsDetailDate, newsDetailDescription, newsDetailLikeCount;
+    private RelativeLayout newsDetailLikeButton, newsDetailShareFB, newsDetailShareTweeter;
+    private EditText newsDetailInputComment;
+    private RelativeLayout newsDetailSubmitCommentButton;
+    private ListView newsDetailComment;
 
     // SETTINGS
     private RelativeLayout settingToggleNotif, settingToggleDownload;
@@ -192,6 +201,9 @@ public class MainActivity extends AppCompatActivity
     private PopupArtistSong popupArtistSong;
     private PopupCommunity popupCommunitySong;
     private PopupAlbumView popupAlbum;
+    private ShareDialog shareDialog;
+    private PopupExit popupExit;
+    private PopupExit popupRetry;
     // EXIT
 
     // MENU
@@ -203,6 +215,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtException(MainActivity.this));
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -237,6 +252,24 @@ public class MainActivity extends AppCompatActivity
 
 
         popupLoading = new PopupLoading(MainActivity.this, R.style.custom_dialog);
+        shareDialog = new ShareDialog(this);
+        popupExit = new PopupExit(MainActivity.this, R.style.custom_dialog) {
+            @Override
+            public void onPositiveButton() {
+                DataPool.getInstance().listHomeBanner.clear();
+                DataPool.getInstance().listHomeTopVideos.clear();
+                DataPool.getInstance().listHomeTopMusic.clear();
+
+                MainActivity.this.finish();
+            }
+        };
+
+        popupRetry = new PopupExit(MainActivity.this, R.style.custom_dialog) {
+            @Override
+            public void onPositiveButton() {
+                ApiManager.getInstance().getUserAccessToken();
+            }
+        };
 
         initMediaPlayer();
         initSideMenu();
@@ -385,20 +418,7 @@ public class MainActivity extends AppCompatActivity
             ApiManager.getInstance().getUserAccessToken();
         } else {
             goToLibrary(false);
-            new AlertDialog.Builder(this)
-                    .setTitle("Connection Error")
-                    .setMessage("No Internet Connection")
-                    .setPositiveButton("Retry", new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if(isNetworkAvailable())
-                                ApiManager.getInstance().getUserAccessToken();
-                        }
-
-                    })
-                    .setNegativeButton("Close", null)
-                    .show();
+            popupRetry.showPopupExit("No Internet Connection", "No", "Retry");
         }
     }
 
@@ -586,6 +606,10 @@ public class MainActivity extends AppCompatActivity
         videoDate.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_LIGHT));
         videoDescription.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_REGULAR));
 
+        videoInputComment = (EditText) findViewById(R.id.video_player_comment_input);
+        videoSubmitCommentButton = (RelativeLayout) findViewById(R.id.video_player_comment_button_submit);
+        videoComment = (ListView) findViewById(R.id.video_player_comment_listview);
+
         videoPlayerFullscreenButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -608,17 +632,27 @@ public class MainActivity extends AppCompatActivity
         newsDetailDate = (TextView) findViewById(R.id.news_detail_date);
         newsDetailDescription = (TextView) findViewById(R.id.news_detail_description);
         loadingBar = (RelativeLayout) findViewById(R.id.news_detail_loading);
+        newsDetailLikeCount = (TextView) findViewById(R.id.news_detail_like_count_text);
+
+        newsDetailLikeButton = (RelativeLayout) findViewById(R.id.news_detail_like_button);
+        newsDetailShareFB = (RelativeLayout) findViewById(R.id.news_detail_facebook_button);
+        newsDetailShareTweeter = (RelativeLayout) findViewById(R.id.news_detail_twitter_button);
 
         newsDetailTitle.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_REGULAR));
         newsDetailDate.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_LIGHT));
         newsDetailDescription.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_REGULAR));
+        newsDetailLikeCount.setTypeface(FontLoader.getTypeFace(this, FontLoader.FontType.HEADLINE_LIGHT));
+
+        newsDetailInputComment = (EditText) findViewById(R.id.news_detail_comment_input);
+        newsDetailSubmitCommentButton = (RelativeLayout) findViewById(R.id.news_detail_comment_button_submit);
+        newsDetailComment = (ListView) findViewById(R.id.news_detail_comment_listview);
 
         CustomMediaPlayer.getInstance().setAudioPanel(this, panelMusicPlayer, musicPlayerProgress, musicPlayerDuration,
                 musicPlayerThumbnail, musicPlayerTitle, musicPlayerArtistName, musicPlayerPauseIcon);
 
-        CustomMediaPlayer.getInstance().setVideoPanel(panelVideoPlayer, videoView, videoDate, videoDescription, videoPlayerThumbnail);
+        CustomMediaPlayer.getInstance().setVideoPanel(panelVideoPlayer, videoView, videoDate, videoDescription, videoPlayerThumbnail, videoComment, videoInputComment, videoSubmitCommentButton);
 
-        CustomMediaPlayer.getInstance().setNewsPanel(panelNewsDetail, newsDetailThumbnail, newsDetailTitle, newsDetailDate, newsDetailDescription, loadingBar, newsScrollView);
+        CustomMediaPlayer.getInstance().setNewsPanel(panelNewsDetail, newsDetailThumbnail, newsDetailTitle, newsDetailDate, newsDetailDescription, loadingBar, newsScrollView, newsDetailLikeCount, newsDetailLikeButton, newsDetailShareFB, newsDetailShareTweeter, shareDialog, newsDetailComment, newsDetailInputComment, newsDetailSubmitCommentButton);
 
     }
 
@@ -653,7 +687,9 @@ public class MainActivity extends AppCompatActivity
 
     private void setSideMenuData() {
         imageLoader.displayImage(userLoginData.getPhotoURL(), sideMenuUserPic, opts);
-        sideMenuFullName.setText(userLoginData.getFullname());
+        if(userLoginData.getFullname().length() > 0)
+            sideMenuFullName.setText(userLoginData.getFullname());
+        else sideMenuFullName.setText("N/A");
         sideMenuWallet.setText("Rp " + userLoginData.getCredit());
     }
 
@@ -874,13 +910,27 @@ public class MainActivity extends AppCompatActivity
         UserProfileData data = DataPool.getInstance().userProfileData;
 
         imageLoader.displayImage(data.photoURL, profilePicture, opts);
-        profileName.setText(data.fullName);
-        profileCity.setText(data.locationCity);
-        profileCountry.setText(data.locationCountry);
+        if(data.fullName != null && data.fullName.length() > 0)
+            profileName.setText(data.fullName);
+        else
+            profileName.setText("N/A");
+        if(data.locationCity != null && data.locationCity.length() > 0)
+            profileCity.setText(data.locationCity);
+        else
+            profileCity.setText("N/A");
+
+        if(data.locationCountry != null && data.locationCountry.length() > 0)
+            profileCountry.setText(data.locationCountry);
+        else
+            profileCountry.setText("N/A");
         profileLikeCount.setText(String.valueOf(data.totalLikes));
         profileMusicCount.setText(String.valueOf(data.totalMusic));
         profileVideoCount.setText(String.valueOf(data.totalVideo));
-        profileDescription.setText(data.profile);
+
+        if(data.profile != null && data.profile.length() > 0)
+            profileDescription.setText(data.profile);
+        else
+            profileDescription.setText("N/A");
     }
 
     private void initPanelUpload() {
@@ -1233,13 +1283,7 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        if(CustomMediaPlayer.getInstance().isAudioPlayerShowing) {
-            if(CustomMediaPlayer.getInstance().isTrackPaused())
-                CustomMediaPlayer.getInstance().closeMusicPlayer();
-            else
-                moveTaskToBack(true);
-//                CustomMediaPlayer.getInstance().pauseTrack();
-        } else if(CustomMediaPlayer.getInstance().isVideoPlayerShowing) {
+        if(CustomMediaPlayer.getInstance().isVideoPlayerShowing) {
             CustomMediaPlayer.getInstance().closeVideoPlayer();
         } else if(CustomMediaPlayer.getInstance().isNewsDetailShowing) {
             CustomMediaPlayer.getInstance().closeNewsDetail();
@@ -1259,27 +1303,34 @@ public class MainActivity extends AppCompatActivity
         } else {
             if(fabMenu.isExpanded()) {
                 fabMenu.collapse();
+            }else if(CustomMediaPlayer.getInstance().isAudioPlayerShowing) {
+                if (CustomMediaPlayer.getInstance().isTrackPaused())
+                    CustomMediaPlayer.getInstance().closeMusicPlayer();
+                else
+                    moveTaskToBack(true);
+//                CustomMediaPlayer.getInstance().pauseTrack();
             } else {
 
-                new AlertDialog.Builder(this)
-                        .setTitle("Quit Application")
-                        .setMessage("Are you sure you want to quit?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                //Stop the activity
-                                DataPool.getInstance().listHomeBanner.clear();
-                                DataPool.getInstance().listHomeTopVideos.clear();
-                                DataPool.getInstance().listHomeTopMusic.clear();
-
-                                MainActivity.this.finish();
-                            }
-
-                        })
-                        .setNegativeButton("Not Now", null)
-                        .show();
+                popupExit.showPopupExit("Quit Neo Dangdut?", "Not Now", "Yes");
+//                new AlertDialog.Builder(this)
+//                        .setTitle("Quit Application")
+//                        .setMessage("Are you sure you want to quit?")
+//                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//
+//                                //Stop the activity
+//                                DataPool.getInstance().listHomeBanner.clear();
+//                                DataPool.getInstance().listHomeTopVideos.clear();
+//                                DataPool.getInstance().listHomeTopMusic.clear();
+//
+//                                MainActivity.this.finish();
+//                            }
+//
+//                        })
+//                        .setNegativeButton("Not Now", null)
+//                        .show();
             }
         }
 

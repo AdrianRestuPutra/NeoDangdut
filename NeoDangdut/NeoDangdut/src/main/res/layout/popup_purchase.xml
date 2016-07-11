@@ -4,8 +4,8 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="@dimen/dialog_artist_song_width"
-        android:layout_height="@dimen/dialog_artist_song_height"
+        android:layout_width="@dimen/dialog_purchase_width"
+        android:layout_height="@dimen/dialog_purchase_height"
         android:layout_centerInParent="true"
         android:background="@color/main_bg"
         android:orientation="vertical"

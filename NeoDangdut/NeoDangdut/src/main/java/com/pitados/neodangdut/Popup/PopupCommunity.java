@@ -111,7 +111,7 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
 
 
     // TWITTER
-    public static String urlEncode(String s) {
+    public String urlEncode(String s) {
         try {
             return URLEncoder.encode(s, "UTF-8");
         }

@@ -81,10 +81,11 @@
     <dimen name="music_player_button_icon_width">15dp</dimen>
     <dimen name="music_player_duration_font">5pt</dimen>
     <dimen name="video_player_height">180dp</dimen>
-    <dimen name="video_player_detail_height">70dp</dimen>
+    <dimen name="video_player_detail_height">50dp</dimen>
     <dimen name="video_player_detail_padding">10dp</dimen>
     <dimen name="video_player_description_margin_top">20dp</dimen>
     <dimen name="video_player_icon_width">20dp</dimen>
+
 
     <!-- Community Music -->
     <dimen name="home_music_list_thumbnail_width">100dp</dimen>
@@ -107,6 +108,7 @@
     <dimen name="news_detail_title_font">15dp</dimen>
     <dimen name="news_detail_date_font">10dp</dimen>
     <dimen name="news_detail_padding">15dp</dimen>
+    <dimen name="news_detail_comment_margin_top">10dp</dimen>
 
     <!-- Shop Music -->
     <dimen name="shop_music_top_song_featured_panel_height">150dp</dimen>
@@ -152,10 +154,10 @@
     <dimen name="setting_icon_margin">180dp</dimen>
 
     <!-- Dialog -->
-    <dimen name="dialog_artist_song_upper_panel_height">100dp</dimen>
-    <dimen name="dialog_artist_song_width">200dp</dimen>
-    <dimen name="dialog_artist_song_height">200dp</dimen>
-    <dimen name="dialog_artist_song_price_height">15dp</dimen>
+    <dimen name="dialog_artist_song_upper_panel_height">130dp</dimen>
+    <dimen name="dialog_artist_song_width">250dp</dimen>
+    <dimen name="dialog_artist_song_height">250dp</dimen>
+    <dimen name="dialog_artist_song_price_height">20dp</dimen>
     <dimen name="dialog_artist_song_thumbnail_size">60dp</dimen>
     <dimen name="dialog_artist_left_panel_margin">2dp</dimen>
     <dimen name="dialog_artist_price_margin">10dp</dimen>
@@ -166,7 +168,7 @@
     <dimen name="dialog_artist_text_margin">2dp</dimen>
     <dimen name="dialog_artist_icon_margin">10dp</dimen>
     <!-- Video -->
-    <dimen name="dialog_artist_video_height">150dp</dimen>
+    <dimen name="dialog_artist_video_height">200dp</dimen>
     <!-- Community -->
     <dimen name="dialog_community_height">300dp</dimen>
     <!-- Loading -->
@@ -217,6 +219,8 @@
     <dimen name="topup_text_size">8pt</dimen>
     
     <!-- Popup Purchase -->
+    <dimen name="dialog_purchase_width">250dp</dimen>
+    <dimen name="dialog_purchase_height">250dp</dimen>
     <dimen name="dialog_purchase_text_title">6pt</dimen>
     <dimen name="dialog_purchase_text_regular">4pt</dimen>
     <dimen name="dialog_purchase_icon">15dp</dimen>
@@ -231,5 +235,20 @@
     <dimen name="search_title_icon_width">15dp</dimen>
     <dimen name="search_title_icon_margin">10dp</dimen>
     <dimen name="search_load_more_button_height">50dp</dimen>
+
+    <dimen name="popup_forgot_width">250dp</dimen>
+    <dimen name="popup_forgot_height">250dp</dimen>
+    <dimen name="popup_forgot_input_height">50dp</dimen>
+
+    <dimen name="popup_exit_font_size">8pt</dimen>
+
+    <!-- Comment -->
+    <dimen name="comment_text_large">8pt</dimen>
+    <dimen name="comment_text_normal">6pt</dimen>
+    <dimen name="comment_thumbnail_width">50dp</dimen>
+    <dimen name="comment_input_height">50dp</dimen>
+    <dimen name="comment_input_padding">5dp</dimen>
+    <dimen name="comment_submit_button_width">80dp</dimen>
+    <dimen name="comment_submit_button_height">30dp</dimen>
 
 </resources>

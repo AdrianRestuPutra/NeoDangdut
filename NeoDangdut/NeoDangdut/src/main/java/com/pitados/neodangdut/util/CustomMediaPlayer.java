@@ -3,6 +3,7 @@ package com.pitados.neodangdut.util;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -12,13 +13,18 @@ import android.support.v7.app.NotificationCompat;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.devbrackets.android.exomedia.EMAudioPlayer;
 import com.devbrackets.android.exomedia.EMVideoView;
@@ -27,10 +33,13 @@ import com.devbrackets.android.exomedia.listener.EMPlaylistServiceCallback;
 import com.devbrackets.android.exomedia.listener.EMProgressCallback;
 import com.devbrackets.android.exomedia.manager.EMPlaylistManager;
 import com.devbrackets.android.exomedia.service.EMPlaylistService;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.pitados.neodangdut.Consts;
 import com.pitados.neodangdut.R;
+import com.pitados.neodangdut.custom.CustomCommentAdapter;
 import com.pitados.neodangdut.model.AlbumItem;
 import com.pitados.neodangdut.model.CommunityContentData;
 import com.pitados.neodangdut.model.LibraryData;
@@ -43,6 +52,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,11 +99,20 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
     private EMVideoView videoPlayer;
     private ImageView videoThumbnail;
     private TextView videoDate, videoDescription;
+    private EditText videoInputComment;
+    private RelativeLayout videoSubmitComment;
+    private ListView videoComment;
     // News
     private ImageView newsThumbnail;
-    private TextView newsDetailTitle, newsDetailDate, newsDescription;
+    private TextView newsDetailTitle, newsDetailDate, newsDescription, newsLikeCount;
+    private RelativeLayout newsDetailLikeButton, newsDetailShareFB, newsDetailShareTweeter;
     private RelativeLayout loadingBar;
     private ScrollView newsScrollView;
+    private EditText newsInputComment;
+    private RelativeLayout newsSubmitComment;
+    private ListView newsComment;
+
+    private CustomCommentAdapter commentAdapter;
 
     private ImageLoader imageLoader;
     private DisplayImageOptions opts;
@@ -98,6 +122,8 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
     private UserLoginData userLoginData;
     private NotificationManager notifManager;
     private NotificationCompat.Builder mBuilder;
+
+    private ShareDialog shareDialog;
 
     public static CustomMediaPlayer getInstance() {
         if(instance == null)
@@ -138,15 +164,19 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         this.audioProgress = audioProgress;
     }
 
-    public void setVideoPanel(View panelVideoPlayer, final EMVideoView videoPlayer, TextView videoDate, TextView videoDescription, ImageView videoThumbnail) {
+    public void setVideoPanel(View panelVideoPlayer, final EMVideoView videoPlayer, TextView videoDate, TextView videoDescription, ImageView videoThumbnail, ListView videoComment, EditText videoInputComment, RelativeLayout videoSubmitComment) {
         this.panelVideoPlayer = panelVideoPlayer;
         this.videoPlayer = videoPlayer;
         this.videoDate = videoDate;
         this.videoDescription = videoDescription;
         this.videoThumbnail = videoThumbnail;
+        this.videoComment = videoComment;
+        this.videoInputComment = videoInputComment;
+        this.videoSubmitComment = videoSubmitComment;
+
     }
 
-    public void setNewsPanel(View panelNewsDetail, ImageView newsThumbnail, TextView newsDetailTitle, TextView newsDetailDate, TextView newsDescription, RelativeLayout loadingBar, ScrollView newsScrollView) {
+    public void setNewsPanel(View panelNewsDetail, ImageView newsThumbnail, TextView newsDetailTitle, TextView newsDetailDate, TextView newsDescription, RelativeLayout loadingBar, ScrollView newsScrollView, TextView newsDetailLikeCount, RelativeLayout newsDetailLikeButton, RelativeLayout newsDetailShareFB, RelativeLayout newsDetailShareTweeter, ShareDialog shareDialog, ListView newsComment, EditText newsInputComment, RelativeLayout newsSubmitComment) {
         this.panelNewsDetail = panelNewsDetail;
         this.newsThumbnail = newsThumbnail;
         this.newsDetailTitle = newsDetailTitle;
@@ -154,6 +184,17 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         this.newsDescription = newsDescription;
         this.loadingBar = loadingBar;
         this.newsScrollView = newsScrollView;
+
+        this.newsLikeCount = newsDetailLikeCount;
+        this.newsDetailLikeButton = newsDetailLikeButton;
+        this.newsDetailShareFB = newsDetailShareFB;
+        this.newsDetailShareTweeter = newsDetailShareTweeter;
+
+        this.shareDialog = shareDialog;
+
+        this.newsComment = newsComment;
+        this.newsInputComment = newsInputComment;
+        this.newsSubmitComment = newsSubmitComment;
     }
 
     public void playTrack(final MusicData data, boolean isPreview) {
@@ -229,7 +270,10 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                     int duration = ((int)audioPlayer.getDuration() / 1000) - mCurrentPos;
                     int minutes = duration / 60;
                     int seconds = duration % 60;
-                    audioPlayerDuration.setText(minutes + ":" + ((seconds < 10) ? "0" + seconds : seconds));
+                    if(duration <= 0)
+                        audioPlayerDuration.setText("0:00");
+                    else
+                        audioPlayerDuration.setText(minutes + ":" + ((seconds < 10) ? "0" + seconds : seconds));
                 }
 
                 mHandler.postDelayed(this, 1000);
@@ -275,6 +319,28 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         selectedCommunityData = data;
         data.totalViews += 1;
         ApiManager.getInstance().addListen(data.ID);
+
+        // TODO get comment
+        DataPool.getInstance().clearListComment();
+        String uri = "http://neodangdut.com/music/detail/"+data.ID;
+        Log.d("Comment", uri);
+
+        ApiManager.getInstance().setOnCommentReceivedListener(new ApiManager.OnCommentReceived() {
+            @Override
+            public void onDataLoaded() {
+                Log.d("Comment", DataPool.getInstance().listComment.size() + "");
+
+                CustomCommentAdapter adapter = new CustomCommentAdapter(context, DataPool.getInstance().listComment);
+                // TODO load comment
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
+
+        ApiManager.getInstance().getComment(uri);
 
         mBuilder.setSmallIcon(R.drawable.nd_local_512);
         mBuilder.setContentTitle("Now Playing");
@@ -328,7 +394,10 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                     int duration = ((int)audioPlayer.getDuration() / 1000) - mCurrentPos;
                     int minutes = duration / 60;
                     int seconds = duration % 60;
-                    audioPlayerDuration.setText(minutes + ":" + ((seconds < 10) ? "0" + seconds : seconds));
+                    if(duration <= 0)
+                        audioPlayerDuration.setText("0:00");
+                    else
+                        audioPlayerDuration.setText(minutes + ":" + ((seconds < 10) ? "0" + seconds : seconds));
                 }
 
                 mHandler.postDelayed(this, 1000);
@@ -432,7 +501,10 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                     int duration = ((int)audioPlayer.getDuration() / 1000) - mCurrentPos;
                     int minutes = duration / 60;
                     int seconds = duration % 60;
-                    audioPlayerDuration.setText(minutes + ":" + ((seconds < 10) ? "0" + seconds : seconds));
+                    if(duration <= 0)
+                        audioPlayerDuration.setText("0:00");
+                    else
+                        audioPlayerDuration.setText(minutes + ":" + ((seconds < 10) ? "0" + seconds : seconds));
                 }
 
                 mHandler.postDelayed(this, 1000);
@@ -547,7 +619,10 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                         int duration = ((int)audioPlayer.getDuration() / 1000) - mCurrentPos;
                         int minutes = duration / 60;
                         int seconds = duration % 60;
-                        audioPlayerDuration.setText(minutes + ":" + ((seconds < 10) ? "0"+seconds : seconds));
+                        if(duration <= 0)
+                            audioPlayerDuration.setText("0:00");
+                        else
+                            audioPlayerDuration.setText(minutes + ":" + ((seconds < 10) ? "0"+seconds : seconds));
                     }
 
                     mHandler.postDelayed(this, 1000);
@@ -709,6 +784,55 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         videoDate.setText(videoData.songName);
         if(videoData.description.length() > 0)
             videoDescription.setText(videoData.description);
+
+        // TODO show comments
+        DataPool.getInstance().clearListComment();
+        final String uri = "http://neodangdut.com/video/detail/"+videoData.ID;
+        DataPool.getInstance().currentURI = uri;
+        Log.d("Comment", uri);
+
+        videoSubmitComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String message = videoInputComment.getText().toString();
+
+                ApiManager.getInstance().setOnCommentPushedListener(new ApiManager.OnCommentPushed() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(context, "Comment Submitted", Toast.LENGTH_SHORT).show();
+                        DataPool.getInstance().clearListComment();
+                        ApiManager.getInstance().getComment(uri);
+
+                        videoInputComment.setText("");
+                    }
+
+                    @Override
+                    public void onError() {
+                        Toast.makeText(context, "Failed to Submit", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                ApiManager.getInstance().pushComment(uri, message);
+            }
+        });
+
+        ApiManager.getInstance().setOnCommentReceivedListener(new ApiManager.OnCommentReceived() {
+            @Override
+            public void onDataLoaded() {
+                Log.d("Comment", DataPool.getInstance().listComment.size() + "");
+
+                commentAdapter = new CustomCommentAdapter(context, DataPool.getInstance().listComment);
+                videoComment.setAdapter(commentAdapter);
+
+                getListViewSize(videoComment);
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
+
+        ApiManager.getInstance().getComment(uri);
     }
 
     public void pauseVideoPlayer() {
@@ -783,29 +907,67 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         panelVideoPlayer.setVisibility(View.INVISIBLE);
         videoPlayer.stopPlayback();
         isVideoPlayerShowing = false;
+
+        videoInputComment.setText("");
+        DataPool.getInstance().listComment.clear();
+        commentAdapter = new CustomCommentAdapter(context, DataPool.getInstance().listComment);
+        videoComment.setAdapter(commentAdapter);
+        commentAdapter.notifyDataSetChanged();
     }
 
     public void showNewsDetail(final NewsData newsData) {
         panelNewsDetail.setVisibility(View.VISIBLE);
         newsScrollView.fullScroll(ScrollView.FOCUS_UP);
-//        ApiManager.getInstance().getToken();
-//        ApiManager.getInstance().setOnTokenReceived(new ApiManager.OnTokenReceived() {
-//            @Override
-//            public void onTokenSaved() {
-//                getNewsDetail(ApiManager.getInstance().TOKEN, newsData.ID);
-//            }
-//
-//            @Override
-//            public void onUserAccessTokenSaved() {
-//
-//            }
-//
-//            @Override
-//            public void onError(String message) {
-//
-//            }
-//        });
-        getNewsDetail(ApiManager.getInstance().USER_ACCESS_TOKEN, newsData.ID);
+
+        getNewsDetail(ApiManager.getInstance().USER_ACCESS_TOKEN, newsData);
+
+        DataPool.getInstance().clearListComment();
+        final String uri = "http://neodangdut.com/news/detail/"+newsData.ID;
+        DataPool.getInstance().currentURI = uri;
+        Log.d("Comment", uri);
+
+        newsSubmitComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String message = newsInputComment.getText().toString();
+
+                ApiManager.getInstance().setOnCommentPushedListener(new ApiManager.OnCommentPushed() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(context, "Comment Submitted", Toast.LENGTH_SHORT).show();
+                        DataPool.getInstance().clearListComment();
+                        ApiManager.getInstance().getComment(uri);
+
+                        newsInputComment.setText("");
+                    }
+
+                    @Override
+                    public void onError() {
+                        Toast.makeText(context, "Failed to Submit", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                ApiManager.getInstance().pushComment(uri, message);
+            }
+        });
+
+        ApiManager.getInstance().setOnCommentReceivedListener(new ApiManager.OnCommentReceived() {
+            @Override
+            public void onDataLoaded() {
+                Log.d("Comment", DataPool.getInstance().listComment.size() + "");
+
+                commentAdapter = new CustomCommentAdapter(context, DataPool.getInstance().listComment);
+                newsComment.setAdapter(commentAdapter);
+
+                getListViewSize(newsComment);
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
+
+        ApiManager.getInstance().getComment(uri);
 
         isNewsDetailShowing = true;
     }
@@ -813,13 +975,19 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
     public void closeNewsDetail() {
         panelNewsDetail.setVisibility(View.GONE);
 
+        newsInputComment.setText("");
+        DataPool.getInstance().listComment.clear();
+        commentAdapter = new CustomCommentAdapter(context, DataPool.getInstance().listComment);
+        newsComment.setAdapter(commentAdapter);
+        commentAdapter.notifyDataSetChanged();
+
         isNewsDetailShowing = false;
     }
 
-    public void getNewsDetail(String token, String id) {
+    public void getNewsDetail(String token, final NewsData data) {
         Map<String, String> params = new HashMap<>();
 
-        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_NEWS+"/"+id, token, params);
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_NEWS+"/"+data.ID, token, params);
 
         request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
             @Override
@@ -837,14 +1005,73 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                         String content = article.getString("content");
                         String tags = article.getString("tags");
                         String slug = article.getString("slug");
-                        String totalLikes = article.getString("total_likes");
+                        final int totalLikes = article.getInt("total_likes");
                         String created = article.getString("created");
                         // TODO related
-                        String isLikeable = article.getString("is_likeable");
+                        final boolean isLikeable = article.getBoolean("is_likeable");
 
                         imageLoader.displayImage(thumbnailURL, newsThumbnail, opts);
                         newsDetailTitle.setText(title);
-                        newsDetailDate.setText(created);
+
+                        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                        try {
+                            Date date = inputFormat.parse(created);
+                            Calendar cal = Calendar.getInstance();
+                            cal.setTime(date);
+
+                            String day = String.valueOf(cal.get((Calendar.DAY_OF_MONTH)));
+                            String month = new SimpleDateFormat("MMMM").format(date);
+                            String year = String.valueOf(cal.get(Calendar.YEAR));
+                            Log.d("DATE FROM SERVER", date.toString());
+                            Log.d("DATE", day + ", " + month + " " + year);
+                            newsDetailDate.setText("Posted on " + month + " " + day + ", " + year);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                        newsLikeCount.setText(String.valueOf(totalLikes));
+
+                        final String url = "neodangdut.com/news/detail/" + data.ID;
+                        newsDetailLikeButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                if (isLikeable) {
+                                    int count = totalLikes + 1;
+                                    newsLikeCount.setText(String.valueOf(count));
+
+                                    ApiManager.getInstance().likeItem(ApiManager.LikeType.ARTICLE, data.ID, null, data);
+                                } else {
+                                    int count = totalLikes - 1;
+                                    newsLikeCount.setText(String.valueOf(count));
+
+                                    ApiManager.getInstance().unlikeItem(ApiManager.LikeType.ARTICLE, data.ID, null, data);
+                                }
+                            }
+                        });
+
+                        newsDetailShareFB.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                ShareLinkContent shareLink = new ShareLinkContent.Builder()
+                                        .setContentUrl(Uri.parse(url))
+                                        .build();
+
+                                shareDialog.show(shareLink);
+                            }
+                        });
+
+                        newsDetailShareTweeter.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                String toShare = "Mau tahu banyak ttg NeoDangdut? Klik disini. http://neodangdut.com/music #neo #dangdut #neodangdut";
+
+                                String tweetUrl = String.format("https://twitter.com/intent/tweet?text=%s",
+                                        urlEncode(toShare));
+
+                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(tweetUrl));
+                                context.startActivity(intent);
+                            }
+                        });
 
                         String parsedContent = content.replaceAll("(\r\n)", "<br />");
                         newsDescription.setText(Html.fromHtml(parsedContent));
@@ -865,6 +1092,16 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         request.execute();
     }
 
+    public String urlEncode(String s) {
+        try {
+            return URLEncoder.encode(s, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e) {
+            Log.wtf("TAG", "UTF-8 should always be supported", e);
+            throw new RuntimeException("URLEncoder.encode() failed for " + s);
+        }
+    }
+
     @Override
     public boolean onPlaylistItemChanged(EMPlaylistManager.PlaylistItem currentItem, boolean hasNext, boolean hasPrevious) {
         return false;
@@ -880,4 +1117,26 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         return false;
     }
 
+
+    private void getListViewSize(ListView myListView) {
+        ListAdapter myListAdapter = myListView.getAdapter();
+        if (myListAdapter == null) {
+            // do nothing return null
+            return;
+        }
+        // set listAdapter in loop for getting final size
+        int totalHeight = 0;
+        for (int size = 0; size < myListAdapter.getCount(); size++) {
+            View listItem = myListAdapter.getView(size, null, myListView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+        // setting listview item in adapter
+        ViewGroup.LayoutParams params = myListView.getLayoutParams();
+        params.height = totalHeight
+                + (myListView.getDividerHeight() * (myListAdapter.getCount() - 1));
+        myListView.setLayoutParams(params);
+        // print height of adapter on log
+        Log.i("height of listItem:", String.valueOf(totalHeight));
+    }
 }

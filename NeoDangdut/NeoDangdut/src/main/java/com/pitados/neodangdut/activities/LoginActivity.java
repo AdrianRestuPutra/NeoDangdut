@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -20,6 +21,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.pitados.neodangdut.Popup.PopupForgot;
 import com.pitados.neodangdut.Popup.PopupLoading;
 import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.RegisterModel;
@@ -48,6 +50,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText loginUsername, loginPassword;
     private Button loginbutton, goToSignupButton;
     private LoginButton facebookButton;
+    private TextView forgotButton;
     // TODO signup page 1
     private EditText signupUsername, signupPassword, signupConfirmPassword,
                     signupEmail, signupConfirmEmail;
@@ -64,6 +67,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             firstName, lastName, city, country, birthday, gender;
 
     private PopupLoading popupLoading;
+    private PopupForgot popupForgot;
 
     // Facebook
     private CallbackManager callbackManager;
@@ -89,6 +93,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             LoginActivity.this.finish();
         } else {
             popupLoading = new PopupLoading(LoginActivity.this, R.style.custom_dialog);
+            popupForgot = new PopupForgot(LoginActivity.this, R.style.custom_dialog);
 
             initPanel();
             initLoginPage();
@@ -181,10 +186,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         loginUsername = (EditText) findViewById(R.id.login_form_username);
         loginPassword = (EditText) findViewById(R.id.login_form_password);
         loginbutton = (Button) findViewById(R.id.login_button_login);
+        forgotButton = (TextView) findViewById(R.id.login_button_forgot);
 
         goToSignupButton = (Button) findViewById(R.id.login_signup);
 
         loginbutton.setOnClickListener(this);
+        forgotButton.setOnClickListener(this);
         goToSignupButton.setOnClickListener(this);
     }
 
@@ -368,6 +375,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             username = password = email = firstName = lastName = gender = "";
         }
+
+        if(view == forgotButton) {
+            popupForgot.showPopupForgot();
+        }
         // LOGIN End
 
         if(view == signupNext) {
@@ -388,7 +399,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 RegisterModel registerData = new RegisterModel(username, password, email,
                                                             firstName, lastName, gender, birthday, city, country);
 
-                ApiManager.getInstance().getRegisterToken(registerData);
                 ApiManager.getInstance().setOnRegisterListener(new ApiManager.OnRegister() {
                     @Override
                     public void onSucceed() {
@@ -404,6 +414,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     }
                 });
+                ApiManager.getInstance().getRegisterToken(registerData);
             } else {
                 popupLoading.showPopupLoading("Incorrect Input!");
             }

@@ -193,7 +193,9 @@
                 android:textColor="@color/white_font"
                 android:textColorHint="@color/purple_font"
                 android:paddingLeft="@dimen/search_input_padding"
-                android:layout_weight="5"/>
+                android:layout_weight="5"
+                android:singleLine="true"
+                android:imeOptions="actionDone"/>
 
             <RelativeLayout
                 android:id="@+id/search_panel_button"

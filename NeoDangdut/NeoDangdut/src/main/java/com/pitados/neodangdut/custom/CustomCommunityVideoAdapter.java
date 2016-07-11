@@ -104,7 +104,7 @@ public class CustomCommunityVideoAdapter extends BaseAdapter {
 
         // TODO set data using holder.wiget
         if(listVideo.get(i).photoURL != null)
-            imageLoader.displayImage(listVideo.get(i).photoURL, holder.thumbnail, opts);
+            imageLoader.displayImage(listVideo.get(i).coverURL, holder.thumbnail, opts);
         holder.videoTitle.setText(listVideo.get(i).songName);
         holder.artistName.setText(listVideo.get(i).userName);
 

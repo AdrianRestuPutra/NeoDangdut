@@ -3,6 +3,7 @@ package com.pitados.neodangdut.util;
 import com.pitados.neodangdut.activities.MainActivity;
 import com.pitados.neodangdut.model.AlbumData;
 import com.pitados.neodangdut.model.BannerModel;
+import com.pitados.neodangdut.model.CommentData;
 import com.pitados.neodangdut.model.CommunityContentData;
 import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.model.MusicData;
@@ -55,6 +56,8 @@ public class DataPool {
     public List<VideoData> listSearchShopVideo;
 
     public AlbumData selectedAlbum;
+    public List<CommentData> listComment;
+    public String currentURI;
 
     public MainActivity mainActivity;
 
@@ -91,6 +94,8 @@ public class DataPool {
         listShopVideoNewVideos = new ArrayList<>();
         listShopVideoAllVideos = new ArrayList<>();
         listSearchShopVideo = new ArrayList<>();
+
+        listComment = new ArrayList<>();
     }
 
     public static DataPool getInstance() {
@@ -98,4 +103,18 @@ public class DataPool {
             instance = new DataPool();
         return  instance;
     }
+
+    public NewsData getNewsData(String newsID) {
+        for(NewsData data : listAllNews) {
+            if(data.ID.equalsIgnoreCase(newsID))
+                return data;
+        }
+
+        return null;
+    }
+
+    public void clearListComment() {
+        listComment.clear();
+    }
+
 }

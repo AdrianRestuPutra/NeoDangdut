@@ -3,8 +3,10 @@ package com.pitados.neodangdut.fragments;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -16,7 +18,6 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.daimajia.slider.library.Indicators.PagerIndicator;
 import com.daimajia.slider.library.SliderLayout;
@@ -29,6 +30,7 @@ import com.pitados.neodangdut.custom.CustomCommunityNewsAdapter;
 import com.pitados.neodangdut.custom.CustomListTopTrackAdapter;
 import com.pitados.neodangdut.custom.CustomListTopVideoAdapter;
 import com.pitados.neodangdut.model.BannerModel;
+import com.pitados.neodangdut.model.NewsData;
 import com.pitados.neodangdut.util.ApiManager;
 import com.pitados.neodangdut.util.CustomMediaPlayer;
 import com.pitados.neodangdut.util.DataPool;
@@ -188,7 +190,7 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
                     loadLatestNews();
                 }
 
-                if(swipeRefresh != null)
+                if (swipeRefresh != null)
                     swipeRefresh.setRefreshing(false);
             }
         });
@@ -198,7 +200,9 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
     private void loadBanner() {
         homeBanner.removeAllSliders();
 
-        for(BannerModel temp : DataPool.getInstance().listHomeBanner) {
+        for(int i = 0; i < DataPool.getInstance().listHomeBanner.size(); i++) {
+            BannerModel temp = DataPool.getInstance().listHomeBanner.get(i);
+//        for(BannerModel temp : DataPool.getInstance().listHomeBanner) {
             DefaultSliderView sliderImage = new DefaultSliderView(context);
             sliderImage
                     .image(temp.imageLink)
@@ -207,7 +211,7 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
 
             // TODO extra
             sliderImage.bundle(new Bundle());
-            sliderImage.getBundle().putString("extra", "TODO extra");
+            sliderImage.getBundle().putInt("index", i);
 
             homeBanner.addSlider(sliderImage);
         }
@@ -257,7 +261,24 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
 
     @Override
     public void onSliderClick(BaseSliderView slider) {
-        Toast.makeText(context, "TODO link to page", Toast.LENGTH_SHORT).show();
+        int index = slider.getBundle().getInt("index");
+
+        BannerModel data = DataPool.getInstance().listHomeBanner.get(index);
+        if(data.dataType == BannerModel.BannerType.ALBUM) {
+
+            popupAlbum.showPopupAlbum(data.dataID);
+        } else if(data.dataType == BannerModel.BannerType.ARTICLE) {
+            NewsData newsData = DataPool.getInstance().getNewsData(data.dataID);
+
+            CustomMediaPlayer.getInstance().showNewsDetail(newsData);
+        } else if(data.dataType == BannerModel.BannerType.EVENT) {
+            openInBrowser(data.link);
+        }
+    }
+
+    private void openInBrowser(String url) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(browserIntent);
     }
 
     private void getListViewSize(ListView myListView) {

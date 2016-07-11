@@ -16,6 +16,7 @@ import com.pitados.neodangdut.R;
 import com.pitados.neodangdut.model.AlbumData;
 import com.pitados.neodangdut.model.AlbumItem;
 import com.pitados.neodangdut.model.BannerModel;
+import com.pitados.neodangdut.model.CommentData;
 import com.pitados.neodangdut.model.CommunityContentData;
 import com.pitados.neodangdut.model.LibraryData;
 import com.pitados.neodangdut.model.MusicData;
@@ -106,6 +107,8 @@ public class ApiManager {
     private OnSearchReceived searchShopMusicListener, searchShopAlbumListener, searchShopVideoListener,
                                 searchCommunityMusicListener, searchCommunityVideoListener;
     private OnConfirmIAP confirmIAPListener;
+    private OnCommentReceived onCommentListener;
+    private OnCommentPushed onCommentPushedListener;
 
     private static ApiManager instance;
 
@@ -748,7 +751,7 @@ public class ApiManager {
                     JSONArray arrData = rawData.getJSONArray("article");
                     totalData = rawData.getInt("total");
 
-                    for(int i = 0; i < arrData.length(); i++) {
+                    for (int i = 0; i < arrData.length(); i++) {
                         JSONObject obj = arrData.getJSONObject(i);
 
                         String ID = obj.getString("id");
@@ -770,7 +773,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(commNewsListener != null && prevDataCount < totalData)
+                if (commNewsListener != null && prevDataCount < totalData)
                     commNewsListener.onDataLoaded(ApiType.COMMUNITY_NEWS);
             }
 
@@ -781,6 +784,97 @@ public class ApiManager {
         });
 
         request.execute();
+    }
+
+    public void getComment(String uri) {
+        Map<String, String > params = new HashMap<>();
+        params.put("uri", uri);
+        params.put("limit", String.valueOf(limitData));
+        params.put("offset", String.valueOf(DataPool.getInstance().listComment.size()));
+        params.put("order", "id");
+        params.put("sort", "desc");
+
+        HttpGetUtil request = new HttpGetUtil(Consts.URL_GET_COMMENTS, USER_ACCESS_TOKEN, params);
+
+        request.setOnHttpGetUtilListener(new HttpGetUtil.HttpGetUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                Log.d("result", result);
+                int prevDataCount = DataPool.getInstance().listComment.size();
+                int totalData = 0;
+
+                try {
+                    JSONObject rawData = new JSONObject(result);
+                    JSONArray arrData = rawData.getJSONArray("comments");
+                    totalData = rawData.getInt("total");
+
+                    for (int i = 0; i < arrData.length(); i++) {
+                        JSONObject obj = arrData.getJSONObject(i);
+                        JSONObject userObj = obj.getJSONObject("user");
+
+                        String ID = obj.getString("unique");
+                        String userID = userObj.getString("id");
+                        String userName = userObj.getString("username");
+                        String photoURL = userObj.getString("photo");
+                        String firstName = userObj.getString("first_name");
+                        String lastName = userObj.getString("last_name");
+                        String message = obj.getString("message");
+                        String host = obj.getString("host");
+                        String uri = obj.getString("uri");
+                        String category = obj.getString("category");
+                        String created = obj.getString("created");
+                        String updated = obj.getString("updated");
+
+                        CommentData tempComment = new CommentData(ID, userID, userName, photoURL, firstName, lastName,
+                                                                message, host, uri, category, created, updated);
+                        DataPool.getInstance().listComment.add(tempComment);
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if (onCommentListener != null && prevDataCount < totalData)
+                    onCommentListener.onDataLoaded();
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        request.execute();
+
+    }
+
+    public void pushComment(String uri, String message) {
+        String url = Consts.URL_GET_COMMENTS+"/push";
+
+        Map<String, String > params = new HashMap<>();
+        params.put("uri", uri);
+        params.put("message", message);
+
+        HttpPostUtil request = new HttpPostUtil(url, USER_ACCESS_TOKEN, params);
+
+        request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                Log.d("Result", result);
+
+                // TODO handle error
+                onCommentPushedListener.onSuccess();
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        request.execute();
+
     }
 
     // COMMUNITY END
@@ -2276,6 +2370,12 @@ public class ApiManager {
     }
 
     public void updateUserData(String name, String city, String country, String profile) {
+//        String firstName, lastName;
+//        if(name.contains(" ")) {
+//            int indexSpace = name
+//            firstName =
+//        }
+
         Map<String, String> params = new HashMap<>();
         params.put("first_name", name);
         params.put("city", city);
@@ -2305,7 +2405,7 @@ public class ApiManager {
                                 userDataUpdatedListener.onUserDataUpdated();
                             } else {
                                 popupLoading.setMessage("Update Failed");
-                                purchaseListener.onError("Purchased Failed");
+                                userDataUpdatedListener.onError();
                             }
                         }
 
@@ -2334,7 +2434,7 @@ public class ApiManager {
         }
 
         AsyncHttpClient request = new AsyncHttpClient();
-        request.addHeader("Authorization", "Bearer "+USER_ACCESS_TOKEN);
+        request.addHeader("Authorization", "Bearer " + USER_ACCESS_TOKEN);
         request.post(Consts.URL_CHANGE_PHOTO, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -2347,6 +2447,32 @@ public class ApiManager {
                 Log.d("CHANGE PP", "Failed");
             }
         });
+    }
+
+    public void forgotPassword(String email) {
+        Map<String, String> params = new HashMap<>();
+        params.put("email", email);
+
+        HttpPostUtil request = new HttpPostUtil(Consts.URL_FORGOT, USER_ACCESS_TOKEN, params);
+
+        request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                Log.d("Result", result);
+                if (result != null) {
+
+                    popupLoading.closePopupLoading();
+                }
+
+            }
+
+            @Override
+            public void beforeExecute() {
+                popupLoading.showPopupLoading("Processing..");
+            }
+        });
+
+        request.execute();
     }
 
     public void getRegisterToken(final RegisterModel data) {
@@ -2386,6 +2512,49 @@ public class ApiManager {
             @Override
             public void beforeExecute() {
                 popupLoading.showPopupLoading("Register..");
+            }
+        });
+        request.execute();
+    }
+
+    public void getRegisterToken() {
+        Map<String, String> params = new HashMap<>();
+        params.put("client_id", CLIENT_ID);
+        params.put("client_secret", CLIENT_SECRET);
+        params.put("scope", "user_managements");
+        params.put("grant_type", "client_credentials");
+        HttpPostUtil request = new HttpPostUtil(Consts.URL_GET_TOKEN, "", params);
+
+        request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                if (result != null) {
+                    Log.d("Result API", result);
+
+                    try {
+                        JSONObject rawData = new JSONObject(result);
+
+                        if (!rawData.has("error")) {
+                            String registerToken = rawData.getString("access_token");
+
+                            USER_ACCESS_TOKEN = registerToken;
+
+                            registerListener.onSucceed();
+                        } else {
+                            registerListener.onFailed("Failed");
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+
+                        registerListener.onFailed("Failed");
+                    }
+                }
+            }
+
+            @Override
+            public void beforeExecute() {
+
             }
         });
         request.execute();
@@ -2523,6 +2692,9 @@ public class ApiManager {
 
     public void setOnConfirmIAP(OnConfirmIAP listener) { confirmIAPListener = listener; }
 
+    public void setOnCommentReceivedListener(OnCommentReceived listener) { this.onCommentListener = listener; }
+    public void setOnCommentPushedListener(OnCommentPushed listener) { this.onCommentPushedListener = listener; }
+
     public interface OnUserAccessTokenReceived {
         void onUserAccessTokenSaved();
         void onError(String message);
@@ -2626,5 +2798,15 @@ public class ApiManager {
 
     public interface OnConfirmIAP {
         void onConfirm();
+    }
+
+    public interface OnCommentReceived {
+        void onDataLoaded();
+        void onError();
+    }
+
+    public interface OnCommentPushed {
+        void onSuccess();
+        void onError();
     }
 }

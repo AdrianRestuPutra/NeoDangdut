@@ -125,7 +125,9 @@
                     android:paddingLeft="@dimen/upload_input_padding_left"
                     android:textColor="@color/white_font"
                     android:textColorHint="@color/purple_font"
-                    android:textSize="@dimen/setting_text_large" />
+                    android:textSize="@dimen/setting_text_large"
+                    android:singleLine="true"
+                    android:imeOptions="actionNext"/>
 
                 <EditText
                     android:id="@+id/upload_description"
@@ -139,7 +141,9 @@
                     android:paddingTop="@dimen/upload_content_padding"
                     android:textColor="@color/white_font"
                     android:textColorHint="@color/purple_font"
-                    android:textSize="@dimen/setting_text_large" />
+                    android:textSize="@dimen/setting_text_large"
+                    android:singleLine="true"
+                    android:imeOptions="actionDone"/>
 
                 <RelativeLayout
                     android:id="@+id/upload_button"

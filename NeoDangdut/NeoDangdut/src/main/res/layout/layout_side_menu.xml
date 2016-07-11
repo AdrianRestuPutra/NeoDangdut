@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -20,7 +20,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
+                android:layout_weight="1"
                 android:text="My Wallet"
                 android:textColor="@color/white_font"
                 android:textSize="@dimen/side_menu_text"/>
@@ -30,14 +30,14 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_weight="1">
+                android:gravity="center_vertical|right"
+                android:layout_weight="2">
 
                 <TextView
                     android:id="@+id/side_menu_user_wallet"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Rp 999999"
+                    android:text="Rp 999999999"
                     android:textColor="@color/white_font"
                     android:textSize="@dimen/setting_text_small"/>
 
@@ -295,7 +295,7 @@
             android:id="@+id/side_menu_download"
             android:layout_width="match_parent"
             android:layout_height="@dimen/side_menu_item_height"
-            android:visibility="invisible"
+            android:visibility="gone"
             android:orientation="horizontal">
 
             <RelativeLayout
@@ -334,7 +334,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/divider_height"
-            android:visibility="invisible"
+            android:visibility="visible"
             android:background="@color/tab_divider"/>
 
         <!-- App Setting -->
@@ -342,7 +342,6 @@
             android:id="@+id/side_menu_setting"
             android:layout_width="match_parent"
             android:layout_height="@dimen/side_menu_item_height"
-            android:layout_marginTop="@dimen/side_menu_shop_margin"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -356,6 +355,20 @@
 
         </LinearLayout>
         <!-- App Setting End -->
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:visibility="visible"
+            android:background="@color/tab_divider"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
 
         <!-- Sign Out -->
         <LinearLayout
@@ -379,4 +392,4 @@
     </LinearLayout>
 
 
-</ScrollView>
+</RelativeLayout>
