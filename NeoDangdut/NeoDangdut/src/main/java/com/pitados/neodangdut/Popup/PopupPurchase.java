@@ -197,27 +197,10 @@ public class PopupPurchase extends Dialog implements View.OnClickListener{
     @Override
     public void onClick(View view) {
         if(view == buttonBuy) {
-//            ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
-//
-//                @Override
-//                public void onUserAccessTokenSaved() {
-//                    if(albumdata == null)
-//                        ApiManager.getInstance().purchaseItem(ApiManager.PurchaseType.SINGLE, selectedID);
-//                    else
-//                        ApiManager.getInstance().purchaseItem(ApiManager.PurchaseType.ALBUM, selectedID);
-//
-//                }
-//
-//                @Override
-//                public void onError(String message) {
-//
-//                }
-//            });
             if(albumdata == null)
                 ApiManager.getInstance().purchaseItem(ApiManager.PurchaseType.SINGLE, selectedID);
             else
                 ApiManager.getInstance().purchaseItem(ApiManager.PurchaseType.ALBUM, selectedID);
-//            ApiManager.getInstance().getUserAccessToken();
 
             closePopupPurchase();
         }

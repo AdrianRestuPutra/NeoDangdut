@@ -38,7 +38,6 @@ public class CustomLibraryVideoAdapter extends BaseAdapter {
 
     public CustomLibraryVideoAdapter(Context context, List<LibraryData> listVideo) {
         this.context = context;
-//        this.listVideo = listVideo;
 
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()

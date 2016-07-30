@@ -45,26 +45,23 @@ public class ConnManager {
             downloadRequest.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
         }
 
-//        downloadRequest.setTitle(Consts.NOTIF_DOWNLOAD_TITLE);
         String ext = (type == DataType.AUDIO) ? ".mp3" : ".mp4";
         downloadRequest.setTitle(Consts.NOTIF_DOWNLOAD_TITLE + filename + ext);
         downloadRequest.setDescription(Consts.NOTIF_DOWNLOAD_DESCRIPTION);
         String filePath = "";
         if(type == DataType.AUDIO) {
-            // TODO savePath audio
+
             File file = new File(Consts.APP_BASE_DIR+"/Music/" + albumName);
             if(!file.isDirectory())
                 file.mkdir();
             filePath = "/Music/" + albumName + "/" + filename + ".mp3";
         } else {
-            // TODO savePath video
+
             File file = new File(Consts.APP_BASE_DIR+"/Video/");
             if(!file.isDirectory())
                 file.mkdir();
             filePath = "/Video/" + filename + ".mp4";
         }
-
-        // TODO add download item to download list
 
         downloadRequest.setDestinationInExternalPublicDir(Consts.APP_BASE_DIR, filePath);
         if(settingData.getNotifState() == true)

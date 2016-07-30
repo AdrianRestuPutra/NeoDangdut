@@ -30,7 +30,6 @@ public class FragmentSearchCommunity extends Fragment implements AbsListView.OnS
     private int pageNumber;
     private String pageTitle;
 
-    // TODO widgets
     private ListView listSong, listVideo;
 
     private CustomCommunityMusicAdapter listMusicAdapter;
@@ -79,19 +78,7 @@ public class FragmentSearchCommunity extends Fragment implements AbsListView.OnS
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-//                ApiManager.getInstance().getUserAccessToken();
-//                ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
-//
-//                    @Override
-//                    public void onUserAccessTokenSaved() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(String message) {
-//
-//                    }
-//                });
+
             }
         });
 

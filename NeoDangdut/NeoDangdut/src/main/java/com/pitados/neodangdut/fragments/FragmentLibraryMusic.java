@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,9 +36,6 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
 
     // Album view
     private LinearLayout albumView;
-    // TODO album view widgets
-
-    // TODO popup dialog
 
     public static FragmentLibraryMusic newInstance(int page, String title) {
         FragmentLibraryMusic home = new FragmentLibraryMusic();
@@ -68,7 +64,7 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.layout_fragment_library_music, container, false);
-        // TODO init widgets
+
         listViewMusic = (GridView) view.findViewById(R.id.list_view_library_music);
 
         swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.lib_music_swipe_refresh);
@@ -77,7 +73,6 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
 
         initAlbumView(view);
 
-        // TODO handle onItemClick
         listViewMusic.setOnItemClickListener(this);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -97,8 +92,7 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
     }
 
     public void loadData() {
-        Log.d("LOAD LIBRARY", "Loaded");
-        // TODO search local data
+        // if list size > 0 load data else wait for the api result
         if(DataPool.getInstance().listLibraryMusic.size() > 0) {
             listAdapter = new CustomLibraryMusicAdapter(context, DataPool.getInstance().listLibraryMusic);
             listViewMusic.setAdapter(listAdapter);
@@ -124,9 +118,7 @@ public class FragmentLibraryMusic extends Fragment implements AdapterView.OnItem
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         if (adapterView == listViewMusic && !StateManager.isTopView) {
-//            LibraryData selected = (LibraryData) listAdapter.getItem(i);
             CustomMediaPlayer.getInstance().playItem(listAdapter.getLibraryItem(i), listAdapter.getListLibrary());
-//            CustomMediaPlayer.getInstance().playItem(DataPool.getInstance().listLibraryMusic.get(i));
         }
     }
 

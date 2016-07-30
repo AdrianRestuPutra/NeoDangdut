@@ -79,7 +79,7 @@ public class CustomCommentAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.layout_list_comment, null);
 
             holder = new ViewHolder();
-            // TODO init all id
+
             holder.thumbnail = (ImageView) view.findViewById(R.id.list_view_comment_thumbnail);
             holder.username = (TextView) view.findViewById(R.id.list_view_comment_name);
             holder.comment = (TextView) view.findViewById(R.id.list_view_comment_text);
@@ -92,7 +92,6 @@ public class CustomCommentAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
 
-        // TODO set data using holder.wiget
         int index = i;
         imageLoader.displayImage(listComment.get(index).photoURL, holder.thumbnail, opts);
         String name = listComment.get(index).firstName + " " + listComment.get(index).lastName;

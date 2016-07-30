@@ -28,14 +28,12 @@ public class FragmentUploadedMusic extends Fragment implements AdapterView.OnIte
     private String pageTitle;
 
     // Widgets
-    // TODO album view widgets
     ListView listMusic;
 
     CustomUploadedMusicAdapter listAdapter;
 
     private boolean isLoadingMore;
 
-//    private SwipeRefreshLayout swipeRefresh;
     private ShareDialog shareDialog;
 
     public static FragmentUploadedMusic newInstance(int page, String title) {
@@ -65,7 +63,6 @@ public class FragmentUploadedMusic extends Fragment implements AdapterView.OnIte
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.layout_fragment_uploaded, container, false);
-        // TODO init widgets
 
         listMusic = (ListView) view.findViewById(R.id.list_view_uploaded);
         listMusic.setFocusable(false);

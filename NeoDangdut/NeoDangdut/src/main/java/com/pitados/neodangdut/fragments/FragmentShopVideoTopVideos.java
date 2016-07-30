@@ -29,7 +29,6 @@ public class FragmentShopVideoTopVideos extends Fragment {
     private int pageNumber;
     private String pageTitle;
 
-    // TODO widgets
     private ListView listTopVideos;
     private Gallery listFeatured;
     private SwipeRefreshLayout swipeRefresh;
@@ -64,7 +63,6 @@ public class FragmentShopVideoTopVideos extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.layout_fragment_shop_video_top_video, container, false);
-        // TODO init widgets
 
         listTopVideos = (ListView) view.findViewById(R.id.shop_video_top_video_listview);
         listTopVideos.setFocusable(false);

@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class CustomAlbumListAdapter extends BaseAdapter {
     private Context context;
-    private List<AlbumItem> listTrack; // TODO change to shop data
+    private List<AlbumItem> listTrack;
 
     private ImageLoader imageLoader;
     private DisplayImageOptions opts;
@@ -113,11 +113,10 @@ public class CustomAlbumListAdapter extends BaseAdapter {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final ViewHolder holder;
         if(view == null) {
-            view = inflater.inflate(R.layout.layout_list_album_item, null); // TODO change to shop top track
+            view = inflater.inflate(R.layout.layout_list_album_item, null);
 
             holder = new ViewHolder();
 
-            // TODO init all id
             holder.musicTitle = (TextView) view.findViewById(R.id.list_view_album_item_title);
             holder.artistName = (TextView) view.findViewById(R.id.list_view_album_item_artist);
             holder.price = (TextView) view.findViewById(R.id.list_view_album_item_price);
@@ -135,7 +134,6 @@ public class CustomAlbumListAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
 
-        // TODO set data using holder.wiget
         holder.musicTitle.setText(listTrack.get(i).songName);
         holder.artistName.setText(listTrack.get(i).singerName);
 

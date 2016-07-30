@@ -202,7 +202,6 @@ public class FragmentHome extends Fragment implements AdapterView.OnItemClickLis
 
         for(int i = 0; i < DataPool.getInstance().listHomeBanner.size(); i++) {
             BannerModel temp = DataPool.getInstance().listHomeBanner.get(i);
-//        for(BannerModel temp : DataPool.getInstance().listHomeBanner) {
             DefaultSliderView sliderImage = new DefaultSliderView(context);
             sliderImage
                     .image(temp.imageLink)

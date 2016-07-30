@@ -33,6 +33,7 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
     private ImageView thumbnail;
     private TextView title, artistName, listenCountText, likeCountText;
     private RelativeLayout buttonPlay, buttonLike, buttonShareFB, buttonShareTwitter, buttonComment;
+    private View lastDivider;
 
     private CommunityContentData commData;
 
@@ -42,6 +43,7 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
     private boolean isMusic;
 
     private ShareDialog shareDialog;
+    private PopupComment popupComment;
 
     public PopupCommunity(Context context, int themeResId) {
         super(context, themeResId);
@@ -76,6 +78,8 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
         buttonShareTwitter = (RelativeLayout) findViewById(R.id.popup_community_song_button_share_twitter);
         buttonComment = (RelativeLayout) findViewById(R.id.popup_community_song_button_comment);
 
+        lastDivider = findViewById(R.id.last_divider);
+
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()
                 .showImageOnLoading(R.drawable.ic_menu_gallery)
@@ -85,6 +89,8 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .resetViewBeforeLoading(true)
                 .build();
+
+        popupComment = new PopupComment(context, R.style.custom_dialog);
 
         buttonPlay.setOnClickListener(this);
         buttonLike.setOnClickListener(this);
@@ -101,6 +107,14 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
         artistName.setText(data.userName);
         listenCountText.setText(String.valueOf(data.totalViews));
         likeCountText.setText(String.valueOf(data.totalLikes));
+
+        Log.d("Category", data.category);
+
+        if(data.category.equalsIgnoreCase("music")) {
+            Log.d("Category Music", "benar");
+            lastDivider.setVisibility(View.VISIBLE);
+            buttonComment.setVisibility(View.VISIBLE);
+        }
 
         this.show();
     }
@@ -145,7 +159,7 @@ public class PopupCommunity extends Dialog implements View.OnClickListener{
             likeCountText.setText(String.valueOf(count));
         }
         if(view == buttonComment) {
-
+            popupComment.showPopupComment(commData.ID);
         }
         if(view == buttonShareFB) {
             String url = "neodangdut.com";

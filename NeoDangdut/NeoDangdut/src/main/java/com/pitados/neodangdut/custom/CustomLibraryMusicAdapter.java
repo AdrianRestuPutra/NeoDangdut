@@ -38,7 +38,6 @@ public class CustomLibraryMusicAdapter extends BaseAdapter {
 
     public CustomLibraryMusicAdapter(Context context, List<LibraryData> listMusic) {
         this.context = context;
-//        this.listMusic = listMusic;
 
         imageLoader = ImageLoader.getInstance();
         opts = new DisplayImageOptions.Builder()

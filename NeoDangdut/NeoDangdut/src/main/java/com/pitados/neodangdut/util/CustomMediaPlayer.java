@@ -87,9 +87,6 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
     private Context context;
     private EMAudioPlayer audioPlayer;
     private SeekBar audioProgress;
-    // TODO audio player pause
-    // TODO audio player shuffle
-    // TODO audio player loop
 
     // Data
     // Audio
@@ -210,7 +207,6 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
         trackType = MusicType.SHOP;
         selectedMusicData = data;
-        // TODO set notif
         mBuilder.setSmallIcon(R.drawable.nd_local_512);
         mBuilder.setContentTitle("Now Playing");
         mBuilder.setContentText(data.singerName + " - " + data.songTitle);
@@ -238,7 +234,6 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
                 audioPauseIcon.setImageResource(R.drawable.icon_pause);
 
-                // TODO change audio data
                 imageLoader.displayImage(data.albumCover, audioPlayerThumbnail, opts);
                 audioPlayerSongTitle.setText(data.songTitle);
                 audioPlayerArtistName.setText(data.singerName);
@@ -292,14 +287,12 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                // TODO set seek thumb
-//                seekBar.setThumb(ContextCompat.getDrawable(context, R.color.colorPrimary));
+
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                // TODO set seek thumb transparent
-//                seekBar.setThumb(ContextCompat.getDrawable(context, R.color.colorPrimary));
+
             }
         });
     }
@@ -320,27 +313,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         data.totalViews += 1;
         ApiManager.getInstance().addListen(data.ID);
 
-        // TODO get comment
         DataPool.getInstance().clearListComment();
-        String uri = "http://neodangdut.com/music/detail/"+data.ID;
-        Log.d("Comment", uri);
-
-        ApiManager.getInstance().setOnCommentReceivedListener(new ApiManager.OnCommentReceived() {
-            @Override
-            public void onDataLoaded() {
-                Log.d("Comment", DataPool.getInstance().listComment.size() + "");
-
-                CustomCommentAdapter adapter = new CustomCommentAdapter(context, DataPool.getInstance().listComment);
-                // TODO load comment
-            }
-
-            @Override
-            public void onError() {
-
-            }
-        });
-
-        ApiManager.getInstance().getComment(uri);
 
         mBuilder.setSmallIcon(R.drawable.nd_local_512);
         mBuilder.setContentTitle("Now Playing");
@@ -362,7 +335,6 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
                 audioPauseIcon.setImageResource(R.drawable.icon_pause);
 
-                // TODO change audio data
                 imageLoader.displayImage(data.photoURL, audioPlayerThumbnail, opts);
                 audioPlayerSongTitle.setText(data.songName);
                 audioPlayerArtistName.setText(data.userName);
@@ -415,14 +387,12 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                // TODO set seek thumb
-//                seekBar.setThumb(ContextCompat.getDrawable(context, R.color.colorPrimary));
+
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                // TODO set seek thumb transparent
-//                seekBar.setThumb(ContextCompat.getDrawable(context, R.color.colorPrimary));
+
             }
         });
     }
@@ -469,7 +439,6 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                 panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
                 audioPauseIcon.setImageResource(R.drawable.icon_pause);
 
-                // TODO change audio data
                 imageLoader.displayImage("", audioPlayerThumbnail, opts);
                 audioPlayerSongTitle.setText(data.songName);
                 audioPlayerArtistName.setText(data.singerName);
@@ -522,14 +491,12 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                // TODO set seek thumb
-//                seekBar.setThumb(ContextCompat.getDrawable(context, R.color.colorPrimary));
+
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                // TODO set seek thumb transparent
-//                seekBar.setThumb(ContextCompat.getDrawable(context, R.color.colorPrimary));
+
             }
         });
     }
@@ -561,7 +528,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
             if(audioPlayer.isPlaying())
                 audioPlayer.stopPlayback();
 
-            // TODO from local
+            // search file in the local storage, if exists play from local else from url
             if(ConnManager.getInstance().fileExist(ConnManager.DataType.AUDIO, data.albumName, data.songTitle)) {
                 Log.d("MEDIA", "Local");
                 String path = "/sdcard/"+Consts.APP_BASE_DIR+"/Music/"+data.albumName+"/"+data.songTitle+".mp3";
@@ -579,7 +546,6 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
                     panelMusicPlayer.setBackgroundColor(context.getResources().getColor(R.color.music_player_bg));
                     audioPauseIcon.setImageResource(R.drawable.icon_pause);
 
-                    // TODO change audio data
                     imageLoader.displayImage(data.albumCover, audioPlayerThumbnail, opts);
                     audioPlayerSongTitle.setText(data.songTitle);
                     audioPlayerArtistName.setText(data.singerName);
@@ -640,14 +606,12 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
 
                 @Override
                 public void onStartTrackingTouch(SeekBar seekBar) {
-                    // TODO set seek thumb
-//                seekBar.setThumb(ContextCompat.getDrawable(context, R.color.colorPrimary));
+
                 }
 
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
-                    // TODO set seek thumb transparent
-//                seekBar.setThumb(ContextCompat.getDrawable(context, R.color.colorPrimary));
+
                 }
             });
         } else {
@@ -670,7 +634,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
             videoPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mediaPlayer) {
-                    // TODO close buffering indicator
+
                     videoPlayer.start();
                 }
             });
@@ -751,7 +715,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         videoPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
-                // TODO close buffering indicator
+
                 videoPlayer.start();
             }
         });
@@ -775,7 +739,7 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         videoPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
-                // TODO close buffering indicator
+
                 videoPlayer.start();
             }
         });
@@ -785,7 +749,6 @@ public class CustomMediaPlayer implements EMPlaylistServiceCallback, EMProgressC
         if(videoData.description.length() > 0)
             videoDescription.setText(videoData.description);
 
-        // TODO show comments
         DataPool.getInstance().clearListComment();
         final String uri = "http://neodangdut.com/video/detail/"+videoData.ID;
         DataPool.getInstance().currentURI = uri;

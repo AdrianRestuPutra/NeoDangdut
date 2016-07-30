@@ -27,7 +27,6 @@ public class FragmentShopMusicAllSongs extends Fragment {
     private int pageNumber;
     private String pageTitle;
 
-    // TODO widgets
     private ListView listAllSong;
 
     private CustomListShopMusicAdapter listAdapter;

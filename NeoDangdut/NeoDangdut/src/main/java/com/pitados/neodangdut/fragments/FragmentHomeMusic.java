@@ -68,7 +68,6 @@ public class FragmentHomeMusic extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.layout_fragment_music, container, false);
-        // TODO init widgets
 
         listViewCommunityMusic = (ListView) view.findViewById(R.id.community_music_listview);
         listViewCommunityMusic.setFocusable(false);

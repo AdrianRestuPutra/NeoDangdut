@@ -61,7 +61,6 @@ public class FragmentHomeNews extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.layout_fragment_news, container, false);
-        // TODO init widgets
 
         listNews = (ListView) view.findViewById(R.id.community_news_listview);
         listNews.setFocusable(false);

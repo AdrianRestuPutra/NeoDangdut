@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    android:background="@color/main_bg">
+
+    <RelativeLayout
+        android:id="@+id/library_music_album_view"
+        android:layout_width="@dimen/dialog_comment_width"
+        android:layout_height="@dimen/dialog_comment_height"
+        android:layout_centerInParent="true">
+
+        <!-- Input -->
+        <LinearLayout
+            android:id="@+id/section_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical">
+
+            <!-- Input comment -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/popup_comment_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/comment_input_height"
+                    android:background="@drawable/bg_input"
+                    android:hint="Write comment here.."
+                    android:paddingLeft="@dimen/comment_input_padding"
+                    android:textColor="@color/white_font"
+                    android:textColorHint="@color/purple_font"
+                    android:textSize="@dimen/comment_text_normal" />
+
+                <RelativeLayout
+                    android:id="@+id/popup_comment_button_submit"
+                    android:layout_width="@dimen/comment_submit_button_width"
+                    android:layout_height="@dimen/comment_submit_button_height"
+                    android:layout_gravity="right"
+                    android:layout_marginTop="@dimen/comment_input_padding"
+                    android:background="@drawable/bg_btn_purple">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="Submit"
+                        android:textColor="@color/white_font" />
+
+                </RelativeLayout>
+            </LinearLayout>
+            <!-- Input end -->
+        </LinearLayout>
+
+        <!-- Comment Section -->
+        <ListView
+            android:id="@+id/popup_comment_listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/section_input">
+
+        </ListView>
+        <!-- Comment Section end -->
+    </RelativeLayout>
+</RelativeLayout>

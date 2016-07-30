@@ -116,7 +116,7 @@ public class UncaughtException implements Thread.UncaughtExceptionHandler {
                                 // sendIntent.setType("text/plain");
                                 sendIntent.setType("message/rfc822");
                                 sendIntent.putExtra(Intent.EXTRA_EMAIL,
-                                        new String[] { "chen@pitados.com", "adrian.oroqodoqs@gmail.com" }); // TODO set email
+                                        new String[] { "adrian.oroqodoqs@gmail.com", "chen@pitados.com" }); // register email for report destination
                                 sendIntent.putExtra(Intent.EXTRA_TEXT,
                                         body.toString());
                                 sendIntent.putExtra(Intent.EXTRA_SUBJECT,

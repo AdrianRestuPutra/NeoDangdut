@@ -1,7 +1,5 @@
 package com.pitados.neodangdut.model;
 
-import android.util.Log;
-
 /**
  * Created by adrianrestuputranto on 5/27/16.
  */
@@ -46,6 +44,5 @@ public class CommunityContentData {
         else
             this.isLikeable = false;
 
-        Log.d("IS LIKEABLE", isLike);
     }
 }

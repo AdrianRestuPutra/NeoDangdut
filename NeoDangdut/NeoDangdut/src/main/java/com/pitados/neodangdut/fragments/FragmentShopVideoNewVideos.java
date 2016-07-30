@@ -25,7 +25,6 @@ public class FragmentShopVideoNewVideos extends Fragment {
     private int pageNumber;
     private String pageTitle;
 
-    // TODO widgets
     private TextView topTitle;
     private ListView listNewVideos;
 
@@ -58,7 +57,6 @@ public class FragmentShopVideoNewVideos extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.layout_fragment_shop_video_top_50, container, false);
-        // TODO init widgets
 
         topTitle = (TextView) view.findViewById(R.id.shop_video_top_50_title);
         topTitle.setText("TOP 50 NEW VIDEOS");

@@ -30,7 +30,6 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
     private int pageNumber;
     private String pageTitle;
 
-    // TODO widgets
     private ListView listTopSong;
     private Gallery listFeatured;
     private SwipeRefreshLayout swipeRefresh;
@@ -68,7 +67,6 @@ public class FragmentShopMusicTopSongs extends Fragment implements AdapterView.O
         Log.d("CREATE VIEW", "Shop");
 
         View view = inflater.inflate(R.layout.layout_fragment_shop_music_top_song, container, false);
-        // TODO init widgets
 
         listTopSong = (ListView) view.findViewById(R.id.shop_music_top_song_listview);
         listTopSong.setFocusable(false);

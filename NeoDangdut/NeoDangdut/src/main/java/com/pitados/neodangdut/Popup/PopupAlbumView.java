@@ -76,6 +76,7 @@ public class PopupAlbumView extends Dialog {
     }
 
     public void showPopupAlbum(final String albumID) {
+        // Show data when loaded
         ApiManager.getInstance().setOnAlbumDetailListener(new ApiManager.OnAlbumDetailReceived() {
             @Override
             public void onDataLoaded() {

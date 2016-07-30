@@ -28,7 +28,6 @@ public class FragmentUploadedVideo extends Fragment {
     private String pageTitle;
 
     // Widgets
-    // TODO album view widgets
     ListView listVideo;
 
     CustomUploadedVideoAdapter listAdapter;
@@ -36,8 +35,6 @@ public class FragmentUploadedVideo extends Fragment {
     private boolean isLoadingMore;
 
     private ShareDialog shareDialog;
-
-    // TODO popup dialog
 
     public static FragmentUploadedVideo newInstance(int page, String title) {
         FragmentUploadedVideo home = new FragmentUploadedVideo();
@@ -66,7 +63,7 @@ public class FragmentUploadedVideo extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.layout_fragment_uploaded, container, false);
-        // TODO init widgets
+
         listVideo = (ListView) view.findViewById(R.id.list_view_uploaded);
         listVideo.setFocusable(false);
 

@@ -115,7 +115,6 @@ public class PopupArtistSong extends Dialog implements View.OnClickListener{
         albumID = data.albumID;
 
         imageLoader.displayImage(data.albumCover, thumbnail, opts);
-//        price.setText(data.price);
         title.setText(data.songTitle);
         artistName.setText(data.singerName);
         albumName.setText(data.albumName);

@@ -60,14 +60,13 @@ public class FragmentLibraryVideo extends Fragment implements AdapterView.OnItem
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.layout_fragment_library_video, container, false);
-        // TODO init widgets
+
         listViewVideo = (GridView) view.findViewById(R.id.list_view_library_video);
 
         swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.lib_video_swipe_refresh);
 
         loadData();
 
-        // TODO handle onItemClick
         listViewVideo.setOnItemClickListener(this);
 
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

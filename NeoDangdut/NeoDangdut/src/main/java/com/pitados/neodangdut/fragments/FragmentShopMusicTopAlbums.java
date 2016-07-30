@@ -26,7 +26,6 @@ public class FragmentShopMusicTopAlbums extends Fragment {
     private int pageNumber;
     private String pageTitle;
 
-    // TODO widgets
     private TextView topTitle;
     private ListView listTopAlbums;
 
@@ -61,7 +60,6 @@ public class FragmentShopMusicTopAlbums extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.layout_fragment_shop_music_top_50, container, false);
-        // TODO init widgets
 
         topTitle = (TextView) view.findViewById(R.id.shop_music_top_50_title);
         topTitle.setText("TOP 50 ALBUMS");
@@ -72,8 +70,6 @@ public class FragmentShopMusicTopAlbums extends Fragment {
         listTopAlbums.setFocusable(false);
 
         loadData();
-
-        // TODO onClick
 
         listTopAlbums.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

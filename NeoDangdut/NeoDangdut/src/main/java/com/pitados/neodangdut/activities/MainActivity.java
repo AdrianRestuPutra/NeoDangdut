@@ -216,14 +216,17 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Using custom exception handler
         Thread.setDefaultUncaughtExceptionHandler(new UncaughtException(MainActivity.this));
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Check if storage permission allowed
         isStoragePermissionGranted();
 
+        // Init in app purchase using OpenIAB
         initIAB();
 
         DataPool.getInstance().mainActivity = MainActivity.this;
@@ -280,7 +283,6 @@ public class MainActivity extends AppCompatActivity
         // Shop
         initPanelShopMusic();
         initPanelShopVideo();
-        // TODO init download
         initPanelSetting();
         initUploadForm();
         initPanelProfile();
@@ -293,34 +295,19 @@ public class MainActivity extends AppCompatActivity
         panelState = PanelState.PANEL_NEW_POST;
         ConnManager.getInstance().init(getBaseContext());
         isUploadFormShowing = false;
-        ApiManager.getInstance().setContext(MainActivity.this); // TEST
+        ApiManager.getInstance().setContext(MainActivity.this);
 
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
         ImageLoader.getInstance().init(config);
 
-        // Set base directory
-//        PackageManager pm = getPackageManager();
-//        String packageName = getPackageName();
-//        try {
-//            PackageInfo pi = pm.getPackageInfo(packageName, 0);
-//            Consts.APP_BASE_DIR = pi.applicationInfo.dataDir;
-//        } catch (PackageManager.NameNotFoundException e) {
-//            e.printStackTrace();
-//        }
+        // Default storage path
         Consts.APP_BASE_DIR = Environment.getExternalStorageDirectory()+"/NeoDangdut";
 
-        String testPath = "/sdcard/"+Consts.APP_BASE_DIR+"/Music/Salome/Salome.mp3";
-        File testFile = new File(testPath);
-
-        Log.d("TEST FILE", testFile.exists()+"");
-
-        // TODO handle floating button
         fabMenu = (FloatingActionsMenu) findViewById(R.id.fab_menu);
         fabMusic = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_upload_music);
         fabMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                showUploadForm();
                 isUploadMusic = true;
                 showFileChooser(true);
             }
@@ -330,7 +317,6 @@ public class MainActivity extends AppCompatActivity
         fabVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                showUploadForm();
                 isUploadMusic = true;
                 showFileChooser(false);
             }
@@ -345,72 +331,6 @@ public class MainActivity extends AppCompatActivity
 
         // Action Bar
         getSupportActionBar().setTitle("Neo Dangdut");
-
-//        ApiManager.getInstance().setOnUserDataListener(new ApiManager.OnUserDataReceived() {
-//            @Override
-//            public void onUserDataLoaded() {
-//                setSideMenuData();
-//            }
-//        });
-//        ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
-//            @Override
-//            public void onUserAccessTokenSaved() {
-//                if (panelState == PanelState.PANEL_SEARCH) {
-//                    // Search
-//                    ApiManager.getInstance().getSearchShopMusic(searchKey);
-//                    ApiManager.getInstance().getSearchShopVideos(searchKey);
-//                    ApiManager.getInstance().getSearchShopMusicAlbums(searchKey);
-//                    ApiManager.getInstance().getSearchCommunityMusic(searchKey);
-//                    ApiManager.getInstance().getSearchCommunityVideo(searchKey);
-//                } else if (panelState == PanelState.PANEL_TOPUP) {
-//                    Log.d("PURCHASE", "confirm");
-//                    ApiManager.getInstance().setOnConfirmIAP(new ApiManager.OnConfirmIAP() {
-//                        @Override
-//                        public void onConfirm() {
-//
-//                            billingProc.consumePurchase(sku);
-//                            ApiManager.getInstance().getUserData();
-//                        }
-//                    });
-//
-//                    ApiManager.getInstance().confirmIAP(originalJSON, purchaseSignature);
-//                } else {
-//                    ApiManager.getInstance().getUserData();
-//
-//                    ApiManager.getInstance().getLibraryMusic();
-//                    ApiManager.getInstance().getLibraryVideo();
-//
-//                    ApiManager.getInstance().getHomeBanner();
-//                    ApiManager.getInstance().getHomeTopMusic();
-//                    ApiManager.getInstance().getHomeTopVideos();
-//                    ApiManager.getInstance().getHomeLatestNews();
-//                    // SHOP MUSIC
-//                    ApiManager.getInstance().getShopMusicTopSongs();
-//                    ApiManager.getInstance().getFeaturedShopMusic();
-//                    ApiManager.getInstance().getShopMusicTopAlbums();
-//                    ApiManager.getInstance().getShopMusicNewSongs();
-//                    ApiManager.getInstance().getShopMusicAllSongs();
-//                    // SHOP VIDEO
-//                    ApiManager.getInstance().getShopVideoTopVideos();
-//                    ApiManager.getInstance().getFeaturedShopVideo();
-//                    ApiManager.getInstance().getShopVideoNewVideos();
-//                    ApiManager.getInstance().getShopVideoAllVideos();
-//
-//                    // Community
-//                    ApiManager.getInstance().getCommunityMusic();
-//                    ApiManager.getInstance().getCommunityVideo();
-//                    ApiManager.getInstance().getAllNews();
-//
-//                    ApiManager.getInstance().getUploadedMusic();
-//                    ApiManager.getInstance().getUploadedVideo();
-//                }
-//            }
-//
-//            @Override
-//            public void onError(String message) {
-//
-//            }
-//        });
 
         setHomeListener();
 
@@ -555,7 +475,7 @@ public class MainActivity extends AppCompatActivity
         musicPlayerPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                CustomMediaPlayer.getInstance().stopTrack();
+
                 if(CustomMediaPlayer.getInstance().isTrackPaused())
                     CustomMediaPlayer.getInstance().resumeTrack();
                 else
@@ -596,7 +516,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        // TODO insert widget id
         videoPlayerFullscreenButton = (ImageView) findViewById(R.id.video_player_fullscreen_button);
         videoView = (EMVideoView) findViewById(R.id.video_player_view);
         videoPlayerThumbnail = (ImageView) findViewById(R.id.video_player_thumbnail);
@@ -694,7 +613,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initPanelNewPost() {
-        // pool fragment
         List<FragmentModel> list = new ArrayList<>();
         list.add(new FragmentModel(0, "Home", FragmentHome.newInstance(0, "Home")));
         list.add(new FragmentModel(1, "Community Music", FragmentHomeMusic.newInstance(0, "Community Music")));
@@ -710,7 +628,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initPanelLibrary() {
-        // pool fragment TEST
         List<FragmentModel> list = new ArrayList<>();
         list.add(new FragmentModel(0, "Music", FragmentLibraryMusic.newInstance(0, "Music")));
         list.add(new FragmentModel(1, "Video", FragmentLibraryVideo.newInstance(1, "Video")));
@@ -792,11 +709,9 @@ public class MainActivity extends AppCompatActivity
                 if(notifIsOn) {
                     iconToggleNotif.setImageResource(R.drawable.btn_toggle_on);
 
-                    // TODO set notif on
                 } else {
                     iconToggleNotif.setImageResource(R.drawable.btn_toggle_off);
 
-                    // TODO set notif off
                 }
             }
         });
@@ -810,11 +725,9 @@ public class MainActivity extends AppCompatActivity
                 if(downloadWIFIOnlyOn) {
                     iconToggleDownload.setImageResource(R.drawable.btn_toggle_on);
 
-                    // TODO set download wifi only
                 } else {
                     iconToggleDownload.setImageResource(R.drawable.btn_toggle_off);
 
-                    // TODO set download wifi only off
                 }
             }
         });
@@ -1059,7 +972,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void closeUploadForm() {
-        // TODO cancel upload
         panelUpload.setVisibility(View.INVISIBLE);
         isUploadFormShowing = false;
     }
@@ -1224,14 +1136,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-//    public void showLoading() {
-//        panelLoading.setVisibility(View.VISIBLE);
-//    }
-//
-//    public void closeLoading() {
-//        panelLoading.setVisibility(View.INVISIBLE);
-//    }
-
     public void goToLibrary(boolean isVideo) {
         if (CustomMediaPlayer.getInstance().isNewsDetailShowing)
             CustomMediaPlayer.getInstance().closeNewsDetail();
@@ -1274,7 +1178,6 @@ public class MainActivity extends AppCompatActivity
                 Log.d("Permission", "GRANTED");
             } else {
                 Log.d("Permission", "NOT GRANTED");
-                // TODO notif user
             }
         }
     }
@@ -1308,29 +1211,9 @@ public class MainActivity extends AppCompatActivity
                     CustomMediaPlayer.getInstance().closeMusicPlayer();
                 else
                     moveTaskToBack(true);
-//                CustomMediaPlayer.getInstance().pauseTrack();
             } else {
 
                 popupExit.showPopupExit("Quit Neo Dangdut?", "Not Now", "Yes");
-//                new AlertDialog.Builder(this)
-//                        .setTitle("Quit Application")
-//                        .setMessage("Are you sure you want to quit?")
-//                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//
-//                                //Stop the activity
-//                                DataPool.getInstance().listHomeBanner.clear();
-//                                DataPool.getInstance().listHomeTopVideos.clear();
-//                                DataPool.getInstance().listHomeTopMusic.clear();
-//
-//                                MainActivity.this.finish();
-//                            }
-//
-//                        })
-//                        .setNegativeButton("Not Now", null)
-//                        .show();
             }
         }
 

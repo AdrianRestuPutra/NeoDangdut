@@ -274,6 +274,7 @@
                 </RelativeLayout>
 
                 <View
+                    android:id="@+id/last_divider"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/divider_height"
                     android:visibility="gone"

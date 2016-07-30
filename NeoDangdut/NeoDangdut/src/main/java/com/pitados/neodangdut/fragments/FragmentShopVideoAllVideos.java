@@ -26,7 +26,6 @@ public class FragmentShopVideoAllVideos extends Fragment {
     private int pageNumber;
     private String pageTitle;
 
-    // TODO widgets
     private ListView listAllVideos;
     private SwipeRefreshLayout swipeRefresh;
 
@@ -61,7 +60,6 @@ public class FragmentShopVideoAllVideos extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.layout_fragment_shop_video_all_videos, container, false);
-        // TODO init widgets
 
         listAllVideos = (ListView) view.findViewById(R.id.shop_video_all_listview);
         swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.shop_video_all_video_swipe_refresh);

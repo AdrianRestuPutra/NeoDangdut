@@ -82,6 +82,7 @@ public class ApiManager {
     private BillingProcessor billingProc;
 
     // Listener
+    private OnServerResponse serverListener;
     private OnUserAccessTokenReceived userAccessListener;
     private OnUserDataReceived userDataListener;
     private OnUserDataUpdated userDataUpdatedListener;
@@ -111,8 +112,6 @@ public class ApiManager {
     private OnCommentPushed onCommentPushedListener;
 
     private static ApiManager instance;
-
-//    public String TOKEN = "token";
 
     public String USER_ACCESS_TOKEN = "user_access_token";
     public String REFRESH_TOKEN = "refresh_token";
@@ -280,7 +279,6 @@ public class ApiManager {
 
 
     // USER DATA
-
     public void getUserData() {
         Map<String, String> params = new HashMap<>();
 
@@ -337,7 +335,8 @@ public class ApiManager {
                             DataPool.getInstance().userProfileData.totalVideo = totalVideo;
                             DataPool.getInstance().userProfileData.unplayed = unplayed;
 
-                            userDataListener.onUserDataLoaded();
+                            if(userDataListener != null)
+                                userDataListener.onUserDataLoaded();
 
                         } else {
                             String errorMessage = rawData.getString("error_description");
@@ -522,7 +521,7 @@ public class ApiManager {
                                 price, discount, singerID, singerName,
                                 labelID, labelName,
                                 description, totalPlayed, totalPurchased);
-                        if(DataPool.getInstance().listHomeTopVideos.size() < 2)
+                        if (DataPool.getInstance().listHomeTopVideos.size() < 2)
                             DataPool.getInstance().listHomeTopVideos.add(tempData);
 
                     }
@@ -532,7 +531,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(dataListener != null)
+                if (dataListener != null)
                     dataListener.onDataLoaded(ApiType.HOME_TOP_VIDEO);
             }
 
@@ -618,7 +617,7 @@ public class ApiManager {
                     JSONObject rawData = new JSONObject(result);
                     JSONArray arrCommunityMusic = rawData.getJSONArray("contents");
                     totalData = rawData.getInt("total");
-                    Log.d("MUSIC TOTAL", totalData+"");
+                    Log.d("MUSIC TOTAL", totalData + "");
 
                     for (int i = 0; i < arrCommunityMusic.length(); i++) {
                         JSONObject obj = arrCommunityMusic.getJSONObject(i);
@@ -652,7 +651,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(commMusicListener != null && prevDataCount < totalData)
+                if (commMusicListener != null && prevDataCount < totalData)
                     commMusicListener.onDataLoaded(ApiType.COMMUNITY_MUSIC);
             }
 
@@ -863,7 +862,6 @@ public class ApiManager {
             public void afterExecute(String result) {
                 Log.d("Result", result);
 
-                // TODO handle error
                 onCommentPushedListener.onSuccess();
             }
 
@@ -1971,7 +1969,7 @@ public class ApiManager {
                     JSONObject rawData = new JSONObject(result);
                     JSONArray arrCommunityMusic = rawData.getJSONArray("contents");
                     totalData = rawData.getInt("total");
-                    Log.d("MUSIC TOTAL", totalData+"");
+                    Log.d("MUSIC TOTAL", totalData + "");
 
                     for (int i = 0; i < arrCommunityMusic.length(); i++) {
                         JSONObject obj = arrCommunityMusic.getJSONObject(i);
@@ -2005,7 +2003,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(searchCommunityMusicListener != null && prevDataCount < totalData)
+                if (searchCommunityMusicListener != null && prevDataCount < totalData)
                     searchCommunityMusicListener.onDataLoaded();
             }
 
@@ -2039,7 +2037,7 @@ public class ApiManager {
                     JSONObject rawData = new JSONObject(result);
                     JSONArray arrCommunityMusic = rawData.getJSONArray("contents");
                     totalData = rawData.getInt("total");
-                    Log.d("VIDEO TOTAL", totalData+"");
+                    Log.d("VIDEO TOTAL", totalData + "");
 
                     for (int i = 0; i < arrCommunityMusic.length(); i++) {
                         JSONObject obj = arrCommunityMusic.getJSONObject(i);
@@ -2072,7 +2070,7 @@ public class ApiManager {
                     e.printStackTrace();
                 }
 
-                if(searchCommunityVideoListener != null && prevDataCount < totalData)
+                if (searchCommunityVideoListener != null && prevDataCount < totalData)
                     searchCommunityVideoListener.onDataLoaded();
             }
 
@@ -2342,8 +2340,6 @@ public class ApiManager {
     public void uploadContent(File file, String category, String name, String description) {
         String url = Consts.URL_GET_TOKEN + "/me/"+category;
 
-        Log.d("URL UPLOAD", url);
-
         try {
             RequestParams params = new RequestParams();
             params.put("name", name);
@@ -2387,19 +2383,19 @@ public class ApiManager {
         request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
             @Override
             public void afterExecute(String result) {
-                if(result != null) {
+                if (result != null) {
                     Log.d("result", result);
                     try {
                         JSONObject rawData = new JSONObject(result);
 
-                        if(rawData.has("error")) {
+                        if (rawData.has("error")) {
                             String message = rawData.getString("error");
 
                             popupLoading.setMessage("Update Failed");
                             userDataUpdatedListener.onError();
                         } else {
                             boolean status = rawData.getBoolean("status");
-                            if(status == true) {
+                            if (status == true) {
                                 // Success
                                 popupLoading.setMessage("Data Updated");
                                 userDataUpdatedListener.onUserDataUpdated();
@@ -2583,7 +2579,7 @@ public class ApiManager {
                 try {
                     JSONObject rawData = new JSONObject(result);
 
-                    if(rawData.has("error")) {
+                    if (rawData.has("error")) {
                         String message = rawData.getString("error_description");
                         Log.d("Register Failed", message);
                         popupLoading.setMessage("Register Failed");
@@ -2633,7 +2629,6 @@ public class ApiManager {
                 } catch (JSONException e) {
                     e.printStackTrace();
 
-//                    popupLoading.setMessage("Register Failed");
                 }
             }
 
@@ -2647,9 +2642,34 @@ public class ApiManager {
 
     // IAP COMMAND
     public void topUpCredit(String productID) {
-        Log.d("TOP UP", "TEST");
         billingProc.purchase(activity, productID);
     }
+
+    public void isServerActive() {
+        Map<String, String> params = new HashMap<>();
+
+        HttpPostUtil request = new HttpPostUtil(Consts.URL_GET_TOKEN, "", params);
+
+        request.setOnHttpPostUtilListener(new HttpPostUtil.HttpPostUtilListener() {
+            @Override
+            public void afterExecute(String result) {
+                if (result != null) {
+                    serverListener.onReceived();
+                } else {
+                    serverListener.onError();
+                }
+            }
+
+            @Override
+            public void beforeExecute() {
+
+            }
+        });
+
+        request.execute();
+    }
+
+    public void setOnServerListener(OnServerResponse listener) { this.serverListener = listener; }
 
     public void setOnUserAccessTokenReceved(OnUserAccessTokenReceived listener) { this.userAccessListener = listener; }
     public void setOnHomeListener(OnHomeDataReceived listener) { this.dataListener =  listener; }
@@ -2694,6 +2714,11 @@ public class ApiManager {
 
     public void setOnCommentReceivedListener(OnCommentReceived listener) { this.onCommentListener = listener; }
     public void setOnCommentPushedListener(OnCommentPushed listener) { this.onCommentPushedListener = listener; }
+
+    public interface OnServerResponse {
+        void onReceived();
+        void onError();
+    }
 
     public interface OnUserAccessTokenReceived {
         void onUserAccessTokenSaved();

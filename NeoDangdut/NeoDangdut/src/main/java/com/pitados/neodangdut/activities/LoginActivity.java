@@ -87,10 +87,23 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // Init FB
         initFB();
 
-        if(userLoginData.getUsername().length() > 0 || userLoginData.getLoginWithFB() == true) { // TODO and FB
-            // TODO intent to main activity
-            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-            LoginActivity.this.finish();
+        // If user already login go straight to main activity
+        if(userLoginData.getUsername().length() > 0 || userLoginData.getLoginWithFB() == true) {
+            ApiManager.getInstance().setOnServerListener(new ApiManager.OnServerResponse() {
+                @Override
+                public void onReceived() {
+                    // TODO intent to main activity
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    LoginActivity.this.finish();
+                }
+
+                @Override
+                public void onError() {
+                    Toast.makeText(getBaseContext(), "Server Unreachable", Toast.LENGTH_SHORT).show();
+                }
+            });
+            ApiManager.getInstance().isServerActive();
+
         } else {
             popupLoading = new PopupLoading(LoginActivity.this, R.style.custom_dialog);
             popupForgot = new PopupForgot(LoginActivity.this, R.style.custom_dialog);
@@ -136,9 +149,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                                 userLoginData.setRefreshToken(refreshToken);
 
-                                popupLoading.closePopupLoading();
-                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                LoginActivity.this.finish();
+                                ApiManager.getInstance().setOnServerListener(new ApiManager.OnServerResponse() {
+                                    @Override
+                                    public void onReceived() {
+                                        // TODO intent to main activity
+                                        popupLoading.closePopupLoading();
+                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                        LoginActivity.this.finish();
+                                    }
+
+                                    @Override
+                                    public void onError() {
+                                        Toast.makeText(getBaseContext(), "Server Unreachable", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                ApiManager.getInstance().isServerActive();
                             }
 
                             @Override
@@ -228,6 +253,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         signupButton.setOnClickListener(this);
     }
 
+    // Validate input data from user
     private void validateLoginForm() {
         String username = loginUsername.getText().toString();
         String password = loginPassword.getText().toString();

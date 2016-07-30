@@ -38,21 +38,18 @@ public class BannerModel {
         if(sub.contains("album")) {
             dataType = BannerType.ALBUM;
             dataID = stripNonDigits(sub);
-            // Album
         } else if(sub.contains("news")) {
             dataType = BannerType.ARTICLE;
             dataID = stripNonDigits(sub);
-            // News
         } else if(sub.contains("event")) {
             dataType = BannerType.EVENT;
-            // Event
         }
     }
 
     private String stripNonDigits(
-            final CharSequence input /* inspired by seh's comment */){
+            final CharSequence input){
         final StringBuilder sb = new StringBuilder(
-                input.length() /* also inspired by seh's comment */);
+                input.length());
         for(int i = 0; i < input.length(); i++){
             final char c = input.charAt(i);
             if(c > 47 && c < 58){

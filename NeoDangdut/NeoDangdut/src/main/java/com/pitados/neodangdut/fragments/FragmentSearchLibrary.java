@@ -24,7 +24,6 @@ public class FragmentSearchLibrary extends Fragment {
     private int pageNumber;
     private String pageTitle;
 
-    // TODO widgets
     private ListView listAllSong;
 
     private CustomListShopMusicAdapter listAdapter;
@@ -61,57 +60,6 @@ public class FragmentSearchLibrary extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.layout_fragment_search_library, container, false);
-        // TODO init widgets
-
-//        listAllSong = (ListView) view.findViewById(R.id.shop_music_all_song_listview);
-//        swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.shop_music_all_song_swipe_refresh);
-//        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                ApiManager.getInstance().getUserAccessToken();
-//                ApiManager.getInstance().setOnUserAccessTokenReceved(new ApiManager.OnUserAccessTokenReceived() {
-//
-//                    @Override
-//                    public void onUserAccessTokenSaved() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(String message) {
-//
-//                    }
-//                });
-//            }
-//        });
-//
-//        popupAlbum = new PopupAlbumView(context, R.style.custom_dialog);
-//
-//        loadData();
-//
-//        listAllSong.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                CustomMediaPlayer.getInstance().playTrack(DataPool.getInstance().listShopMusicAllSongs.get(i), true);
-//            }
-//        });
-//
-//        listAllSong.setOnScrollListener(new AbsListView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(AbsListView absListView, int i) {
-//
-//            }
-//
-//            @Override
-//            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-//                int lastItem = firstVisibleItem + visibleItemCount;
-//
-//                if (lastItem == totalItemCount && totalItemCount != 0) {
-//                    loadMore();
-//                }
-//            }
-//        });
-//
-//        listAllSong.setFastScrollEnabled(true);
 
         return view;
     }

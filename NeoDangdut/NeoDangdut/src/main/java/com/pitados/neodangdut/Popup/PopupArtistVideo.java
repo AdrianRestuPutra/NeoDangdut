@@ -80,7 +80,6 @@ public class PopupArtistVideo extends Dialog implements View.OnClickListener{
         videoData = data;
 
         imageLoader.displayImage(data.cover, thumbnail, opts);
-//        price.setText(data.price);
         title.setText(data.videoTitle);
         artistName.setText(data.singerName);
         viewCount.setText("0");
